@@ -1,0 +1,240 @@
+/**
+ * MEDICAL STUDY WEBAPP - RICH DARK THEME
+ * Engineered for long clinical study sessions:
+ * - Multi-tiered surface depth (base midnight, slate surface, elevated indigo-slate)
+ * - Luminous, rich cyan, violet, and emerald ambient glows
+ * - Comfortable soft off-white text contrast without harsh glare
+ * - Clearly visible yet elegant borders
+ */
+
+[data-theme="dark"] {
+  --theme-mode: dark;
+
+  /* Deep layered surfaces with perceptible depth */
+  --bg-body: #090d16;                /* Deep midnight slate base */
+  --bg-body-secondary: #0d1424;      /* Slightly lifted slate */
+  --bg-surface: #131c31;             /* Primary card & section surface */
+  --bg-surface-elevated: #1a2642;    /* Elevated widgets, dropdowns, sticky elements */
+  --bg-surface-hover: #223254;       /* Interactive hover state */
+  --bg-sidebar: #0b111e;             /* Right navigation drawer base */
+  --bg-sidebar-elevated: #152038;    /* Nav items & headers */
+  --bg-glass: rgba(15, 23, 42, 0.85); /* Frosted blur overlay */
+  --bg-overlay: rgba(3, 7, 18, 0.75); /* Modal / drawer backdrop */
+
+  /* Comfortable, glare-free typography */
+  --text-primary: #f1f5f9;           /* Soft off-white, high contrast but zero eye strain */
+  --text-secondary: #cbd5e1;         /* Luminous cool slate for supporting text */
+  --text-muted: #94a3b8;             /* Readable metadata & footnotes */
+  --text-subtle: #64748b;            /* Icons & inactive anchors */
+  --text-inverse: #090d16;
+
+  /* Visible, soft borders */
+  --border-subtle: #1e2d4a;          /* Soft separation */
+  --border-default: #2a3c61;         /* Clear structural borders */
+  --border-strong: #405888;          /* Highlighting borders */
+  --border-focus: #38bdf8;           /* Focus ring */
+
+  /* Rich, vibrant accents in dark mode */
+  --accent-primary: #38bdf8;         /* Luminous Sky Cyan */
+  --accent-primary-hover: #7dd3fc;
+  --accent-primary-light: #082f49;
+  --accent-primary-subtle: rgba(56, 189, 248, 0.14);
+
+  --accent-secondary: #818cf8;       /* Luminous Indigo/Violet */
+  --accent-secondary-hover: #a5b4fc;
+  --accent-secondary-light: #1e1b4b;
+
+  /* Semantic Alerts in Dark Mode */
+  --state-success: #34d399;
+  --state-success-bg: rgba(6, 78, 59, 0.45);
+  --state-success-border: #059669;
+
+  --state-warning: #fbbf24;
+  --state-warning-bg: rgba(120, 53, 15, 0.45);
+  --state-warning-border: #d97706;
+
+  --state-danger: #f87171;
+  --state-danger-bg: rgba(127, 29, 29, 0.45);
+  --state-danger-border: #dc2626;
+
+  --state-info: #38bdf8;
+  --state-info-bg: rgba(12, 74, 110, 0.45);
+  --state-info-border: #0284c7;
+
+  /* Shadows with glow */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 14px -2px rgba(0, 0, 0, 0.6), 0 2px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.7), 0 6px 14px -2px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 22px 38px -6px rgba(0, 0, 0, 0.85);
+  --shadow-glow-accent: 0 0 28px rgba(56, 189, 248, 0.32);
+
+  /* Deep Glowing Ambient Meshes (rich saturated colors, never flat gray!) */
+  --ambient-mesh-1: radial-gradient(circle at 12% 20%, rgba(56, 189, 248, 0.15) 0%, transparent 55%);
+  --ambient-mesh-2: radial-gradient(circle at 88% 65%, rgba(129, 140, 248, 0.13) 0%, transparent 50%);
+  --ambient-mesh-3: radial-gradient(circle at 45% 90%, rgba(52, 211, 153, 0.11) 0%, transparent 45%);
+
+  /* Header & Card Gradients */
+  --grad-primary: linear-gradient(135deg, #0284c7 0%, #3b82f6 50%, #6366f1 100%);
+  --grad-surface: linear-gradient(180deg, rgba(19, 28, 49, 0.95) 0%, rgba(13, 20, 36, 0.95) 100%);
+  --grad-accent-card: linear-gradient(135deg, rgba(8, 47, 73, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
+  --grad-warning-card: linear-gradient(135deg, rgba(120, 53, 15, 0.5) 0%, rgba(20, 15, 10, 0.6) 100%);
+
+  /* ==========================================================================
+     COMPONENT COMPATIBILITY ALIASES (Dark Mode)
+     ========================================================================== */
+  --color-primary: var(--accent-primary);
+  --color-primary-light: var(--accent-primary-light);
+  --color-primary-hover: var(--accent-primary-hover);
+  --color-accent: var(--accent-secondary);
+  --color-accent-light: var(--accent-secondary-light);
+  --color-accent-bg: var(--accent-secondary-light);
+  --color-surface: var(--bg-surface-elevated);
+  --color-surface-subtle: #223254;
+  --color-bg: var(--bg-body);
+  --color-border: #3b507a;
+  --color-border-subtle: #243556;
+  --color-border-strong: #4f6b9e;
+  --color-text: var(--text-primary);
+  --color-text-muted: var(--text-muted);
+  --color-danger: var(--state-danger);
+  --color-danger-bg: var(--state-danger-bg);
+  --color-danger-border: var(--state-danger-border);
+  --color-warning: var(--state-warning);
+  --color-warning-bg: var(--state-warning-bg);
+  --color-warning-border: var(--state-warning-border);
+  --color-success: var(--state-success);
+  --color-success-bg: var(--state-success-bg);
+  --color-success-border: var(--state-success-border);
+}
+
+/* Dark Mode Card & Table Visual Depth */
+[data-theme="dark"] .study-section {
+  background-color: var(--bg-surface);
+  border-color: var(--border-default);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .medical-card,
+[data-theme="dark"] .clinical-card,
+[data-theme="dark"] .key-fact-card,
+[data-theme="dark"] .hazard-card,
+[data-theme="dark"] .timeline-card,
+[data-theme="dark"] .historical-milestone-card {
+  background-color: var(--bg-surface-elevated);
+  border-color: #31446b;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .data-table th,
+[data-theme="dark"] .medical-table th {
+  background-color: #1e2c4c;
+  color: #f1f5f9;
+  border-block-end: 2px solid var(--accent-primary);
+  border-inline-end: 1px solid #2a3d66;
+}
+
+[data-theme="dark"] .data-table td,
+[data-theme="dark"] .medical-table td {
+  border-block-end: 1px solid #243556;
+  border-inline-end: 1px solid #243556;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .data-table tr:nth-child(even) td,
+[data-theme="dark"] .medical-table tr:nth-child(even) td {
+  background-color: rgba(26, 38, 66, 0.45);
+}
+
+/* Dark Mode Card Headers with Saturated Contrast */
+[data-theme="dark"] .card-header.bg-primary {
+  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .card-header.bg-info {
+  background: linear-gradient(135deg, #075985 0%, #0284c7 100%) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .card-header.bg-success {
+  background: linear-gradient(135deg, #064e3b 0%, #047857 100%) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .card-header.bg-warning {
+  background: linear-gradient(135deg, #78350f 0%, #b45309 100%) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .card-header.bg-danger {
+  background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .card-header.bg-accent {
+  background: linear-gradient(135deg, #312e81 0%, #4338ca 100%) !important;
+  color: #ffffff !important;
+}
+
+/* Dark Mode Shift Timeline / Pathogenesis Nodes */
+[data-theme="dark"] .shift-node {
+  background-color: var(--bg-surface-elevated);
+  border-color: #31446b;
+  border-inline-start-color: var(--accent-primary);
+}
+
+[data-theme="dark"] .shift-date-badge {
+  background-color: #223254;
+  border-color: #3b507a;
+  color: #38bdf8;
+}
+
+/* Dark Mode Callout Overrides */
+[data-theme="dark"] .medical-callout,
+[data-theme="dark"] .clinical-callout-card {
+  background-color: #162036;
+  border-color: #2e4168;
+}
+
+[data-theme="dark"] .medical-callout.callout-info {
+  background-color: rgba(14, 165, 233, 0.12);
+  border-color: rgba(14, 165, 233, 0.35);
+  border-inline-start-color: #38bdf8;
+}
+
+[data-theme="dark"] .medical-callout.callout-warning {
+  background-color: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  border-inline-start-color: #fbbf24;
+}
+
+[data-theme="dark"] .medical-callout.callout-danger {
+  background-color: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  border-inline-start-color: #f87171;
+}
+
+[data-theme="dark"] .medical-callout.callout-primary {
+  background-color: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.35);
+  border-inline-start-color: #60a5fa;
+}
+
+/* Dark Mode Code Styling */
+[data-theme="dark"] code {
+  background-color: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.28);
+  font-weight: 500;
+}
+
+/* Dark Mode Card Header Badges */
+[data-theme="dark"] .card-header .badge,
+[data-theme="dark"] .card-header .badge-subtle {
+  background: rgba(0, 0, 0, 0.3) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+

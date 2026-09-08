@@ -1,0 +1,63 @@
+/**
+ * MEDICAL STUDY WEBAPP - PRINT STYLESHEET
+ * Clean, high-contrast black-and-white output for offline paper study.
+ */
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+  }
+
+  .ambient-bg,
+  .app-header,
+  .app-sidebar,
+  .mobile-drawer,
+  .drawer-backdrop,
+  .reading-progress-bar-container,
+  .search-modal-backdrop,
+  .section-actions,
+  .toast-container,
+  .mobile-nav-toggle {
+    display: none !important;
+  }
+
+  .app-layout {
+    display: block !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .app-content {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .chapter-hero {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    background: #fafafa !important;
+    page-break-after: avoid;
+  }
+
+  .study-section {
+    page-break-inside: avoid;
+  }
+
+  .medical-table {
+    border: 1px solid #333 !important;
+  }
+
+  .medical-table th, .medical-table td {
+    border: 1px solid #ccc !important;
+    color: #000 !important;
+  }
+
+  a {
+    color: #000 !important;
+    text-decoration: none !important;
+  }
+}
