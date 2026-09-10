@@ -156,6 +156,8 @@ window.ComponentRenderer = {
       sectionBody = this.renderChapter28Section(section);
     } else if (chapterId === 'ch-29') {
       sectionBody = this.renderChapter29Section(section);
+    } else if (chapterId === 'ch-30') {
+      sectionBody = this.renderChapter30Section(section);
     } else {
       sectionBody = `<p>${section.summary || ''}</p>`;
     }
@@ -6694,6 +6696,25 @@ window.ComponentRenderer = {
           <div class="callout-content"><p>${sec.summary || ''}</p></div>
         </div>
 
+        <div class="grid-4" style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-block-end: var(--space-6);">
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-danger);">
+            <div class="stat-value" style="color: var(--state-danger); font-size: 1.65rem; font-weight: 800;">۱۰۰٪</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">کشندگی پس از ظهور علائم بالینی</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-success);">
+            <div class="stat-value" style="color: var(--state-success); font-size: 1.65rem; font-weight: 800;">۱۰۰٪</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">قابلیت پیشگیری با واکسیناسیون به موقع</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--color-primary);">
+            <div class="stat-value" style="color: var(--color-primary); font-size: 1.65rem; font-weight: 800;">۱۸۰,۰۰۰+</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">حیوان‌گزیدگی سالانه ثبت‌شده در ایران</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid #4338ca;">
+            <div class="stat-value" style="color: #4338ca; font-size: 1.65rem; font-weight: 800;">۷۰۰+</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">مرکز درمان و پیشگیری هاری در کشور</div>
+          </div>
+        </div>
+
         <h3 style="margin-block-end: var(--space-3);">ویژگی‌های عمومی و زیست‌شناختی ویروس هاری</h3>
         <div class="grid-2" style="margin-block-end: var(--space-6);">
           <div class="key-fact-card">
@@ -6778,7 +6799,7 @@ window.ComponentRenderer = {
 
       const primaryCards = primaryTrans.map(t => `
         <div class="stage-step-card">
-          <div class="step-num-badge">مسیر اصلی</div>
+          <div class="step-num-badge" style="background: var(--color-primary); color: #fff;">اصلی</div>
           <div style="flex: 1;">
             <strong style="color: var(--text-primary); display: block; margin-block-end: 4px;">${t.mode || ''}</strong>
             <span style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed);">${t.detail || ''}</span>
@@ -6788,7 +6809,7 @@ window.ComponentRenderer = {
 
       const rareCards = rareTrans.map(t => `
         <div class="stage-step-card">
-          <div class="step-num-badge" style="background: var(--state-warning);">نادر</div>
+          <div class="step-num-badge" style="background: var(--state-warning); color: #fff;">نادر</div>
           <div style="flex: 1;">
             <strong style="color: var(--text-primary); display: block; margin-block-end: 4px;">${t.mode || ''}</strong>
             <span style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed);">${t.detail || ''}</span>
@@ -6925,6 +6946,7 @@ window.ComponentRenderer = {
 
         <h3 style="margin-block-end: var(--space-3);">اقدامات پیشگیری اولیه در سطح جامعه (Primary Prevention)</h3>
         <div class="clinical-card" style="margin-block-end: var(--space-6);">
+          <div class="card-header bg-success text-white"><strong>محورهای پنج‌گانه استراتژی پیشگیری اولیه در جمعیت‌های انسانی و حیوانی</strong></div>
           <div class="card-body">
             <ul style="margin: 0; padding-inline-start: 20px; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">
               ${primary.map(p => `<li style="margin-block-end: 6px;">${p}</li>`).join('')}
@@ -6955,7 +6977,7 @@ window.ComponentRenderer = {
 
       const stepCards = steps.map(s => `
         <div class="stage-step-card">
-          <div class="step-num-badge">${s.step}</div>
+          <div class="step-num-badge" style="background: var(--color-primary); color: #fff;">${s.step}</div>
           <div style="flex: 1;">
             <strong style="color: var(--text-primary); font-size: 1rem; display: block; margin-block-end: 4px;">${s.name || ''}</strong>
             <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed);">${s.detail || ''}</p>
@@ -7049,7 +7071,7 @@ window.ComponentRenderer = {
 
       const spRows = species.map(s => `
         <tr>
-          <td><code style="font-weight: 700;">${s.species || ''}</code></td>
+          <td><span class="badge badge-subtle" style="font-family: monospace; font-size: 0.95rem; font-weight: 700;">${s.species || ''}</span></td>
           <td><strong>${s.primaryHost || ''}</strong></td>
           <td style="font-size: var(--font-size-sm);">${s.humanPathogenicity || ''}</td>
         </tr>
@@ -7066,6 +7088,21 @@ window.ComponentRenderer = {
         <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
           <div class="callout-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
           <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="grid-3" style="margin-block-end: var(--space-6);">
+          <div class="stat-card" style="border-inline-start: 4px solid var(--color-primary);">
+            <div class="stat-value" style="color: var(--color-primary); font-size: 1.65rem; font-weight: 800;">۸ به ۱</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">نسبت عفونت‌های بدون‌علامت (ساب‌کلینیکال) به علامت‌دار</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-warning);">
+            <div class="stat-value" style="color: var(--state-warning); font-size: 1.65rem; font-weight: 800;">۲ الی ۳ ماه</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">حداقل ماندگاری پنیر سنتی در آب‌نمک ۱۷٪ جهت سلامت</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-danger);">
+            <div class="stat-value" style="color: var(--state-danger); font-size: 1.65rem; font-weight: 800;">B. melitensis ۱</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">شایع‌ترین، حادترین و مهاجم‌ترین سویه بومی در ایران</div>
+          </div>
         </div>
 
         <h3 style="margin-block-end: var(--space-3);">کلیات و تابلوی بالینی تب مالت (بروسلوز)</h3>
@@ -7110,6 +7147,7 @@ window.ComponentRenderer = {
 
         <h3 style="margin-block-end: var(--space-3);">خسارات دامی و اقتصادی بروسلوز</h3>
         <div class="clinical-card" style="margin-block-end: var(--space-6);">
+          <div class="card-header bg-warning text-white"><strong>پیامدهای اقتصادی و خسارات سنگین به صنعت دامپروری</strong></div>
           <div class="card-body">
             <ul style="margin: 0; padding-inline-start: 20px; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">
               ${econ.map(ec => `<li style="margin-block-end: 6px;">${ec}</li>`).join('')}
@@ -7148,7 +7186,7 @@ window.ComponentRenderer = {
 
       const transCards = trans.map(t => `
         <div class="stage-step-card">
-          <div class="step-num-badge">انتقال</div>
+          <div class="step-num-badge" style="background: var(--color-primary); color: #fff;">انتقال</div>
           <div style="flex: 1;">
             <strong style="color: var(--text-primary); display: block; margin-block-end: 4px;">${t.route || ''}</strong>
             <span style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed);">${t.detail || ''}</span>
@@ -7186,7 +7224,7 @@ window.ComponentRenderer = {
 
       const testRows = tests.map(t => `
         <tr>
-          <td style="width: 200px;"><code>${t.name || ''}</code></td>
+          <td style="width: 200px;"><code style="font-weight: 700; color: var(--color-primary);">${t.name || ''}</code></td>
           <td style="font-size: var(--font-size-sm);">${t.role || ''}</td>
         </tr>
       `).join('');
@@ -7265,13 +7303,11 @@ window.ComponentRenderer = {
       const matrix = sec.matrixComparison || [];
       const rows = matrix.map(m => `
         <tr>
-          <td style="width: 200px; font-weight: 700; background-color: var(--color-surface-subtle);">${m.parameter || ''}</td>
+          <td style="width: 180px; font-weight: 700; background-color: var(--color-surface-subtle);">${m.parameter || ''}</td>
           <td style="border-inline-start: 2px solid var(--state-danger-subtle);">
-            <strong style="color: var(--state-danger); display: block; margin-block-end: 3px;">هاری (Rabies):</strong>
             ${m.rabies || ''}
           </td>
           <td style="border-inline-start: 2px solid var(--color-primary-light);">
-            <strong style="color: var(--color-primary); display: block; margin-block-end: 3px;">تب مالت (Brucellosis):</strong>
             ${m.brucellosis || ''}
           </td>
         </tr>
@@ -7288,9 +7324,9 @@ window.ComponentRenderer = {
           <table class="medical-table">
             <thead>
               <tr>
-                <th style="width: 200px;">مؤلفه مقایسه</th>
-                <th style="background: rgba(220, 38, 38, 0.08); color: var(--state-danger);">هاری (Rabies)</th>
-                <th style="background: rgba(2, 132, 199, 0.08); color: var(--color-primary);">تب مالت (Brucellosis)</th>
+                <th style="width: 180px;">مؤلفه مقایسه</th>
+                <th style="background: rgba(220, 38, 38, 0.08); color: var(--state-danger); font-weight: 800;">هاری (Rabies)</th>
+                <th style="background: rgba(2, 132, 199, 0.08); color: var(--color-primary); font-weight: 800;">تب مالت (Brucellosis)</th>
               </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -7302,7 +7338,7 @@ window.ComponentRenderer = {
     return `<p>${sec.summary || ''}</p>`;
   },
 
-  bindSectionActions(container) {
+    bindSectionActions(container) {
     container.querySelectorAll('.btn-bookmark').forEach(btn => {
       btn.addEventListener('click', () => {
         const secId = btn.getAttribute('data-section-id');
