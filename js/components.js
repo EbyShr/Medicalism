@@ -6664,7 +6664,645 @@ window.ComponentRenderer = {
     return `<p>${sec.summary || ''}</p>`;
   },
 
-    bindSectionActions(container) {
+    
+  /* =========================================================================
+     CHAPTER 30 RENDERERS (RABIES & BRUCELLOSIS)
+     ========================================================================= */
+  renderChapter30Section(sec) {
+    if (!sec) return '';
+
+    if (sec.id === 'ch30-sec01') {
+      const pa = sec.pathogenAttributes || {};
+      const patterns = sec.epidemiologicPatterns || [];
+      const de = sec.descriptiveEpidemiology || {};
+      const iran = sec.iranStatus || {};
+
+      const patternCards = patterns.map(p => `
+        <div class="clinical-card">
+          <div class="card-header bg-danger text-white d-flex align-center gap-2">
+            <span class="icon">🐺</span><strong>${p.pattern || ''}</strong>
+          </div>
+          <div class="card-body">
+            <p style="margin: 0; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">${p.cycle || ''}</p>
+          </div>
+        </div>
+      `).join('');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">ویژگی‌های عمومی و زیست‌شناختی ویروس هاری</h3>
+        <div class="grid-2" style="margin-block-end: var(--space-6);">
+          <div class="key-fact-card">
+            <div class="card-label">عامل اتیولوژیک</div>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);">${pa.etiology || ''}</p>
+          </div>
+          <div class="key-fact-card">
+            <div class="card-label">ماهیت عفونت</div>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);">${pa.nature || ''}</p>
+          </div>
+          <div class="key-fact-card" style="border-inline-start: 4px solid var(--state-danger);">
+            <div class="card-label" style="color: var(--state-danger);">میزان کشندگی (CFR)</div>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);">${pa.caseFatalityRate || ''}</p>
+          </div>
+          <div class="key-fact-card" style="border-inline-start: 4px solid var(--color-primary);">
+            <div class="card-label" style="color: var(--color-primary);">ویژگی منحصربه‌فرد کلینیکی</div>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);">${pa.uniqueFeature || ''}</p>
+          </div>
+          <div class="key-fact-card">
+            <div class="card-label">میزبانان و مخازن طبیعی</div>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);">${pa.naturalReservoirs || ''}</p>
+          </div>
+          <div class="key-fact-card">
+            <div class="card-label">حساسیت و مقاومت ذاتی انسان</div>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);">${pa.susceptibility || ''}</p>
+          </div>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">الگوهای سه‌گانه اپیدمیولوژیک هاری</h3>
+        <div class="grid-3" style="margin-block-end: var(--space-6);">${patternCards}</div>
+
+        <h3 style="margin-block-end: var(--space-3);">اپیدمیولوژی توصیفی (فرد، مکان، زمان)</h3>
+        <div class="grid-2" style="margin-block-end: var(--space-6);">
+          <div class="clinical-card">
+            <div class="card-header bg-primary text-white"><strong>سیمای سنی و جنسی</strong></div>
+            <div class="card-body">
+              <p style="margin-block-end: var(--space-2); font-size: var(--font-size-sm);"><strong>توزیع سنی:</strong> ${de.age || ''}</p>
+              <p style="margin: 0; font-size: var(--font-size-sm);"><strong>توزیع جنسی:</strong> ${de.gender || ''}</p>
+            </div>
+          </div>
+          <div class="clinical-card">
+            <div class="card-header bg-info text-white"><strong>مشاغل پرخطر و فصول بروز</strong></div>
+            <div class="card-body">
+              <p style="margin-block-end: var(--space-2); font-size: var(--font-size-sm);"><strong>گروه‌های شغلی:</strong> ${de.highRiskOccupations || ''}</p>
+              <p style="margin: 0; font-size: var(--font-size-sm);"><strong>توزیع زمانی (فصل):</strong> ${de.seasonality || ''}</p>
+            </div>
+          </div>
+          <div class="clinical-card" style="grid-column: 1 / -1;">
+            <div class="card-header bg-accent text-white"><strong>بار جهانی بیماری و مناطق گرمسیری</strong></div>
+            <div class="card-body">
+              <p style="margin: 0; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">${de.globalBurden || ''}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="historical-milestone-card" style="border-inline-start-color: var(--state-danger);">
+          <div class="historical-milestone-header">
+            <span class="icon">📍</span>
+            <strong>وضعیت اپیدمیولوژیک هاری در ایران و هدف‌گذاری WHO</strong>
+          </div>
+          <div class="historical-milestone-body">
+            <p style="margin-block-end: var(--space-2);"><strong>اندامیسیته:</strong> ${iran.endemicity || ''}</p>
+            <p style="margin-block-end: var(--space-2);"><strong>کانون‌های پرخطر:</strong> ${iran.highRiskHotspots || ''}</p>
+            <p style="margin-block-end: var(--space-2);"><strong>سهم حیوانات گزنده:</strong> ${iran.animalBitesShare || ''}</p>
+            <p style="margin-block-end: var(--space-2);"><strong>آمار سالیانه:</strong> ${iran.annualIncidence || ''}</p>
+            <div style="background: var(--color-surface-subtle); padding: 10px 14px; border-radius: var(--radius-sm); border-inline-start: 4px solid var(--state-success); margin-block-start: 8px;">
+              <strong style="color: var(--state-success);">چشم‌انداز ۲۰۳۰:</strong> ${iran.who2030Goal || ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (sec.id === 'ch30-sec02') {
+      const trans = sec.transmissionRoutes || {};
+      const primaryTrans = trans.primary || [];
+      const rareTrans = trans.rare || [];
+      const tissueFacts = trans.tissueViabilityFacts || [];
+      const inc = sec.incubationFactors || {};
+      const incDet = inc.keyDeterminants || [];
+      const stages = sec.clinicalStages || [];
+
+      const primaryCards = primaryTrans.map(t => `
+        <div class="stage-step-card">
+          <div class="step-num-badge">مسیر اصلی</div>
+          <div style="flex: 1;">
+            <strong style="color: var(--text-primary); display: block; margin-block-end: 4px;">${t.mode || ''}</strong>
+            <span style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed);">${t.detail || ''}</span>
+          </div>
+        </div>
+      `).join('');
+
+      const rareCards = rareTrans.map(t => `
+        <div class="stage-step-card">
+          <div class="step-num-badge" style="background: var(--state-warning);">نادر</div>
+          <div style="flex: 1;">
+            <strong style="color: var(--text-primary); display: block; margin-block-end: 4px;">${t.mode || ''}</strong>
+            <span style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed);">${t.detail || ''}</span>
+          </div>
+        </div>
+      `).join('');
+
+      const incCards = incDet.map(d => `
+        <div class="key-fact-card">
+          <div class="card-label">${d.factor || ''}</div>
+          <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed);">${d.desc || ''}</p>
+        </div>
+      `).join('');
+
+      const stageCards = stages.map((st, idx) => `
+        <div class="flow-step" style="padding: 16px 20px; align-items: flex-start;">
+          <span class="step-badge" style="${idx === 3 ? 'background: var(--state-danger);' : ''}">${idx + 1}</span>
+          <div style="flex: 1;">
+            <div class="d-flex justify-between align-center flex-wrap gap-1" style="margin-block-end: 6px;">
+              <strong style="color: var(--text-primary); font-size: 1.05rem;">${st.stage || ''}</strong>
+              <span class="badge badge-warning">${st.duration || ''}</span>
+            </div>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed);">${st.symptoms || ''}</p>
+          </div>
+        </div>
+      `).join('<div class="flow-arrow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="7 10 12 15 17 10"></polyline></svg></div>');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="historical-milestone-card" style="border-inline-start-color: var(--color-primary); margin-block-end: var(--space-6);">
+          <div class="historical-milestone-header">
+            <span class="icon">🧠</span>
+            <strong>مکانیسم پاتوژنز و صعود رتروگراد آکسونی ویروس</strong>
+          </div>
+          <div class="historical-milestone-body">
+            <p style="margin: 0; font-size: 0.95rem; line-height: var(--line-height-relaxed);">${sec.pathogenesisMechanism || ''}</p>
+          </div>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">راه‌های اولیه و متداول انتقال</h3>
+        <div class="grid-2" style="margin-block-end: var(--space-6);">${primaryCards}</div>
+
+        <h3 style="margin-block-end: var(--space-3);">مسیرهای نادر انتقال و نکات بافتی ویروس</h3>
+        <div class="grid-2" style="margin-block-end: var(--space-4);">${rareCards}</div>
+
+        <div class="clinical-card" style="margin-block-end: var(--space-6);">
+          <div class="card-header bg-info text-white"><strong>نکات کلیدی زیست‌پذیری بافتی ویروس هاری</strong></div>
+          <div class="card-body">
+            <ul style="margin: 0; padding-inline-start: 20px; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">
+              ${tissueFacts.map(f => `<li style="margin-block-end: 6px;">${f}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">دوره نهفتگی (کمون) و عوامل مؤثر بر آن</h3>
+        <p style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-block-end: var(--space-3);"><strong>طول دوره معمول:</strong> ${inc.typicalDuration || ''}</p>
+        <div class="grid-2" style="margin-block-end: var(--space-6);">${incCards}</div>
+
+        <div class="medical-callout callout-warning" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
+          <div class="callout-content">
+            <strong style="display: block; margin-block-end: 4px; font-size: 1rem;">قانون زرین ۱۰ روزه قرنطینه حیوان مهاجم (سگ و گربه):</strong>
+            <p style="margin: 0; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">${inc.tenDayQuarantineRule || ''}</p>
+          </div>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">سیر بالینی و مراحل چهارگانه بیماری هاری در انسان</h3>
+        <div class="cycle-flow-container">${stageCards}</div>
+      `;
+    }
+
+    if (sec.id === 'ch30-sec03') {
+      const defs = sec.caseDefinitions || [];
+      const lab = sec.laboratoryDiagnosis || {};
+      const antemortem = lab.antemortem || [];
+      const postmortem = lab.postmortem || [];
+      const primary = sec.primaryPrevention || [];
+      const prep = sec.prepProtocol || {};
+
+      const defCards = defs.map(d => `
+        <div class="clinical-card">
+          <div class="card-header bg-primary text-white d-flex justify-between align-center">
+            <strong>${d.type || ''}</strong>
+            <span class="badge badge-subtle">تعریف استاندارد کشوری</span>
+          </div>
+          <div class="card-body">
+            <p style="margin: 0; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">${d.criteria || ''}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const anteItems = antemortem.map(a => `
+        <li style="margin-block-end: 8px;">
+          <strong style="color: var(--color-primary);">${a.method || ''}:</strong>
+          <span style="font-size: var(--font-size-sm); color: var(--text-secondary);"> ${a.desc || ''}</span>
+        </li>
+      `).join('');
+
+      const postItems = postmortem.map(p => `
+        <li style="margin-block-end: 8px;">
+          <strong style="color: var(--state-danger);">${p.method || ''}:</strong>
+          <span style="font-size: var(--font-size-sm); color: var(--text-secondary);"> ${p.desc || ''}</span>
+        </li>
+      `).join('');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">تعاریف استاندارد نظام مراقبت هاری</h3>
+        <div class="grid-2" style="margin-block-end: var(--space-6);">${defCards}</div>
+
+        <h3 style="margin-block-end: var(--space-3);">روش‌های تشخیص آزمایشگاهی اختصاصی هاری</h3>
+        <div class="grid-2" style="margin-block-end: var(--space-6);">
+          <div class="clinical-card">
+            <div class="card-header bg-info text-white"><strong>آزمون‌های پیش از مرگ (Antemortem)</strong></div>
+            <div class="card-body">
+              <ul style="margin: 0; padding-inline-start: 18px; line-height: var(--line-height-relaxed);">${anteItems}</ul>
+            </div>
+          </div>
+          <div class="clinical-card">
+            <div class="card-header bg-danger text-white"><strong>آزمون‌های پس از مرگ (Postmortem - استاندارد طلایی)</strong></div>
+            <div class="card-body">
+              <ul style="margin: 0; padding-inline-start: 18px; line-height: var(--line-height-relaxed);">${postItems}</ul>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">اقدامات پیشگیری اولیه در سطح جامعه (Primary Prevention)</h3>
+        <div class="clinical-card" style="margin-block-end: var(--space-6);">
+          <div class="card-body">
+            <ul style="margin: 0; padding-inline-start: 20px; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">
+              ${primary.map(p => `<li style="margin-block-end: 6px;">${p}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+
+        <div class="historical-milestone-card" style="border-inline-start-color: var(--color-primary);">
+          <div class="historical-milestone-header">
+            <span class="icon">💉</span>
+            <strong>واکسیناسیون قبل از مواجهه (PrEP - Pre-Exposure Prophylaxis)</strong>
+          </div>
+          <div class="historical-milestone-body">
+            <p style="margin-block-end: var(--space-2);"><strong>گروه‌های هدف:</strong> ${prep.targetGroups || ''}</p>
+            <p style="margin-block-end: var(--space-2);"><strong>رژیم واکسیناسیون:</strong> ${prep.regimen || ''}</p>
+            <p style="margin: 0;"><strong>پایش تیتر آنتی‌بادی:</strong> ${prep.monitoring || ''}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    if (sec.id === 'ch30-sec04') {
+      const steps = sec.woundManagementSteps || [];
+      const cats = sec.whoCategories || [];
+      const rig = sec.rigAdministration || {};
+      const regs = sec.vaccinationRegimens || [];
+      const special = sec.specialConsiderations || {};
+
+      const stepCards = steps.map(s => `
+        <div class="stage-step-card">
+          <div class="step-num-badge">${s.step}</div>
+          <div style="flex: 1;">
+            <strong style="color: var(--text-primary); font-size: 1rem; display: block; margin-block-end: 4px;">${s.name || ''}</strong>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed);">${s.detail || ''}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const catRows = cats.map(c => `
+        <tr>
+          <td style="width: 170px;"><strong>${c.category || ''}</strong></td>
+          <td>${c.exposureType || ''}</td>
+          <td><strong style="color: var(--color-primary);">${c.recommendedAction || ''}</strong></td>
+        </tr>
+      `).join('');
+
+      const regCards = regs.map(r => `
+        <div class="clinical-card">
+          <div class="card-header bg-primary text-white"><strong>${r.name || ''}</strong></div>
+          <div class="card-body">
+            <div style="background: var(--color-surface-subtle); padding: 8px 12px; border-radius: var(--radius-sm); margin-block-end: var(--space-3); border-inline-start: 3px solid var(--color-primary);">
+              <strong style="font-size: var(--font-size-xs); color: var(--color-primary);">برنامه زمانی:</strong>
+              <span style="font-size: var(--font-size-sm); display: block; font-weight: 700; margin-block-start: 2px;">${r.schedule || ''}</span>
+            </div>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed);">${r.details || ''}</p>
+          </div>
+        </div>
+      `).join('');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">پروتکل ۵ مرحله‌ای مدیریت فوری زخم حیوان‌گزیدگی</h3>
+        <div class="grid-2" style="margin-block-end: var(--space-6);">${stepCards}</div>
+
+        <h3 style="margin-block-end: var(--space-3);">رده‌بندی مواجهه و اقدامات درمانی طبق سازمان جهانی بهداشت (WHO)</h3>
+        <div class="table-scroll-container" style="margin-block-end: var(--space-6);">
+          <table class="medical-table">
+            <thead>
+              <tr>
+                <th style="width: 170px;">رده مواجهه</th>
+                <th>نوع تماس با حیوان مشکوک</th>
+                <th>اقدام درمانی توصیه شده</th>
+              </tr>
+            </thead>
+            <tbody>${catRows}</tbody>
+          </table>
+        </div>
+
+        <div class="clinical-card" style="margin-block-end: var(--space-6); border-inline-start: 4px solid var(--state-danger);">
+          <div class="card-header bg-danger text-white"><strong>راهنمای تجویز ایمونوگلوبولین اختصاصی هاری (RIG)</strong></div>
+          <div class="card-body">
+            <p style="margin-block-end: var(--space-2); font-size: var(--font-size-sm);"><strong>اندیکاسیون:</strong> ${rig.indication || ''}</p>
+            <p style="margin-block-end: var(--space-2); font-size: var(--font-size-sm);"><strong>دوزاژ:</strong> ${rig.dose || ''}</p>
+            <p style="margin: 0; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);"><strong>تکنیک اینفیلتراسیون:</strong> ${rig.technique || ''}</p>
+          </div>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">رژیم‌های واکسیناسیون پس از مواجهه (PEP Regimens)</h3>
+        <div class="grid-3" style="margin-block-end: var(--space-6);">${regCards}</div>
+
+        <div class="grid-2">
+          <div class="key-fact-card">
+            <div class="card-label">مواجهه با جوندگان و خرگوش‌ها</div>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);">${special.rodentsAndRabbits || ''}</p>
+          </div>
+          <div class="key-fact-card">
+            <div class="card-label">پروتکل تجربی میلواکی (Milwaukee)</div>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);">${special.milwaukeeProtocol || ''}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    if (sec.id === 'ch30-sec05') {
+      const gc = sec.generalConcepts || {};
+      const chron = gc.chronicityClassification || [];
+      const species = sec.brucellaSpecies || [];
+      const env = sec.environmentalSurvival || [];
+      const econ = sec.economicImpacts || [];
+      const desc = sec.descriptiveLandscape || {};
+
+      const chronCards = chron.map(c => `
+        <div class="key-fact-card">
+          <div class="card-label">${c.phase || ''}</div>
+          <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);">${c.duration || ''}</p>
+        </div>
+      `).join('');
+
+      const spRows = species.map(s => `
+        <tr>
+          <td><code style="font-weight: 700;">${s.species || ''}</code></td>
+          <td><strong>${s.primaryHost || ''}</strong></td>
+          <td style="font-size: var(--font-size-sm);">${s.humanPathogenicity || ''}</td>
+        </tr>
+      `).join('');
+
+      const envRows = env.map(e => `
+        <tr>
+          <td>${e.medium || ''}</td>
+          <td><span class="badge badge-warning">${e.survivalTime || ''}</span></td>
+        </tr>
+      `).join('');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">کلیات و تابلوی بالینی تب مالت (بروسلوز)</h3>
+        <div class="grid-2" style="margin-block-end: var(--space-6);">
+          <div class="key-fact-card">
+            <div class="card-label">ماهیت و اسامی مترادف</div>
+            <p style="margin-block-end: var(--space-1); font-size: var(--font-size-sm); color: var(--text-secondary);">${gc.nature || ''}</p>
+            <p style="margin: 0; font-size: var(--font-size-xs); color: var(--color-primary);"><strong>اسامی:</strong> ${gc.synonyms || ''}</p>
+          </div>
+          <div class="key-fact-card">
+            <div class="card-label">سیمای بالینی عمومی</div>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);">${gc.clinicalPicture || ''}</p>
+          </div>
+          <div class="key-fact-card">
+            <div class="card-label">میزان کشندگی</div>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);">${gc.caseFatality || ''}</p>
+          </div>
+          <div class="key-fact-card">
+            <div class="card-label">نسبت ساب‌کلینیکال به علامت‌دار</div>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);">${gc.subclinicalRatio || ''}</p>
+          </div>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">تقسیم‌بندی بالینی بروسلوز بر اساس مدت زمان بیماری</h3>
+        <div class="grid-3" style="margin-block-end: var(--space-6);">${chronCards}</div>
+
+        <h3 style="margin-block-end: var(--space-3);">گونه‌های باکتری بروسلا و مخازن اصلی</h3>
+        <div class="table-scroll-container" style="margin-block-end: var(--space-6);">
+          <table class="medical-table">
+            <thead><tr><th>گونه باکتری</th><th>میزبان و مخزن اولیه</th><th>بیماری‌زایی در انسان و ویژگی‌های اپیدمیولوژیک</th></tr></thead>
+            <tbody>${spRows}</tbody>
+          </table>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">بقای بروسلا در فرآورده‌های دامی و محیط زیست</h3>
+        <div class="table-scroll-container" style="margin-block-end: var(--space-6);">
+          <table class="medical-table">
+            <thead><tr><th>محیط / فرآورده دامی</th><th>مدت زمان بقا</th></tr></thead>
+            <tbody>${envRows}</tbody>
+          </table>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">خسارات دامی و اقتصادی بروسلوز</h3>
+        <div class="clinical-card" style="margin-block-end: var(--space-6);">
+          <div class="card-body">
+            <ul style="margin: 0; padding-inline-start: 20px; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">
+              ${econ.map(ec => `<li style="margin-block-end: 6px;">${ec}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+
+        <div class="historical-milestone-card" style="border-inline-start-color: var(--color-primary);">
+          <div class="historical-milestone-header">
+            <span class="icon">📊</span>
+            <strong>اپیدمیولوژی توصیفی، وضعیت جهانی و سیمای بروسلوز در ایران</strong>
+          </div>
+          <div class="historical-milestone-body">
+            <p style="margin-block-end: var(--space-2);"><strong>سن و جنس:</strong> ${desc.age || ''} — ${desc.gender || ''}</p>
+            <p style="margin-block-end: var(--space-2);"><strong>مشاغل پرخطر:</strong> ${desc.highRiskJobs || ''}</p>
+            <p style="margin-block-end: var(--space-2);"><strong>سیمای جهانی:</strong> ${desc.globalStatus || ''}</p>
+            <div style="background: var(--color-surface-subtle); padding: 10px 14px; border-radius: var(--radius-sm); border-inline-start: 4px solid var(--state-warning); margin-block-start: 8px;">
+              <strong style="color: var(--state-warning);">وضعیت ایران و موانع ریشه‌کنی:</strong> ${desc.iranStatus || ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (sec.id === 'ch30-sec06') {
+      const trans = sec.transmissionToHumans || [];
+      const organ = sec.organManifestations || [];
+      const cases = sec.caseDefinitions || [];
+      const sero = sec.serologyAndKinetics || {};
+      const kinetics = sero.kinetics || [];
+      const tests = sero.tests || [];
+      const prev = sec.preventionAndTreatment || {};
+      const anPrev = prev.animalPrevention || [];
+      const huPrev = prev.humanPrevention || [];
+      const tx = prev.treatmentRegimens || {};
+
+      const transCards = trans.map(t => `
+        <div class="stage-step-card">
+          <div class="step-num-badge">انتقال</div>
+          <div style="flex: 1;">
+            <strong style="color: var(--text-primary); display: block; margin-block-end: 4px;">${t.route || ''}</strong>
+            <span style="font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--line-height-relaxed);">${t.detail || ''}</span>
+          </div>
+        </div>
+      `).join('');
+
+      const organCards = organ.map(o => `
+        <div class="clinical-card">
+          <div class="card-header bg-primary text-white"><strong>${o.system || ''}</strong></div>
+          <div class="card-body">
+            <p style="margin: 0; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">${o.detail || ''}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const caseCards = cases.map(c => `
+        <div class="clinical-card">
+          <div class="card-header bg-info text-white d-flex justify-between align-center">
+            <strong>${c.level || ''}</strong>
+            <span class="badge badge-subtle">نظام مراقبت کشوری</span>
+          </div>
+          <div class="card-body">
+            <p style="margin: 0; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">${c.desc || ''}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const kinRows = kinetics.map(k => `
+        <tr>
+          <td style="width: 180px;"><strong>${k.period || ''}</strong></td>
+          <td>${k.status || ''}</td>
+        </tr>
+      `).join('');
+
+      const testRows = tests.map(t => `
+        <tr>
+          <td style="width: 200px;"><code>${t.name || ''}</code></td>
+          <td style="font-size: var(--font-size-sm);">${t.role || ''}</td>
+        </tr>
+      `).join('');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">راه‌های پنج‌گانه انتقال بروسلا به انسان</h3>
+        <div class="grid-2" style="margin-block-end: var(--space-6);">${transCards}</div>
+
+        <h3 style="margin-block-end: var(--space-3);">تظاهرات بالینی عضو-محور و عوارض سیستمیک</h3>
+        <div class="grid-2" style="margin-block-end: var(--space-6);">${organCards}</div>
+
+        <h3 style="margin-block-end: var(--space-3);">تعاریف استاندارد مورد بیماری در نظام مراقبت کشوری</h3>
+        <div class="grid-3" style="margin-block-end: var(--space-6);">${caseCards}</div>
+
+        <h3 style="margin-block-end: var(--space-3);">کینتیک زمانی تولید آنتی‌بادی‌های بروسلا</h3>
+        <div class="table-scroll-container" style="margin-block-end: var(--space-6);">
+          <table class="medical-table">
+            <thead><tr><th style="width: 180px;">مقطع زمانی بیماری</th><th>وضعیت ترشح و کلاس آنتی‌بادی</th></tr></thead>
+            <tbody>${kinRows}</tbody>
+          </table>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">روش‌های سرولوژی و آزمون‌های آزمایشگاهی استاندارد</h3>
+        <div class="table-scroll-container" style="margin-block-end: var(--space-6);">
+          <table class="medical-table">
+            <thead><tr><th style="width: 200px;">نام آزمون</th><th>کاربرد بالینی و ویژگی تشخیصی</th></tr></thead>
+            <tbody>${testRows}</tbody>
+          </table>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">سطوح پیشگیری و رژیم‌های درمانی دو دارویی استاندارد کشوری</h3>
+        <div class="grid-2" style="margin-block-end: var(--space-6);">
+          <div class="clinical-card">
+            <div class="card-header bg-success text-white"><strong>پیشگیری در جمعیت حیوانی (اساس ریشه‌کنی)</strong></div>
+            <div class="card-body">
+              <ul style="margin: 0; padding-inline-start: 18px; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">
+                ${anPrev.map(p => `<li style="margin-block-end: 6px;">${p}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+          <div class="clinical-card">
+            <div class="card-header bg-info text-white"><strong>پیشگیری در جمعیت انسانی</strong></div>
+            <div class="card-body">
+              <ul style="margin: 0; padding-inline-start: 18px; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">
+                ${huPrev.map(p => `<li style="margin-block-end: 6px;">${p}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="historical-milestone-card" style="border-inline-start-color: var(--color-primary);">
+          <div class="historical-milestone-header">
+            <span class="icon">💊</span>
+            <strong>پروتکل درمان دارویی کشوری تب مالت</strong>
+          </div>
+          <div class="historical-milestone-body">
+            <p style="margin-block-end: var(--space-2);"><strong>استراتژی:</strong> ${tx.strategy || ''}</p>
+            <div style="background: var(--color-surface-subtle); padding: 10px 14px; border-radius: var(--radius-sm); border-inline-start: 4px solid var(--color-primary); margin-block-end: 8px;">
+              <strong style="color: var(--color-primary);">خط اول درمان:</strong> ${tx.firstLine || ''}
+            </div>
+            <div style="background: var(--color-surface-subtle); padding: 10px 14px; border-radius: var(--radius-sm); border-inline-start: 4px solid var(--state-info); margin-block-end: 8px;">
+              <strong style="color: var(--state-info);">خط دوم (کودکان زیر ۸ سال و بارداری):</strong> ${tx.secondLine || ''}
+            </div>
+            <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary);"><strong>مراقبت و گزارش‌دهی:</strong> ${tx.reporting || ''}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    if (sec.id === 'ch30-sec07') {
+      const matrix = sec.matrixComparison || [];
+      const rows = matrix.map(m => `
+        <tr>
+          <td style="width: 200px; font-weight: 700; background-color: var(--color-surface-subtle);">${m.parameter || ''}</td>
+          <td style="border-inline-start: 2px solid var(--state-danger-subtle);">
+            <strong style="color: var(--state-danger); display: block; margin-block-end: 3px;">هاری (Rabies):</strong>
+            ${m.rabies || ''}
+          </td>
+          <td style="border-inline-start: 2px solid var(--color-primary-light);">
+            <strong style="color: var(--color-primary); display: block; margin-block-end: 3px;">تب مالت (Brucellosis):</strong>
+            ${m.brucellosis || ''}
+          </td>
+        </tr>
+      `).join('');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <h3 style="margin-block-end: var(--space-3);">ماتریس مقایسه تطبیقی جامع ویژگی‌های اپیدمیولوژیک و مراقبتی هاری و تب مالت</h3>
+        <div class="table-scroll-container">
+          <table class="medical-table">
+            <thead>
+              <tr>
+                <th style="width: 200px;">مؤلفه مقایسه</th>
+                <th style="background: rgba(220, 38, 38, 0.08); color: var(--state-danger);">هاری (Rabies)</th>
+                <th style="background: rgba(2, 132, 199, 0.08); color: var(--color-primary);">تب مالت (Brucellosis)</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    return `<p>${sec.summary || ''}</p>`;
+  },
+
+  bindSectionActions(container) {
     container.querySelectorAll('.btn-bookmark').forEach(btn => {
       btn.addEventListener('click', () => {
         const secId = btn.getAttribute('data-section-id');
