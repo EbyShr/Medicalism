@@ -12,8 +12,16 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Helper to mount a chapter
+  // Helper to mount a chapter or exam-qa
   function mountChapter(chapterId) {
+    if (chapterId === 'exam-qa') {
+      if (window.ComponentRenderer && contentContainer) {
+        window.ComponentRenderer.renderExamQA(contentContainer);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
+
     const chapter = chapters.find(c => c.id === chapterId) || chapters[0];
     if (window.ComponentRenderer && contentContainer) {
       window.ComponentRenderer.renderChapter(chapter, contentContainer);
@@ -21,6 +29,19 @@ document.addEventListener('DOMContentLoaded', () => {
         window.AppNavigation.initScrollspy();
       }
     }
+  }
+
+  // Header QA Direct Button Click
+  const headerQaBtn = document.getElementById('headerQaBtn');
+  if (headerQaBtn) {
+    headerQaBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (window.appState) {
+        window.appState.setActiveChapter('exam-qa');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        history.pushState(null, null, '#exam-qa');
+      }
+    });
   }
 
   // Subscribe to reactive active chapter changes

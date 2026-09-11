@@ -7377,5 +7377,257 @@ window.ComponentRenderer = {
         }
       });
     });
+  },
+
+  /**
+   * Renders the dedicated Exam Q&A Question Bank (72 multiple-choice questions & surveillance matrix)
+   */
+  renderExamQA(container) {
+    if (!container) return;
+    const data = window.EXAM_QA_DATA;
+    if (!data) {
+      container.innerHTML = '<div class="study-section"><p>داده‌های بانک سوالات یافت نشد.</p></div>';
+      return;
+    }
+
+    const { meta, surveillanceTable = [], questions = [] } = data;
+
+    const surveillanceRowsHtml = surveillanceTable.map(row => {
+      const isUrgent = row.reportingPriority.includes('فوری');
+      return `
+        <tr>
+          <td><strong>${row.disease}</strong></td>
+          <td>
+            <span class="qa-priority-pill ${isUrgent ? 'pill-urgent' : 'pill-monthly'}">
+              ${row.reportingPriority}
+            </span>
+          </td>
+          <td>${row.suspectedProbable}</td>
+          <td>${row.confirmedCriterion}</td>
+        </tr>
+      `;
+    }).join('');
+
+    const questionsHtml = questions.map(q => {
+      const optionsHtml = q.options.map(opt => {
+        const isCorrect = opt.key === q.correctKey;
+        return `
+          <div class="qa-option-item ${isCorrect ? 'is-correct' : ''}">
+            <div class="qa-option-marker">${opt.key}</div>
+            <div class="qa-option-text">${opt.text}</div>
+            ${isCorrect ? `
+              <span class="qa-correct-badge">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>پاسخ صحیح</span>
+              </span>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="qa-question-card" id="qa-q-${q.id}" data-qa-id="${q.id}" data-search-text="${(q.stem + ' ' + q.options.map(o => o.text).join(' ')).toLowerCase()}">
+          <div class="qa-card-header">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="qa-num-badge">سوال ${q.id} از ${questions.length}</span>
+              <span class="qa-part-tag" title="${q.part}">${q.part}</span>
+            </div>
+            <button type="button" class="action-mini-btn btn-qa-copy-link" data-target-id="qa-q-${q.id}" title="کپی لینک مستقیم سوال" aria-label="کپی لینک سوال">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="qa-stem">${q.stem}</div>
+          <div class="qa-options-list">
+            ${optionsHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const html = `
+      <article class="exam-qa-article" id="exam-qa">
+        <!-- Hero Header -->
+        <header class="exam-qa-hero">
+          <div class="exam-qa-badges">
+            <span class="exam-badge-primary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              ${meta.title}
+            </span>
+            <span class="exam-badge-success">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              ${questions.length} تست همراه با کلید قطعی
+            </span>
+          </div>
+
+          <h1 class="exam-qa-title">${meta.subtitle}</h1>
+          <p class="exam-qa-subtitle">${meta.description}</p>
+
+          <!-- Fast Jump Pills -->
+          <div style="margin-block-start: 12px;">
+            <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); margin-block-end: 6px;">پرش سریع به دسته‌بندی سوالات:</div>
+            <div class="exam-jump-chips">
+              <a href="#qa-matrix" class="exam-jump-chip">📊 جدول مقایسه‌ای مراقبت</a>
+              <a href="#qa-q-1" class="exam-jump-chip">تست ۱ تا ۱۵</a>
+              <a href="#qa-q-16" class="exam-jump-chip">تست ۱۶ تا ۳۰</a>
+              <a href="#qa-q-31" class="exam-jump-chip">تست ۳۱ تا ۴۵</a>
+              <a href="#qa-q-46" class="exam-jump-chip">تست ۴۶ تا ۶۰</a>
+              <a href="#qa-q-61" class="exam-jump-chip">تست ۶۱ تا ۷۲</a>
+            </div>
+          </div>
+
+          <!-- Controls Toolbar -->
+          <div class="exam-qa-toolbar">
+            <div class="exam-qa-search-box">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="qaFilterInput" class="exam-qa-search-input" placeholder="جستجوی سریع در متن سوالات و گزینه‌ها...">
+            </div>
+
+            <div class="exam-qa-tools-actions">
+              <button type="button" class="btn-study-mode-toggle" id="btnQuizModeToggle">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <span id="quizModeLabel">حالت خودآزمایی (پوشاندن پاسخ‌ها)</span>
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <!-- Surveillance Matrix Table (From Pages 1 & 2) -->
+        <section class="qa-matrix-section" id="qa-matrix">
+          <div class="qa-matrix-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+            <span>جدول مقایسه‌ای ویژگی‌ها، اولویت گزارش‌دهی و معیارهای تشخیصی بیماری‌های واگیر اصلی</span>
+          </div>
+          <div class="qa-matrix-table-wrap">
+            <table class="qa-matrix-table">
+              <thead>
+                <tr>
+                  <th style="width: 20%;">بیماری و پاتوژن</th>
+                  <th style="width: 22%;">اولویت و زمان‌بندی گزارش‌دهی</th>
+                  <th style="width: 30%;">تعریف مورد مشکوک / محتمل</th>
+                  <th style="width: 28%;">معیار قطعی تشخیص (Confirmed)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${surveillanceRowsHtml}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Questions Stream (72 Questions Back to Back) -->
+        <section class="qa-stream-container" id="qaQuestionsStream">
+          ${questionsHtml}
+        </section>
+      </article>
+    `;
+
+    container.innerHTML = html;
+    this.bindExamQAActions(container);
+  },
+
+  /**
+   * Binds interactive filter, quiz mode toggling, and copy link handlers
+   */
+  bindExamQAActions(container) {
+    const filterInput = container.querySelector('#qaFilterInput');
+    const stream = container.querySelector('#qaQuestionsStream');
+    const cards = container.querySelectorAll('.qa-question-card');
+    const quizToggle = container.querySelector('#btnQuizModeToggle');
+    const quizLabel = container.querySelector('#quizModeLabel');
+
+    // Live search filter
+    if (filterInput) {
+      filterInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim().toLowerCase();
+        cards.forEach(card => {
+          const text = card.getAttribute('data-search-text') || '';
+          if (!query || text.includes(query)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    }
+
+    // Self-assessment Quiz Mode
+    if (quizToggle && stream) {
+      let quizActive = false;
+      quizToggle.addEventListener('click', () => {
+        quizActive = !quizActive;
+        stream.classList.toggle('quiz-mode-active', quizActive);
+        quizToggle.classList.toggle('is-active', quizActive);
+        if (quizLabel) {
+          quizLabel.textContent = quizActive 
+            ? 'پاسخ‌ها پنهان شد (کلیک روی کارت برای دیدن)' 
+            : 'حالت خودآزمایی (پوشاندن پاسخ‌ها)';
+        }
+        if (window.showToast) {
+          window.showToast(quizActive ? 'حالت خودآزمایی فعال شد. برای مشاهده کلید روی هر تست کلیک کنید.' : 'نمایش تمام پاسخ‌ها فعال شد.');
+        }
+      });
+
+      // Clicking card reveals answer in quiz mode
+      cards.forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (stream.classList.contains('quiz-mode-active') && !e.target.closest('.btn-qa-copy-link')) {
+            card.classList.toggle('is-revealed');
+          }
+        });
+      });
+    }
+
+    // Copy Question Link
+    container.querySelectorAll('.btn-qa-copy-link').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const targetId = btn.getAttribute('data-target-id');
+        const url = `${window.location.origin}${window.location.pathname}#${targetId}`;
+        navigator.clipboard.writeText(url).then(() => {
+          if (window.showToast) window.showToast('لینک مستقیم سوال در کلیپ‌بورد کپی شد');
+        }).catch(() => {
+          if (window.showToast) window.showToast('آدرس مستقیم: #' + targetId);
+        });
+      });
+    });
+
+    // Jump Chip Smooth Scroll
+    container.querySelectorAll('.exam-jump-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        e.preventDefault();
+        const href = chip.getAttribute('href');
+        if (href && href.startsWith('#')) {
+          const targetEl = container.querySelector(href);
+          if (targetEl) {
+            const headerOffset = 80;
+            const elementPosition = targetEl.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+            history.pushState(null, null, href);
+          }
+        }
+      });
+    });
   }
 };
+
