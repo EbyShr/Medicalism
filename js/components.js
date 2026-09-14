@@ -3840,6 +3840,25 @@ window.ComponentRenderer = {
           </div>
         </div>
 
+        ${sec.ssiTimeline ? `
+        <div class="medical-callout callout-warning" style="margin-block-end: var(--space-6); border-inline-start: 4px solid #f59e0b;">
+          <div class="callout-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
+          <div class="callout-content">
+            <p><strong>بازه زمانی عفونت‌های محل جراحی (SSI) و ایمپلنت‌ها:</strong> ${sec.ssiTimeline}</p>
+          </div>
+        </div>` : ''}
+
+        ${sec.highRiskWards && sec.highRiskWards.length ? `
+        <h3 style="margin-block-end: var(--space-3);">بخش‌های پرخطر بیمارستانی (High-Risk Wards)</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3); margin-block-end: var(--space-6);">
+          ${sec.highRiskWards.map(w => `
+            <div class="key-fact-card" style="border-inline-start: 4px solid var(--state-danger); padding: var(--space-3); background: var(--bg-surface-raised); border-radius: var(--radius-md); border: 1px solid var(--border-default);">
+              <div class="card-label" style="font-weight: bold; color: var(--state-danger);">${w.ward || ''}</div>
+              <p style="margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary); margin-top: 4px;">${w.risk || ''}</p>
+            </div>
+          `).join('')}
+        </div>` : ''}
+
         <h3 style="margin-block-end: var(--space-3);">منشأ عفونت: درون‌زاد در برابر برون‌زاد</h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-3); margin-block-end: var(--space-6);">
           <div class="stage-info-block">
@@ -3972,7 +3991,15 @@ window.ComponentRenderer = {
         <h3 style="margin-block-end: var(--space-3);">دستورالعمل بهداشت تنفسی و آداب سرفه (CDC 2003)</h3>
         <div style="margin-block-end: var(--space-6);">${cdcBadges}</div>
 
-        <h3 style="margin-block-end: var(--space-3);">گام‌های سه‌گانه بررسی و مهار طغیان‌های بیمارستانی</h3>
+        ${sec.infectionControlTeam && sec.infectionControlTeam.length ? `
+        <h3 style="margin-block-end: var(--space-3);">اعضای تیم کنترل عفونت بیمارستانی</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: var(--space-2); margin-block-end: var(--space-6);">
+          ${sec.infectionControlTeam.map(member => `
+            <span class="stage-badge" style="background: var(--bg-surface-raised); border: 1px solid var(--border-default); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); font-weight: 600; color: var(--accent-primary);">🩺 ${member}</span>
+          `).join('')}
+        </div>` : ''}
+
+        <h3 style="margin-block-end: var(--space-3);">گام‌های بررسی و مهار طغیان‌های بیمارستانی</h3>
         <div style="margin-block-end: var(--space-6);">${steps}</div>
 
         <h3 style="margin-block-end: var(--space-3);">کنترل عفونت در بلایای طبیعی (سیل، زلزله)</h3>

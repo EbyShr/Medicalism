@@ -56,14 +56,14 @@ def run_tests():
         page.goto(file_url)
         page.wait_for_load_state("networkidle")
 
-        # Verify Chapter Registry in Navigation Tree (29 Chapters, 148 Sections total)
+        # Verify Chapter Registry in Navigation Tree (28 Chapters, 144 Sections total)
         chapter_items = page.locator("#desktopNavTree .nav-chapter-item").all()
-        print(f"Registered chapters in nav: {len(chapter_items)} (Expected: 29)")
-        assert len(chapter_items) == 29, f"Expected 29 chapters, got {len(chapter_items)}"
+        print(f"Registered chapters in nav: {len(chapter_items)} (Expected: 28)")
+        assert len(chapter_items) == 28, f"Expected 28 chapters, got {len(chapter_items)}"
 
         total_nav_links = page.locator("#desktopNavTree .nav-heading-link").all()
-        print(f"Total nav heading links: {len(total_nav_links)} (Expected: 148)")
-        assert len(total_nav_links) == 148, f"Expected 148 nav links across all 29 chapters, got {len(total_nav_links)}"
+        print(f"Total nav heading links: {len(total_nav_links)} (Expected: 144)")
+        assert len(total_nav_links) == 144, f"Expected 144 nav links across all 28 chapters, got {len(total_nav_links)}"
 
         # Verify Initial Chapter (Now Chapter 1: ch-27 کلیات و تعاریف اپیدمیولوژی بیماری‌های واگیر)
         ch1_title = page.locator(".chapter-title").inner_text()
@@ -136,25 +136,24 @@ def run_tests():
             ("ch-28", "سالک", 5),         # فصل ۱۱
             ("ch-25", "کالا آزار", 4),    # فصل ۱۲
             ("ch-30", "هاری", 7),         # فصل ۱۳ (بیماری‌های مشترک انسان و حیوان - هاری و بروسلوز)
-            ("ch-16", "بیمارستانی", 4),   # فصل ۱۴
-            ("ch-23", "بیمارستانی", 4),   # فصل ۱۵
-            ("ch-17", "مقاومت", 4),       # فصل ۱۶
-            ("ch-15", "غیرواگیر", 5),     # فصل ۱۷
-            ("ch-09", "غیرواگیر", 6),     # فصل ۱۸
-            ("ch-13", "پرفشاری", 4),      # فصل ۱۹
-            ("ch-03", "ایسکمیک", 6),      # فصل ۲۰
-            ("ch-06", "سکته", 4),         # فصل ۲۱
-            ("ch-07", "روماتیسمی", 3),    # فصل ۲۲
-            ("ch-04", "چاقی", 6),         # فصل ۲۳
-            ("ch-05", "سرطان", 6),        # فصل ۲۴
-            ("ch-12", "تیروئید", 6),      # فصل ۲۵
-            ("ch-14", "ریزمغذی", 3),      # فصل ۲۶
-            ("ch-11", "دخانیات", 4),      # فصل ۲۷
-            ("ch-10", "سوءمصرف", 5),      # فصل ۲۸
-            ("ch-08", "روان", 4),         # فصل ۲۹
+            ("ch-16", "بیمارستانی", 4),   # فصل ۱۴ (ادغام‌شده: عفونت‌های بیمارستانی)
+            ("ch-17", "مقاومت", 4),       # فصل ۱۵
+            ("ch-15", "غیرواگیر", 5),     # فصل ۱۶
+            ("ch-09", "غیرواگیر", 6),     # فصل ۱۷
+            ("ch-13", "پرفشاری", 4),      # فصل ۱۸
+            ("ch-03", "ایسکمیک", 6),      # فصل ۱۹
+            ("ch-06", "سکته", 4),         # فصل ۲۰
+            ("ch-07", "روماتیسمی", 3),    # فصل ۲۱
+            ("ch-04", "چاقی", 6),         # فصل ۲۲
+            ("ch-05", "سرطان", 6),        # فصل ۲۳
+            ("ch-12", "تیروئید", 6),      # فصل ۲۴
+            ("ch-14", "ریزمغذی", 3),      # فصل ۲۵
+            ("ch-11", "دخانیات", 4),      # فصل ۲۶
+            ("ch-10", "سوءمصرف", 5),      # فصل ۲۷
+            ("ch-08", "روان", 4),         # فصل ۲۸
         ]
 
-        print("\n--- Testing Navigation, Zero Undefined & Content Rendering Across All 29 Chapters ---")
+        print("\n--- Testing Navigation, Zero Undefined & Content Rendering Across All 28 Chapters ---")
         for new_num, (ch_id, keyword, expected_sec_count) in enumerate(expected_chapters, 1):
             ch_header = page.locator(f"#desktopNavTree .nav-chapter-header[data-chapter-id='{ch_id}']")
             ch_header.click()
@@ -196,16 +195,16 @@ def run_tests():
             page.screenshot(path=shot_path, full_page=False)
             print(f"Saved {ch_id} screenshot to {shot_path}")
 
-        # Test Chapter Progression Footer (Navigate back from Chapter 30 (ch-08) to Chapter 29 (ch-10) via footer card)
+        # Test Chapter Progression Footer (Navigate back from Chapter 28 (ch-08) to Chapter 27 (ch-10) via footer card)
         page.locator("#desktopNavTree .nav-chapter-header[data-chapter-id='ch-08']").click()
         page.wait_for_timeout(250)
         prev_card = page.locator(".chapter-nav-card.prev-chapter-card")
-        assert prev_card.is_visible(), "Previous chapter card should be visible in Chapter 30"
+        assert prev_card.is_visible(), "Previous chapter card should be visible in Chapter 28"
         prev_card.click()
         page.wait_for_timeout(300)
-        back_ch29_title = page.locator(".chapter-title").inner_text()
-        print(f"Title after clicking prev chapter card: {back_ch29_title}")
-        assert "سوءمصرف" in back_ch29_title, f"Expected return to Chapter 29 (سوءمصرف مواد), got {back_ch29_title}"
+        back_ch27_title = page.locator(".chapter-title").inner_text()
+        print(f"Title after clicking prev chapter card: {back_ch27_title}")
+        assert "سوءمصرف" in back_ch27_title, f"Expected return to Chapter 27 (سوءمصرف مواد), got {back_ch27_title}"
 
         # 4. Test Multi-Chapter Search Engine Across Chapters
         print("\n--- Testing Multi-Chapter Search Engine Across All Chapters ---")
@@ -221,7 +220,7 @@ def run_tests():
             ("کوپلیک", "ch-18", "ch18-sec01"),          # Measles
             ("روتاویروس", "ch-20", "ch20-sec01"),       # Emerging
             ("بوتولیسم", "ch-22", "ch22-sec01"),        # 16 Syndromes
-            ("NNIS", "ch-23", "ch23-sec02"),           # Nosocomial NNIS
+            ("NNIS", "ch-16", "ch16-sec03"),           # Nosocomial NNIS (Merged Chapter)
             ("هیپنوزوئیت", "ch-24", "ch24-sec02"),      # Malaria Management
             ("دلتامترین", "ch-25", "ch25-sec04"),       # Kala-azar
             ("سرخک", "ch-26", "ch26-sec01"),          # Surveillance Definitions
@@ -288,10 +287,10 @@ def run_tests():
         assert drawer_box["x"] + drawer_box["width"] <= 390.1, f"Drawer renders offscreen to the right: {drawer_box['x'] + drawer_box['width']}"
         print("PASS: Drawer is fully within mobile viewport!")
 
-        # Verify all 29 chapters are listed in mobile drawer
+        # Verify all 28 chapters are listed in mobile drawer
         mobile_chapters = mobile_page.locator("#mobileNavTree .nav-chapter-item").all()
-        print(f"Mobile nav drawer chapters: {len(mobile_chapters)} (Expected: 29)")
-        assert len(mobile_chapters) == 29, f"Expected 29 chapters in mobile drawer, got {len(mobile_chapters)}"
+        print(f"Mobile nav drawer chapters: {len(mobile_chapters)} (Expected: 28)")
+        assert len(mobile_chapters) == 28, f"Expected 28 chapters in mobile drawer, got {len(mobile_chapters)}"
 
         # Screenshot of mobile drawer
         mobile_shot_path = os.path.join(screenshot_dir, "mobile_nav_drawer.png")
@@ -314,7 +313,7 @@ def run_tests():
             print(f" - {err}")
         sys.exit(1)
     else:
-        print("\nALL AUTOMATED TESTS PASSED WITH 100% SUCCESS ACROSS ALL 29 RATIONALLY REORDERED CHAPTERS AND 148 SECTIONS!")
+        print("\nALL AUTOMATED TESTS PASSED WITH 100% SUCCESS ACROSS ALL 28 RATIONALLY REORDERED CHAPTERS AND 144 SECTIONS!")
 
 if __name__ == "__main__":
     run_tests()
