@@ -156,6 +156,8 @@ window.ComponentRenderer = {
       sectionBody = this.renderChapter29Section(section);
     } else if (chapterId === 'ch-30') {
       sectionBody = this.renderChapter30Section(section);
+    } else if (chapterId === 'ch-31') {
+      sectionBody = this.renderChapter31Section(section);
     } else {
       sectionBody = `<p>${section.summary || ''}</p>`;
     }
@@ -7368,6 +7370,550 @@ window.ComponentRenderer = {
         }
       });
     });
-  }
+  },
+
+  /* =========================================================================
+     CHAPTER 31 RENDERERS (VACCINE-PREVENTABLE DISEASES PART 2 & SURVEILLANCE)
+     ========================================================================= */
+  renderChapter31Section(sec) {
+    if (!sec) return '';
+
+    if (sec.id === 'ch31-sec01') {
+      const cd = sec.caseDefinitions || {};
+      const td = sec.transmissionDynamics || {};
+      const path = sec.pathogenesis || {};
+      const organs = sec.targetOrgans || [];
+      const spectrum = sec.clinicalSpectrum || {};
+      const unvac = spectrum.unvaccinated || {};
+      const vac = spectrum.vaccinated || {};
+      const interventions = sec.interventionsImpact || [];
+
+      const organCards = organs.map(o => `
+        <div class="clinical-card" style="border-inline-start: 4px solid var(--state-danger);">
+          <div class="card-header bg-danger text-white d-flex align-center gap-2" style="font-weight: 700;">
+            <span>🫀</span> ${o.organ || ''} — ${o.pathology || ''}
+          </div>
+          <div class="card-body">
+            <p style="margin: 0; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">${o.clinicalImpact || ''}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const interventionRows = interventions.map(it => `
+        <tr>
+          <td><strong>${it.intervention || ''}</strong></td>
+          <td>${it.action || ''}</td>
+          <td><span class="badge badge-danger">${it.mortalityEffect || ''}</span></td>
+          <td><span class="badge badge-info">${it.transmissionEffect || ''}</span></td>
+        </tr>
+      `).join('');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="grid-4" style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-block-end: var(--space-6);">
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-danger);">
+            <div class="stat-value" style="color: var(--state-danger); font-size: 1.6rem; font-weight: 800;">100 ng/kg</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">دوز کشنده اگزوتوکسین دیفتری</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--color-primary);">
+            <div class="stat-value" style="color: var(--color-primary); font-size: 1.6rem; font-weight: 800;">۲ تا ۷ روز</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">دوره کمون دیفتری</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-warning);">
+            <div class="stat-value" style="color: var(--state-warning); font-size: 1.6rem; font-weight: 800;">۲ تا ۶ هفته</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">واگیری بدون درمان مؤثر</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-success);">
+            <div class="stat-value" style="color: var(--state-success); font-size: 1.6rem; font-weight: 800;">حداکثر ۴ روز</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">قطع سرایت با آنتی‌بیوتیک</div>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-6);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">تعاریف استاندارد مورد در نظام مراقبت دیفتری</h3>
+          <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
+            <div class="clinical-card">
+              <div class="card-header bg-primary text-white" style="font-weight: 700;">مورد بالینی (Clinical Case)</div>
+              <div class="card-body"><p style="margin:0;">${cd.clinical || ''}</p></div>
+            </div>
+            <div class="clinical-card">
+              <div class="card-header bg-primary text-white" style="font-weight: 700;">مورد محتمل (Probable Case)</div>
+              <div class="card-body"><p style="margin:0;">${cd.probable || ''}</p></div>
+            </div>
+            <div class="clinical-card">
+              <div class="card-header bg-success text-white" style="font-weight: 700;">مورد قطعی (Confirmed Case)</div>
+              <div class="card-body"><p style="margin:0;">${cd.confirmed || ''}</p></div>
+            </div>
+            <div class="clinical-card">
+              <div class="card-header bg-warning text-dark" style="font-weight: 700;">مورد مشکوک (Suspected Case)</div>
+              <div class="card-body"><p style="margin:0; font-weight: bold; color: var(--state-danger);">${cd.suspected || ''}</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-6);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">پاتوژنز و ارگان‌های هدف اگزوتوکسین</h3>
+          <div class="medical-callout callout-warning" style="margin-block-end: var(--space-4);">
+            <div class="callout-icon">⚠️</div>
+            <div class="callout-content">
+              <strong>مکانیسم بدون باکتریمی:</strong> ${path.localInvasion || ''}<br>
+              <strong>توکسمی و مرگ سلولی:</strong> ${path.molecularMechanism || ''}
+            </div>
+          </div>
+          <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-4);">
+            ${organCards}
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-6);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">سیر بالینی بر اساس وضعیت واکسیناسیون</h3>
+          <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
+            <div class="clinical-card" style="border-top: 4px solid var(--state-danger);">
+              <div class="card-header" style="font-weight: 700; color: var(--state-danger);">افراد واکسینه‌نشده (Unvaccinated)</div>
+              <div class="card-body">
+                <ul class="styled-list">
+                  <li><strong>مرحله پرودرومال:</strong> ${unvac.prodromeRate || ''}</li>
+                  <li><strong>پیشرفت به فرم غشایی:</strong> ${unvac.membranousRate || ''}</li>
+                  <li><strong>میزان کشندگی:</strong> ${unvac.fatalityRate || ''}</li>
+                </ul>
+              </div>
+            </div>
+            <div class="clinical-card" style="border-top: 4px solid var(--state-success);">
+              <div class="card-header" style="font-weight: 700; color: var(--state-success);">افراد واکسینه‌شده (Vaccinated)</div>
+              <div class="card-body">
+                <ul class="styled-list">
+                  <li><strong>حامل بدون علامت:</strong> ${vac.asymptomaticRate || ''}</li>
+                  <li><strong>علائم پرودرومال:</strong> ${vac.prodromeRate || ''}</li>
+                  <li><strong>فرم غشایی:</strong> ${vac.membranousRate || ''}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">مقایسه اثر مداخلات درمانی بر مرگ‌ومیر و انتقال</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>مداخله درمانی</th>
+                  <th>مکانیسم و هدف</th>
+                  <th>اثر بر مورتالیتی</th>
+                  <th>اثر بر سرایت و دفع باسیل</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${interventionRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    if (sec.id === 'ch31-sec02') {
+      const ep = sec.epidemiology || {};
+      const milestones = ep.iranMilestones || [];
+      const demoData = sec.demographicData1388 || [];
+      const mgmt = sec.clinicalManagement || {};
+      const iso = sec.isolationProtocols || {};
+      const contactMgmt = sec.contactAndCarrierManagement || {};
+      const carriers = contactMgmt.carrierProtocols || [];
+      const contacts = contactMgmt.closeContactsProtocols || [];
+
+      const demoRows = demoData.map(d => `
+        <tr ${d.ageGroup === 'مجموع کل' ? 'style="font-weight: bold; background-color: var(--surface-secondary);"' : ''}>
+          <td>${d.ageGroup || ''}</td>
+          <td>${d.population || ''}</td>
+          <td>${d.totalCases || ''}</td>
+          <td>${d.incidencePer100k || ''}</td>
+          <td>${d.maleCases || ''}</td>
+          <td>${d.femaleCases || ''}</td>
+          <td>${d.urbanCases || ''}</td>
+          <td>${d.ruralCases || ''}</td>
+          <td>${d.iranianCases || ''}</td>
+          <td>${d.nonIranianCases || ''}</td>
+        </tr>
+      `).join('');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="grid-4" style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-block-end: var(--space-6);">
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-success);">
+            <div class="stat-value" style="color: var(--state-success); font-size: 1.6rem; font-weight: 800;">۰.۰۵</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">بروز در ۱۰۰ هزار نفر (سال ۱۳۸۸)</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--color-primary);">
+            <div class="stat-value" style="color: var(--color-primary); font-size: 1.6rem; font-weight: 800;">۹۹٪</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">پوشش نوبت سوم ثلاث (DTP3)</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-success);">
+            <div class="stat-value" style="color: var(--state-success); font-size: 1.6rem; font-weight: 800;">۰٪</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">میزان کشندگی در سال ۱۳۸۸</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-warning);">
+            <div class="stat-value" style="color: var(--state-warning); font-size: 1.6rem; font-weight: 800;">۶۰٪</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">موارد در سن بالای ۱۵ سال</div>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-6);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">سیمای اپیدمیولوژی توصیفی در جهان و ایران</h3>
+          <p style="line-height: var(--line-height-relaxed);">${ep.global || ''}</p>
+          <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4); margin-block-start: var(--space-4);">
+            ${milestones.map(m => `
+              <div class="clinical-card">
+                <div class="card-header bg-primary text-white" style="font-weight: 700;">سال ${m.year} — ${m.event}</div>
+                <div class="card-body"><p style="margin:0;">${m.details}</p></div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-6);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">جدول دموگرافیک و توزیع موارد دیفتری در سال ۱۳۸۸ ایران</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>گروه سنی</th>
+                  <th>جمعیت</th>
+                  <th>کل موارد: N (%)</th>
+                  <th>بروز در ۱۰۰ هزار</th>
+                  <th>مرد: N (%)</th>
+                  <th>زن: N (%)</th>
+                  <th>شهری: N (%)</th>
+                  <th>روستایی: N (%)</th>
+                  <th>ایرانی: N (%)</th>
+                  <th>غیرایرانی: N (%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${demoRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-6);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">اصول درمان بالینی و قوانین جداسازی (Isolation)</h3>
+          <div class="medical-callout callout-danger" style="margin-block-end: var(--space-4);">
+            <div class="callout-icon">🚨</div>
+            <div class="callout-content">
+              <strong>قاعده حیاتی ایمنی‌شناسی:</strong> ${mgmt.postRecoveryVaccine || ''}
+            </div>
+          </div>
+          <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
+            <div class="clinical-card">
+              <div class="card-header bg-primary text-white" style="font-weight: 700;">درمان دارویی بیمار</div>
+              <div class="card-body">
+                <ul class="styled-list">
+                  <li><strong>آنتی‌توکسین:</strong> ${mgmt.antitoxin || ''}</li>
+                  <li><strong>آنتی‌بیوتیک:</strong> ${mgmt.antibiotics || ''}</li>
+                  <li><strong>کشت مثبت مداوم:</strong> ${mgmt.persistentCulture || ''}</li>
+                </ul>
+              </div>
+            </div>
+            <div class="clinical-card">
+              <div class="card-header bg-warning text-dark" style="font-weight: 700;">پروتکل‌های جداسازی (Isolation)</div>
+              <div class="card-body">
+                <ul class="styled-list">
+                  <li><strong>فرم تنفسی:</strong> ${iso.respiratory || ''}</li>
+                  <li><strong>عدم دسترسی به کشت:</strong> ${iso.noCulture || ''}</li>
+                  <li><strong>فرم پوستی:</strong> ${iso.cutaneous || ''}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">مدیریت ناقلان (Carriers) و تماس‌های نزدیک (Close Contacts)</h3>
+          <div class="medical-callout callout-warning" style="margin-block-end: var(--space-4);">
+            <div class="callout-icon">⛔</div>
+            <div class="callout-content">
+              <strong>ممنوعیت قطعی:</strong> ${contactMgmt.contraindication || ''}
+            </div>
+          </div>
+          <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
+            <div class="clinical-card">
+              <div class="card-header bg-info text-white" style="font-weight: 700;">مدیریت ناقلان بدون علامت</div>
+              <div class="card-body">
+                <ul class="styled-list">
+                  ${carriers.map(c => `<li>${c}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+            <div class="clinical-card">
+              <div class="card-header bg-info text-white" style="font-weight: 700;">مدیریت تماس‌های نزدیک</div>
+              <div class="card-body">
+                <ul class="styled-list">
+                  ${contacts.map(c => `<li>${c}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (sec.id === 'ch31-sec03') {
+      const cd = sec.caseDefinitions || {};
+      const agent = sec.agentAndTransmission || {};
+      const elim = sec.eliminationTargets || {};
+      const iranTrends = elim.iranTrends || [];
+      const strategies = sec.therapeuticAndPreventiveStrategies || [];
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="grid-4" style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-block-end: var(--space-6);">
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-danger);">
+            <div class="stat-value" style="color: var(--state-danger); font-size: 1.6rem; font-weight: 800;">> ۹۵٪</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">نرخ کشندگی کزاز نوزادی</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--color-primary);">
+            <div class="stat-value" style="color: var(--color-primary); font-size: 1.6rem; font-weight: 800;">۳ تا ۲۸ روز</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">بازه سنی بروز علائم بالینی</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-success);">
+            <div class="stat-value" style="color: var(--state-success); font-size: 1.6rem; font-weight: 800;">< ۱ در ۱۰۰۰</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">شاخص حذف در سطح شهرستان</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-info);">
+            <div class="stat-value" style="color: var(--state-info); font-size: 1.6rem; font-weight: 800;">تا ۵ ماهگی</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">محافظت با آنتی‌بادی مادری</div>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-6);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">تعاریف استاندارد مورد در کزاز نوزادی</h3>
+          <div class="medical-callout callout-warning" style="margin-block-end: var(--space-4);">
+            <div class="callout-icon">🔍</div>
+            <div class="callout-content">
+              <strong>ویژگی منحصر‌به‌فرد تشخیصی:</strong> ${cd.diagnosticNature || ''}
+            </div>
+          </div>
+          <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
+            <div class="clinical-card">
+              <div class="card-header bg-warning text-dark" style="font-weight: 700;">مورد مشکوک (Suspected Case)</div>
+              <div class="card-body"><p style="margin:0;">${cd.suspected || ''}</p></div>
+            </div>
+            <div class="clinical-card">
+              <div class="card-header bg-danger text-white" style="font-weight: 700;">مورد قطعی (Confirmed Case)</div>
+              <div class="card-body"><p style="margin:0;">${cd.confirmed || ''}</p></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-6);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">عامل بیماری‌زا، مقاومت و ویژگی‌های انتقال</h3>
+          <div class="clinical-card" style="border-top: 4px solid var(--color-primary);">
+            <div class="card-body">
+              <ul class="styled-list">
+                <li><strong>عامل اتیولوژیک و اسپورها:</strong> ${agent.etiology || ''}</li>
+                <li><strong>مخزن باکتری:</strong> ${agent.reservoir || ''}</li>
+                <li><strong>راه انتقال:</strong> ${agent.transmission || ''}</li>
+                <li><strong>دوره کمون و شاخص‌ها:</strong> ${agent.clinicalMetrics || ''}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-6);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">شاخص‌های حذف جهانی و وضعیت در ایران</h3>
+          <div class="medical-callout callout-info" style="margin-block-end: var(--space-4);">
+            <div class="callout-icon">🌍</div>
+            <div class="callout-content">
+              <strong>هدف جهانی:</strong> ${elim.globalTarget || ''}<br>
+              <strong>طبیعت بیماری:</strong> ${elim.eradiationNature || ''} (${elim.underreporting || ''})
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>مقطع زمانی</th>
+                  <th>شاخص و وضعیت کنترل کزاز نوزادی در ایران</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${iranTrends.map(t => `
+                  <tr>
+                    <td><strong>${t.year}</strong></td>
+                    <td>${t.status}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">راهبردهای درمانی و پیشگیری</h3>
+          <div class="clinical-card" style="border-inline-start: 4px solid var(--state-success);">
+            <div class="card-body">
+              <ul class="styled-list">
+                ${strategies.map(s => `<li>${s}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (sec.id === 'ch31-sec04') {
+      const diseases = sec.diseases || [];
+
+      const diseaseCards = diseases.map(d => `
+        <div class="clinical-card" style="margin-block-end: var(--space-4); border-top: 4px solid var(--state-danger);">
+          <div class="card-header bg-light d-flex justify-between align-center" style="padding: var(--space-3) var(--space-4);">
+            <div class="d-flex align-center gap-2">
+              <span class="badge badge-danger" style="font-weight: 800;">${d.number}</span>
+              <h4 style="margin:0; font-size: 1.1rem; font-weight: 700;">${d.name}</h4>
+            </div>
+            <span class="badge badge-danger">گزارش تلفنی فوری</span>
+          </div>
+          <div class="card-body" style="padding: var(--space-4);">
+            <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-3); margin-block-end: var(--space-3);">
+              <div style="background: var(--surface-secondary); padding: var(--space-3); border-radius: var(--radius-sm);">
+                <strong style="color: var(--state-warning);">مورد مشکوک / محتمل:</strong>
+                <p style="margin: var(--space-1) 0 0 0; font-size: var(--font-size-sm);">${d.probable || d.suspected || ''}</p>
+              </div>
+              <div style="background: var(--surface-secondary); padding: var(--space-3); border-radius: var(--radius-sm);">
+                <strong style="color: var(--state-success);">مورد قطعی:</strong>
+                <p style="margin: var(--space-1) 0 0 0; font-size: var(--font-size-sm);">${d.confirmed || ''}</p>
+              </div>
+            </div>
+            <div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); padding: var(--space-3); border-radius: var(--radius-sm);">
+              <strong style="color: var(--state-danger);">اقدامات مراقبت و پیشگیری:</strong>
+              <p style="margin: var(--space-1) 0 0 0; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">${d.surveillanceActions || ''}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      return `
+        <div class="medical-callout callout-danger" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon">📞</div>
+          <div class="callout-content">
+            <strong>اصل بنیادین مراقبت تلفنی:</strong> ${sec.reportingPrinciple || ''}
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3 class="block-title" style="margin-block-end: var(--space-4);">بیماری‌های ۸ گانه اولویت‌دار مشمول گزارش تلفنی فوری</h3>
+          ${diseaseCards}
+        </div>
+      `;
+    }
+
+    if (sec.id === 'ch31-sec05') {
+      const diseases = sec.diseases || [];
+
+      const diseaseCards = diseases.map(d => `
+        <div class="clinical-card" style="margin-block-end: var(--space-4); border-top: 4px solid var(--color-primary);">
+          <div class="card-header bg-light d-flex justify-between align-center" style="padding: var(--space-3) var(--space-4);">
+            <div class="d-flex align-center gap-2">
+              <span class="badge badge-primary" style="font-weight: 800;">${d.number}</span>
+              <h4 style="margin:0; font-size: 1.1rem; font-weight: 700;">${d.name}</h4>
+            </div>
+            <span class="badge badge-info">گزارش کتبی / دوره‌ای</span>
+          </div>
+          <div class="card-body" style="padding: var(--space-4);">
+            <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-3); margin-block-end: var(--space-3);">
+              <div style="background: var(--surface-secondary); padding: var(--space-3); border-radius: var(--radius-sm);">
+                <strong style="color: var(--text-primary);">مورد مشکوک:</strong>
+                <p style="margin: var(--space-1) 0 0 0; font-size: var(--font-size-sm);">${d.suspected || ''}</p>
+              </div>
+              <div style="background: var(--surface-secondary); padding: var(--space-3); border-radius: var(--radius-sm);">
+                <strong style="color: var(--color-primary);">مورد محتمل / قطعی:</strong>
+                <p style="margin: var(--space-1) 0 0 0; font-size: var(--font-size-sm);">${d.confirmed || d.probable || ''}</p>
+              </div>
+            </div>
+            <div style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); padding: var(--space-3); border-radius: var(--radius-sm);">
+              <strong style="color: var(--color-primary);">اقدامات مراقبت و زمان‌بندی:</strong>
+              <p style="margin: var(--space-1) 0 0 0; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">${d.surveillanceActions || ''}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon">📋</div>
+          <div class="callout-content">
+            <strong>اصل گزارش‌دهی کتبی:</strong> ${sec.reportingPrinciple || ''}
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3 class="block-title" style="margin-block-end: var(--space-4);">بیماری‌های ۷ گانه مشمول گزارش کتبی غیرفوری</h3>
+          ${diseaseCards}
+        </div>
+      `;
+    }
+
+    if (sec.id === 'ch31-sec06') {
+      const matrix = sec.matrix || [];
+
+      const matrixRows = matrix.map((row, i) => {
+        const isImmediate = row.reportingType.includes('فوری');
+        const badgeClass = isImmediate ? 'badge-danger' : 'badge-info';
+
+        return `
+          <tr>
+            <td style="font-weight: 700; white-space: nowrap;">${row.disease}</td>
+            <td style="white-space: nowrap;"><span class="badge ${badgeClass}">${row.reportingType}</span></td>
+            <td>${row.clinicalKey}</td>
+            <td><strong style="color: var(--color-primary);">${row.labCriteria}</strong></td>
+            <td>${row.specificActions}</td>
+          </tr>
+        `;
+      }).join('');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon">📊</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">جدول مقایسه‌ای الگوریتم مراقبت ۱۷ بیماری نظام کشوری</h3>
+          <div class="table-responsive" style="max-height: 700px; overflow-y: auto;">
+            <table class="medical-data-table" style="font-size: var(--font-size-sm);">
+              <thead style="position: sticky; top: 0; background: var(--surface-primary); z-index: 2;">
+                <tr>
+                  <th style="min-width: 140px;">بیماری</th>
+                  <th style="min-width: 130px;">نوع و زمان گزارش‌دهی</th>
+                  <th style="min-width: 180px;">نشانه بالینی کلیدی</th>
+                  <th style="min-width: 170px;">معیار آزمایشگاهی تأیید قطعی</th>
+                  <th style="min-width: 220px;">اقدامات اختصاصی مراقبت و قرنطینه</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${matrixRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    return `<p>${sec.summary || ''}</p>`;
+  },
+
 };
 
