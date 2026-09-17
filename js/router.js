@@ -14,32 +14,6 @@ window.AppRouter = {
     const hash = window.location.hash.replace(/^#/, '');
     if (!hash) return;
 
-    // 1. Direct Exam Q&A Bank Route
-    if (hash === 'exam-qa') {
-      if (window.appState && window.appState.activeChapterId !== 'exam-qa') {
-        window.appState.setActiveChapter('exam-qa');
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-
-    // 2. Exam Q&A Question Direct Route (e.g. #qa-q-10)
-    if (hash.startsWith('qa-')) {
-      if (window.appState && window.appState.activeChapterId !== 'exam-qa') {
-        window.appState.setActiveChapter('exam-qa');
-      }
-      setTimeout(() => {
-        const el = document.getElementById(hash);
-        if (el) {
-          const headerOffset = 80;
-          const elementPosition = el.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-          window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-        }
-      }, 150);
-      return;
-    }
-
     const chapters = window.CHAPTERS_REGISTRY || [];
 
     // 3. Direct Chapter Route (e.g. #ch-01, #ch-02)

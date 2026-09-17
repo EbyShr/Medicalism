@@ -81,7 +81,7 @@ def run_tests():
         assert sidebar_box['x'] > content_box['x'], f"Sidebar must be on physical RIGHT: sidebar={sidebar_box['x']}, content={content_box['x']}"
         print("PASS: Desktop navigation is physically on the RIGHT side!")
 
-        screenshot_dir = os.path.join(os.environ.get("USERPROFILE", ""), ".gemini", "antigravity", "brain", "f08a77b5-b26d-4faf-8ddf-2e35c2851175")
+        screenshot_dir = os.path.join(os.environ.get("USERPROFILE", ""), ".gemini", "antigravity", "brain", "9b30c28f-3558-4f46-907a-b21c4ad8c6c7")
         
         # Capture Initial Light Theme Screenshot (Chapter 1)
         light_shot_path = os.path.join(screenshot_dir, "desktop_light_theme.png")
