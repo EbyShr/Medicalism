@@ -188,7 +188,7 @@ window.AppNavigation = {
                   <polyline points="21 15 16 10 5 21"></polyline>
                 </svg>
               </div>
-              <span class="nav-folder-title">رادیولوژی و تروماهای اسکلتی</span>
+              <span class="nav-folder-title">رادیولوژی و تصویربرداری بالینی</span>
             </div>
             <div class="nav-folder-meta">
               <span class="nav-folder-badge badge-rad" style="background: rgba(14, 165, 233, 0.12); color: #0ea5e9;">${radChapters.length} فصل</span>

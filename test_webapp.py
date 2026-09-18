@@ -244,14 +244,14 @@ def run_tests():
         assert sidebar_box["x"] > content_box["x"], f"[Course 2] Sidebar must be on physical RIGHT: sidebar={sidebar_box['x']}, content={content_box['x']}"
         print("[Course 2] PASS: Desktop sidebar is physically on the RIGHT side!")
 
-        # Verify exactly 1 chapter in registry and 9 sections
+        # Verify 2 chapters in registry and 18 total sections
         rad_chapters = page.locator("#desktopNavTree .nav-chapter-item").all()
-        print(f"[Course 2] Registered chapters in nav: {len(rad_chapters)} (Strict Expected: 1)")
-        assert len(rad_chapters) == 1, f"Expected strictly 1 chapter in Course 2, got {len(rad_chapters)}"
+        print(f"[Course 2] Registered chapters in nav: {len(rad_chapters)} (Strict Expected: 2)")
+        assert len(rad_chapters) == 2, f"Expected strictly 2 chapters in Course 2, got {len(rad_chapters)}"
 
         rad_nav_links = page.locator("#desktopNavTree .nav-heading-link").all()
-        print(f"[Course 2] Total nav heading links: {len(rad_nav_links)} (Expected: 9)")
-        assert len(rad_nav_links) == 9, f"Expected 9 nav links in Course 2, got {len(rad_nav_links)}"
+        print(f"[Course 2] Total nav heading links: {len(rad_nav_links)} (Expected: 18)")
+        assert len(rad_nav_links) == 18, f"Expected 18 nav links in Course 2, got {len(rad_nav_links)}"
 
         # Verify Radiology Folder only
         rad_folder = page.locator('#desktopNavTree .nav-folder-item[data-folder-key="rad"]')
@@ -449,6 +449,44 @@ def run_tests():
         assert page.locator("#s7").is_visible(), "Navigated to section s7"
         print("PASS: Clinical search hit navigated to section s7!")
 
+        # 2.4 Test Chapter 2 Switching & Verification
+        print("\n--- [Course 2] Testing Chapter 2 (Abdominal X-ray Interpretation) ---")
+        page.goto(rad_url + "#rad-ch02")
+        page.wait_for_load_state("networkidle")
+        page.wait_for_timeout(300)
+
+        ch2_title = page.locator(".chapter-title").inner_text()
+        print(f"[Course 2] Chapter 2 Title: {ch2_title}")
+        assert "شکم" in ch2_title, f"Expected شکم in Chapter 2 title, got {ch2_title}"
+
+        ch2_sections = page.locator(".study-section").all()
+        print(f"[Course 2] Chapter 2 Rendered sections: {len(ch2_sections)} (Expected: 9)")
+        assert len(ch2_sections) == 9, f"Expected 9 sections in Chapter 2, got {len(ch2_sections)}"
+
+        for i in range(1, 10):
+            sec_id = f"s{i}"
+            badge = page.locator(f"#{sec_id} .section-id-badge")
+            assert badge.is_visible(), f"Chapter 2 badge #{sec_id} should be visible"
+            assert f"#{sec_id}" in badge.inner_text()
+        print("[Course 2] PASS: All 9 Section ID badges (#s1 - #s9) verified on Chapter 2!")
+
+        has_ch2_undefined = page.evaluate("""() => {
+            const stream = document.querySelector('.sections-stream');
+            if (!stream) return false;
+            const text = stream.innerText;
+            const html = stream.innerHTML;
+            return text.includes('undefined') || html.includes('>undefined<') || text.includes('NaN');
+        }""")
+        assert not has_ch2_undefined, "Found undefined or NaN in Chapter 2 DOM!"
+        print("[Course 2] PASS: Chapter 2 is 100% free of undefined and NaN!")
+
+        # Verify previous chapter card on Chapter 2 points to Chapter 1
+        prev_btn = page.locator(".prev-chapter-card")
+        assert prev_btn.is_visible(), "Prev chapter card should be visible on Chapter 2"
+        prev_text = prev_btn.inner_text()
+        assert "1" in prev_text or "۱" in prev_text or "تروما" in prev_text or "مفصلی" in prev_text
+        print(f"[Course 2] PASS: Previous chapter card points to Chapter 1!")
+
         # Mobile Drawer for Radiology (390px)
         mobile_page = browser.new_page(viewport={"width": 390, "height": 844})
         mobile_page.goto(rad_url)
@@ -458,8 +496,8 @@ def run_tests():
         mobile_page.wait_for_timeout(350)
 
         mob_rad_ch = mobile_page.locator("#mobileNavTree .nav-chapter-item").all()
-        print(f"[Course 2] Mobile nav chapters: {len(mob_rad_ch)} (Expected: 1)")
-        assert len(mob_rad_ch) == 1, f"Expected 1 chapter in mobile drawer, got {len(mob_rad_ch)}"
+        print(f"[Course 2] Mobile nav chapters: {len(mob_rad_ch)} (Expected: 2)")
+        assert len(mob_rad_ch) == 2, f"Expected 2 chapters in mobile drawer, got {len(mob_rad_ch)}"
 
         shot_mob_rad = os.path.join(screenshot_dir, "mobile_nav_drawer_radiology.png")
         mobile_page.screenshot(path=shot_mob_rad)

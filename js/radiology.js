@@ -798,7 +798,21 @@ window.RadiologyModule = (function() {
                   }
             ]
       }
-}
+},
+    'rad-ch02': {
+      "chapterId": "rad-ch02",
+      "sections": {
+        "s1": [],
+        "s2": [],
+        "s3": [],
+        "s4": [],
+        "s5": [],
+        "s6": [],
+        "s7": [],
+        "s8": [],
+        "s9": []
+      }
+    }
   };
 
   let manifestDiagnostics = {};

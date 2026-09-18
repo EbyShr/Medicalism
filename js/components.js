@@ -163,6 +163,8 @@ window.ComponentRenderer = {
       sectionBody = this.renderChapter31Section(section);
     } else if (chapterId === 'ch-32' || chapterId === 'rad-ch01') {
       sectionBody = this.renderChapter32Section(section, chapterId);
+    } else if (chapterId === 'rad-ch02') {
+      sectionBody = this.renderChapterAbdominalSection(section, chapterId);
     } else {
       sectionBody = `<p>${section.summary || ''}</p>`;
     }
@@ -8216,6 +8218,724 @@ window.ComponentRenderer = {
           <div class="card-body" style="padding: var(--space-4);">
             <h4 style="margin: 0 0 var(--space-2) 0; color: var(--state-danger);">آسیب‌های هایپرفلکشن گردنی و شکستگی قطره‌اشکی (Cervical Hyperflexion & Teardrop)</h4>
             <p style="margin: 0; font-size: 0.9rem; line-height: 1.75;">${sec.hyperflexionTeardrop || ''}</p>
+          </div>
+        </div>
+
+        ${getGallery('s9')}
+      `;
+    } else {
+      contentHtml = `<p>${sec.summary || ''}</p>${getGallery(sec.id)}`;
+    }
+
+    return contentHtml;
+  },
+
+
+  /* =========================================================================
+     CHAPTER RENDERERS (ABDOMINAL X-RAY INTERPRETATION - rad-ch02)
+     ========================================================================= */
+  renderChapterAbdominalSection(sec, chapterId = 'rad-ch02') {
+    let contentHtml = '';
+    const activeChId = chapterId || 'rad-ch02';
+    const getGallery = (secId) => {
+      if (window.RadiologyModule && typeof window.RadiologyModule.renderGallery === 'function') {
+        return window.RadiologyModule.renderGallery(secId, activeChId);
+      }
+      return '';
+    };
+
+    if (sec.id === 's1') {
+      const stdCards = (sec.standardProjections || []).map(p => `
+        <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--accent-primary);">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+              <strong style="color: var(--accent-primary); font-size: 0.98rem;">${p.name}</strong>
+              <span class="badge badge-info" style="font-size: 0.8rem;">${p.latin || ''}</span>
+            </div>
+            <p style="margin: var(--space-2) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${p.role}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const addCards = (sec.additionalProjections || []).map(p => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-3);">
+          <strong style="color: var(--text-primary); font-size: 0.95rem;">${p.name}</strong>
+          <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7;">${p.role}</p>
+        </div>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">نماهای استاندارد رادیوگرافی شکم (Standard Projections)</h3>
+          ${stdCards}
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">نماهای تکمیلی و رویکرد روتین بالینی (Additional Projections & Routine Practice)</h3>
+          ${addCards}
+        </div>
+
+        ${getGallery('s1')}
+      `;
+    }
+    else if (sec.id === 's2') {
+      const boundRows = (sec.boundaries || []).map(b => `
+        <tr>
+          <td style="font-weight: 800; white-space: nowrap; color: var(--accent-primary); width: 28%; min-width: 130px;">${b.boundary}</td>
+          <td style="font-size: 0.9rem; line-height: 1.7;">${b.criteria}</td>
+        </tr>
+      `).join('');
+
+      const quadCards = ((sec.topography && sec.topography.quadrants) || []).map(q => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-block-end: var(--space-2);">
+            <strong style="color: var(--accent-primary); font-size: 0.95rem;">${q.title}</strong>
+            <span class="badge badge-neutral" style="font-weight: 700;">${q.id}</span>
+          </div>
+          <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.65;">${q.organs}</p>
+        </div>
+      `).join('');
+
+      const regBadges = ((sec.topography && sec.topography.regions) || []).map((r, i) => `
+        <div style="display: flex; align-items: center; gap: 8px; background: rgba(14, 165, 233, 0.06); border: 1px solid rgba(14, 165, 233, 0.2); padding: 8px 12px; border-radius: var(--radius-md); font-size: 0.88rem;">
+          <span style="color: var(--accent-primary); font-weight: 800;">${i + 1}.</span>
+          <span>${r}</span>
+        </div>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">حدود آناتومیک یک گرافی معتبر شکم (Adequacy & Boundaries)</h3>
+          <div class="table-responsive" style="margin-block-end: var(--space-3);">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>حد آناتومیک</th>
+                  <th>معیار صحت تکنیکی و شمول</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${boundRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">تقسیم‌بندی چهار ربع شکم (Four Quadrants)</h3>
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3);">
+            ${quadCards}
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">تقسیم‌بندی نواحی نه‌گانه شکم (Nine Clinical Regions)</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: var(--space-2);">
+            ${regBadges}
+          </div>
+        </div>
+
+        ${getGallery('s2')}
+      `;
+    } else if (sec.id === 's3') {
+      const organCards = (sec.solidOrgans || []).map(o => `
+        <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--accent-primary);">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <strong style="color: var(--accent-primary); font-size: 0.95rem;">${o.name}:</strong>
+            <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${o.desc}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const sk = sec.skeletalAndLines || {};
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">ارزیابی ارگان‌های توپر و مجاری ادراری (Solid Organs & Urinary System)</h3>
+          ${organCards}
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">ساختارهای اسکلتی، لگن و خط شنتون (Skeletal Pelvis & Shenton's Line)</h3>
+          
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-3);">
+            <strong style="color: var(--text-primary); font-size: 0.95rem;">ستون فقرات کمری و حلقه لگن:</strong>
+            <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${sk.spineAndPelvis || ''}</p>
+          </div>
+
+          <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--state-warning); background: rgba(245, 158, 11, 0.04);">
+            <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+              <strong style="color: var(--state-warning); font-size: 0.95rem;">خط شنتون (Shenton's Line):</strong>
+              <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${sk.shentonsLine || ''}</p>
+            </div>
+          </div>
+
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-3);">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3); border-radius: var(--radius-md);">
+              <strong style="color: var(--accent-primary); font-size: 0.92rem;">رباط اینگوینال (Inguinal Ligament):</strong>
+              <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${sk.inguinalLigament || ''}</p>
+            </div>
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3); border-radius: var(--radius-md);">
+              <strong style="color: var(--accent-primary); font-size: 0.92rem;">قاعده‌های ریه (Lung Bases):</strong>
+              <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${sk.lungBases || ''}</p>
+            </div>
+          </div>
+        </div>
+
+        ${getGallery('s3')}
+      `;
+    }
+    else if (sec.id === 's4') {
+      const gasRows = (sec.bowelGas || []).map(g => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-3);">
+          <strong style="color: var(--accent-primary); font-size: 0.95rem;">${g.part}:</strong>
+          <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${g.finding}</p>
+        </div>
+      `).join('');
+
+      const stepCards = (sec.presentationSteps || []).map(s => `
+        <div style="background: rgba(14, 165, 233, 0.05); border: 1px solid rgba(14, 165, 233, 0.2); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-2);">
+          <strong style="color: var(--accent-primary); font-size: 0.93rem;">${s.step}</strong>
+          <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65;">${s.desc}</p>
+        </div>
+      `).join('');
+
+      const abcdeBadges = (sec.abcdeFramework || []).map(item => `
+        <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--accent-primary);">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-block-end: var(--space-1);">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-primary); color: #fff; font-weight: 800; font-size: 0.9rem;">${item.letter}</span>
+              <strong style="font-size: 0.98rem; color: var(--text-primary);">${item.title}</strong>
+            </div>
+            <p style="margin: 0; font-size: 0.9rem; line-height: 1.7; color: var(--text-secondary);">${item.desc}</p>
+          </div>
+        </div>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">الگوی توزیع گاز طبیعی لومن روده (Bowel Gas Pattern)</h3>
+          ${gasRows}
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">مراحل چهارگانه ارائه استاندارد کلیشه (Presentation Steps)</h3>
+          ${stepCards}
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">چارچوب پنج‌گانه سیستماتیک ABCDE</h3>
+          ${abcdeBadges}
+        </div>
+
+        ${getGallery('s4')}
+      `;
+    } else if (sec.id === 's5') {
+      const pneu = sec.pneumoperitoneum || {};
+      const causesList = (pneu.causes || []).map(c => `<li style="margin-block-end: 6px;">${c}</li>`).join('');
+
+      const signCards = (sec.radiologicSigns || []).map(s => `
+        <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--accent-primary);">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <strong style="color: var(--accent-primary); font-size: 0.95rem;">${s.name}</strong>
+            <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${s.mechanism}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const diffCards = (sec.differentials || []).map(d => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-3);">
+          <strong style="color: var(--text-primary); font-size: 0.93rem;">${d.condition}:</strong>
+          <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.65;">${d.features}</p>
+        </div>
+      `).join('');
+
+      const retro = sec.pneumoretroperitoneum || {};
+      const retroCauses = (retro.causes || []).map(c => `<li style="margin-block-end: 6px;">${c}</li>`).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <!-- Pneumoperitoneum -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">پنوموپریتونئوم (Pneumoperitoneum - هوای آزاد صفاقی)</h3>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-3);">
+            <p style="margin: 0 0 var(--space-2) 0; font-size: 0.92rem; line-height: 1.7;"><strong>تعریف بالینی:</strong> ${pneu.definition || ''}</p>
+            <strong style="font-size: 0.9rem; color: var(--text-primary);">علل اصلی پرفوراسیون و هوای آزاد:</strong>
+            <ul style="margin: var(--space-2) var(--space-4) 0 0; padding: 0; font-size: 0.9rem; line-height: 1.7;">
+              ${causesList}
+            </ul>
+          </div>
+
+          <div class="medical-callout callout-danger" style="margin-block-end: var(--space-4);">
+            <div class="callout-icon">⚡</div>
+            <div class="callout-content">
+              <strong>حساسیت تصویربرداری:</strong> ${pneu.imagingSensitivity || ''}
+            </div>
+          </div>
+        </div>
+
+        <!-- Radiologic Signs -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">نشانه‌های رادیولوژیک اختصاصی پنوموپریتونئوم</h3>
+          ${signCards}
+        </div>
+
+        <!-- Differentials -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">تشخیص‌های افتراقی و پدیده‌های مشابه پنوموپریتونئوم</h3>
+          ${diffCards}
+        </div>
+
+        <!-- Pneumoretroperitoneum -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">پنومورتروپریتونئوم (Pneumoretroperitoneum - هوای خلف صفاق)</h3>
+          <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--state-danger);">
+            <div class="card-body" style="padding: var(--space-4);">
+              <p style="margin: 0 0 var(--space-2) 0; font-size: 0.92rem; line-height: 1.7;"><strong>مفهوم بالینی:</strong> ${retro.concept || ''}</p>
+              <p style="margin: 0 0 var(--space-2) 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.65;"><strong>محتویات تشریحی رتروپریتونئوم:</strong> ${retro.retroperitonealAnatomy || ''}</p>
+              <strong style="font-size: 0.9rem; color: var(--text-primary);">علل اصلی:</strong>
+              <ul style="margin: var(--space-2) var(--space-4) 0 0; padding: 0; font-size: 0.88rem; line-height: 1.7;\">
+                ${retroCauses}
+              </ul>
+            </div>
+          </div>
+          <div class="medical-callout callout-warning" style="margin-block-end: var(--space-3);">
+            <div class="callout-icon">🔑</div>
+            <div class="callout-content">
+              <strong>کلید تشخیصی:</strong> ${retro.diagnosticKey || ''}
+            </div>
+          </div>
+        </div>
+
+        ${getGallery('s5')}
+      `;
+    }
+    else if (sec.id === 's6') {
+      const bilia = sec.pneumobilia || {};
+      const biliaCauses = (bilia.causes || []).map(c => `<li style="margin-block-end: 6px;">${c}</li>`).join('');
+
+      const portal = sec.portalVenousGas || {};
+      const portalCauses = (portal.causes || []).map(c => `<li style="margin-block-end: 6px;">${c}</li>`).join('');
+
+      const tableRows = (sec.comparisonTable || []).map(r => `
+        <tr>
+          <td style="font-weight: 800; white-space: nowrap; color: var(--accent-primary); width: 22%; min-width: 120px;">${r.parameter}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; width: 39%; min-width: 160px;">${r.pneumobilia}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; width: 39%; min-width: 160px; color: var(--state-danger); font-weight: 600;">${r.portalGas}</td>
+        </tr>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4); margin-block-end: var(--space-5);">
+          <!-- Pneumobilia -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-4); border-top: 4px solid var(--accent-primary);">
+            <h4 style="margin: 0 0 var(--space-2) 0; color: var(--accent-primary); font-size: 1rem;">پنوموبیلیا (Pneumobilia)</h4>
+            <p style="margin: 0 0 var(--space-3) 0; font-size: 0.9rem; line-height: 1.7;">${bilia.features || ''}</p>
+            <strong style="font-size: 0.88rem; color: var(--text-primary);">علل تشخیصی:</strong>
+            <ul style="margin: var(--space-2) var(--space-4) 0 0; padding: 0; font-size: 0.88rem; line-height: 1.7;">
+              ${biliaCauses}
+            </ul>
+          </div>
+
+          <!-- Portal Venous Gas -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-4); border-top: 4px solid var(--state-danger);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-block-end: var(--space-2);">
+              <h4 style="margin: 0; color: var(--state-danger); font-size: 1rem;">گاز در ورید پورت (Portal Venous Gas)</h4>
+              <span class="badge badge-danger">اورژانس حیاتی</span>
+            </div>
+            <p style="margin: 0 0 var(--space-2) 0; font-size: 0.9rem; line-height: 1.7;">${portal.features || ''}</p>
+            <p style="margin: 0 0 var(--space-3) 0; font-size: 0.88rem; color: var(--state-danger); font-weight: 700; line-height: 1.65;">⚠️ ${portal.prognosis || ''}</p>
+            <strong style="font-size: 0.88rem; color: var(--text-primary);">علل شایع:</strong>
+            <ul style="margin: var(--space-2) var(--space-4) 0 0; padding: 0; font-size: 0.88rem; line-height: 1.7;">
+              ${portalCauses}
+            </ul>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">جدول مقایسه افتراقی الگوهای گاز شاخه‌دار داخل کبد</h3>
+          <div class="table-responsive" style="margin-block-end: var(--space-3);">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>پارامتر مقایسه</th>
+                  <th>پنوموبیلیا (Pneumobilia)</th>
+                  <th>گاز ورید پورت (Portal Venous Gas)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tableRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        ${getGallery('s6')}
+      `;
+    } else if (sec.id === 's7') {
+      const dilCards = (sec.dilationCriteria || []).map(c => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-3);">
+          <strong style="color: var(--accent-primary); font-size: 0.95rem;">${c.criterion}:</strong>
+          <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${c.desc}</p>
+        </div>
+      `).join('');
+
+      const mech = sec.mechanicalVsIleus || {};
+
+      const etioCards = (sec.sboEtiology || []).map(e => `
+        <div style="background: rgba(14, 165, 233, 0.05); border: 1px solid rgba(14, 165, 233, 0.2); padding: var(--space-3); border-radius: var(--radius-md);">
+          <strong style="color: var(--accent-primary); font-size: 0.92rem;">${e.category}</strong>
+          <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${e.examples}</p>
+        </div>
+      `).join('');
+
+      const gall = sec.gallstoneIleus || {};
+      const triadItems = (gall.riglersTriad || []).map(t => `<li style="margin-block-end: 6px; font-weight: 700;">${t}</li>`).join('');
+
+      const her = sec.hernias || {};
+
+      const sbLbRows = (sec.smallVsLargeTable || []).map(r => `
+        <tr>
+          <td style="font-weight: 800; white-space: nowrap; color: var(--accent-primary); width: 25%; min-width: 120px;">${r.feature}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; width: 37%; min-width: 150px;">${r.smallBowel}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; width: 38%; min-width: 150px;">${r.largeBowel}</td>
+        </tr>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <!-- Dilation Criteria -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">معیارهای رادیولوژیک اتساع روده باریک (Small Bowel Dilation)</h3>
+          ${dilCards}
+        </div>
+
+        <!-- SBO vs Ileus -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">انسداد مکانیکی در برابر ایلئوس روده باریک</h3>
+          <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--accent-primary);">
+            <div class="card-body" style="padding: var(--space-4);">
+              <strong style="color: var(--accent-primary); font-size: 0.95rem;">انسداد مکانیکی (SBO):</strong>
+              <p style="margin: var(--space-1) 0 var(--space-2) 0; font-size: 0.9rem; line-height: 1.7;">${mech.sbo || ''}</p>
+              <div style="background: rgba(14, 165, 233, 0.08); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm); font-size: 0.88rem; line-height: 1.65;">
+                <strong>معیارهای شدت انسداد مکانیکی (High-Grade SBO):</strong> ${mech.highGradeCriteria || ''}
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-3);">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3); border-radius: var(--radius-md);">
+              <strong style="color: var(--text-primary); font-size: 0.93rem;">ایلئوس فلجی (Paralytic Ileus):</strong>
+              <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${mech.paralyticIleus || ''}</p>
+            </div>
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3); border-radius: var(--radius-md);">
+              <strong style="color: var(--text-primary); font-size: 0.93rem;">لوپ نگهبان (Sentinel Loop):</strong>
+              <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${mech.sentinelLoop || ''}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Etiology of SBO -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">طبقه‌بندی علل انسداد مکانیکی روده باریک</h3>
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3);">
+            ${etioCards}
+          </div>
+        </div>
+
+        <!-- Gallstone Ileus & Rigler's Triad -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">ایلئوس سنگ کیسه صفرا و تریاد ریگلر (Rigler's Triad)</h3>
+          <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--state-warning);">
+            <div class="card-body" style="padding: var(--space-4);">
+              <p style="margin: 0 0 var(--space-2) 0; font-size: 0.9rem; line-height: 1.7;"><strong>پاتوفیزیولوژی:</strong> ${gall.pathophysiology || ''}</p>
+              <strong style="color: var(--state-warning); font-size: 0.95rem;">اجزای سه‌گانه تریاد ریگلر (Rigler's Triad):</strong>
+              <ol style="margin: var(--space-2) var(--space-4) 0 0; padding: 0; font-size: 0.9rem; line-height: 1.7;">
+                ${triadItems}
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hernias -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">انسداد ناشی از فتق‌ها (Hernias)</h3>
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-3); margin-block-end: var(--space-3);">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3); border-radius: var(--radius-md);">
+              <strong style="color: var(--text-primary); font-size: 0.92rem;">فتق اینگوینال:</strong>
+              <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${her.inguinal || ''}</p>
+            </div>
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3); border-radius: var(--radius-md);">
+              <strong style="color: var(--text-primary); font-size: 0.92rem;">فتق نافی:</strong>
+              <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${her.umbilical || ''}</p>
+            </div>
+          </div>
+          <div class="medical-callout callout-warning" style="margin-block-end: var(--space-3);">
+            <div class="callout-icon">⚠️</div>
+            <div class="callout-content">
+              ${her.goldenRule || ''}
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison Small vs Large -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">جدول مقایسه افتراقی روده باریک و بزرگ متسع</h3>
+          <div class="table-responsive" style="margin-block-end: var(--space-3);">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>ویژگی رادیولوژیک</th>
+                  <th>روده باریک متسع (Small Bowel)</th>
+                  <th>روده بزرگ متسع (Large Bowel)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${sbLbRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        ${getGallery('s7')}
+      `;
+    }
+    else if (sec.id === 's8') {
+      const lbCards = (sec.largeBowelCriteria || []).map(c => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-3);">
+          <strong style="color: var(--accent-primary); font-size: 0.95rem;">${c.criterion}:</strong>
+          <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${c.desc}</p>
+        </div>
+      `).join('');
+
+      const lboCauses = (sec.lboCauses || []).map(c => `
+        <div style="background: rgba(14, 165, 233, 0.05); border: 1px solid rgba(14, 165, 233, 0.2); padding: var(--space-3); border-radius: var(--radius-md);">
+          <strong style="color: var(--accent-primary); font-size: 0.92rem;">${c.cause}</strong>
+          <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${c.desc}</p>
+        </div>
+      `).join('');
+
+      const og = sec.ogilvieSyndrome || {};
+      const ogRisks = (og.riskFactors || []).map(r => `<li style="margin-block-end: 6px;">${r}</li>`).join('');
+
+      const sig = sec.sigmoidVolvulus || {};
+      const sigSigns = (sig.signs || []).map(s => `<li style="margin-block-end: 6px;">${s}</li>`).join('');
+
+      const caec = sec.caecalVolvulus || {};
+      const caecSigns = (caec.signs || []).map(s => `<li style="margin-block-end: 6px;">${s}</li>`).join('');
+
+      const volvRows = (sec.volvulusComparison || []).map(r => `
+        <tr>
+          <td style="font-weight: 800; white-space: nowrap; color: var(--accent-primary); width: 22%; min-width: 120px;">${r.criteria}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; width: 39%; min-width: 160px;">${r.sigmoid}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; width: 39%; min-width: 160px;">${r.caecal}</td>
+        </tr>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <!-- Large Bowel Dilation Criteria -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">معیارهای رادیولوژیک اتساع روده بزرگ (Large Bowel Dilation)</h3>
+          ${lbCards}
+        </div>
+
+        <!-- Causes of LBO -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">علل شایع انسداد مکانیکی کولون (Large Bowel Obstruction)</h3>
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3);">
+            ${lboCauses}
+          </div>
+        </div>
+
+        <!-- Ogilvie Syndrome -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">سودواوبستراکشن حاد کولون / سندرم اوگیلوی (Ogilvie Syndrome)</h3>
+          <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--state-danger);">
+            <div class="card-body" style="padding: var(--space-4);">
+              <p style="margin: 0 0 var(--space-2) 0; font-size: 0.92rem; line-height: 1.7;"><strong>تعریف:</strong> ${og.definition || ''}</p>
+              <p style="margin: 0 0 var(--space-2) 0; font-size: 0.9rem; line-height: 1.7;"><strong>پاتولوژی:</strong> ${og.pathology || ''}</p>
+              <p style="margin: 0 0 var(--space-2) 0; font-size: 0.9rem; line-height: 1.7;"><strong>تظاهرات بالینی:</strong> ${og.clinicalPresentation || ''}</p>
+              <p style="margin: 0 0 var(--space-3) 0; font-size: 0.9rem; color: var(--state-danger); font-weight: 700; line-height: 1.7;">⚠️ <strong>خطر اصلی:</strong> ${og.primaryDanger || ''}</p>
+              <strong style="font-size: 0.9rem; color: var(--text-primary);">عوامل خطر زمینه‌ای (Risk Factors):</strong>
+              <ul style="margin: var(--space-2) var(--space-4) 0 0; padding: 0; font-size: 0.88rem; line-height: 1.7;">
+                ${ogRisks}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Volvulus Overview -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">ولولوس دستگاه گوارش (Volvulus)</h3>
+          <div class="medical-callout callout-info" style="margin-block-end: var(--space-4);">
+            <div class="callout-icon">🔄</div>
+            <div class="callout-content">
+              <strong>مکانیسم دوگانه:</strong> ${sec.volvulusGeneral || ''}
+            </div>
+          </div>
+
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4); margin-block-end: var(--space-4);">
+            <!-- Sigmoid Volvulus -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-4); border-top: 4px solid var(--accent-primary);">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-block-end: var(--space-2);">
+                <h4 style="margin: 0; color: var(--accent-primary); font-size: 1rem;">ولولوس سیگموئید (Sigmoid)</h4>
+                <span class="badge badge-info">Coffee Bean</span>
+              </div>
+              <p style="margin: 0 0 var(--space-2) 0; font-size: 0.88rem; color: var(--text-secondary);"><strong>جمعیت در معرض خطر:</strong> ${sig.population || ''}</p>
+              <strong style="font-size: 0.88rem; color: var(--text-primary);">نشانه‌های رادیولوژیک:</strong>
+              <ul style="margin: var(--space-2) var(--space-4) 0 0; padding: 0; font-size: 0.88rem; line-height: 1.7;">
+                ${sigSigns}
+              </ul>
+            </div>
+
+            <!-- Caecal Volvulus -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-4); border-top: 4px solid var(--state-warning);">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-block-end: var(--space-2);">
+                <h4 style="margin: 0; color: var(--state-warning); font-size: 1rem;">ولولوس سکوم (Caecal)</h4>
+                <span class="badge badge-warning">Comma Shaped</span>
+              </div>
+              <p style="margin: 0 0 var(--space-2) 0; font-size: 0.88rem; color: var(--text-secondary);"><strong>عامل مستعدکننده:</strong> ${caec.predisposingFactor || ''}</p>
+              <strong style="font-size: 0.88rem; color: var(--text-primary);">نشانه‌های رادیولوژیک:</strong>
+              <ul style="margin: var(--space-2) var(--space-4) 0 0; padding: 0; font-size: 0.88rem; line-height: 1.7;">
+                ${caecSigns}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Volvulus Comparison Table -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">جدول مقایسه افتراقی ولولوس سیگموئید و ولولوس سکوم</h3>
+          <div class="table-responsive" style="margin-block-end: var(--space-3);">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>معیار رادیولوژیک</th>
+                  <th>ولولوس سیگموئید (Sigmoid Volvulus)</th>
+                  <th>ولولوس سکوم (Caecal Volvulus)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${volvRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        ${getGallery('s8')}
+      `;
+    } else if (sec.id === 's9') {
+      const calc = sec.calcifications || {};
+      const signCalcRows = (calc.significant || []).map(c => `
+        <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--state-danger);">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <strong style="color: var(--state-danger); font-size: 0.95rem;">${c.name}:</strong>
+            <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${c.desc}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const nonCalcRows = (calc.nonPathologic || []).map(c => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-2);">
+          <strong style="color: var(--text-primary); font-size: 0.93rem;">${c.name}:</strong>
+          <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.65;">${c.desc}</p>
+        </div>
+      `).join('');
+
+      const dis = sec.disability || {};
+      const skelList = (dis.skeletal || []).map(s => `<li style="margin-block-end: 6px;">${s}</li>`).join('');
+
+      const extras = (sec.everythingElse || []).map(e => `
+        <div style="background: rgba(14, 165, 233, 0.05); border: 1px solid rgba(14, 165, 233, 0.2); padding: var(--space-3); border-radius: var(--radius-md);">
+          <strong style="color: var(--accent-primary); font-size: 0.92rem;">${e.category}</strong>
+          <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65;\">${e.details}</p>
+        </div>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <!-- Calcification (C) -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">ارزیابی کلسیفیکاسیون‌ها (C: Calcification)</h3>
+          
+          <h4 style="margin: 0 0 var(--space-2) 0; color: var(--state-danger); font-size: 0.98rem;">کلسیفیکاسیون‌های دارای اهمیت تشخیصی بالینی:</h4>
+          ${signCalcRows}
+
+          <h4 style="margin: var(--space-4) 0 var(--space-2) 0; color: var(--text-primary); font-size: 0.98rem;">کلسیفیکاسیون‌های بدون اهمیت پاتولوژیک (شایع و بی‌خطر):</h4>
+          ${nonCalcRows}
+        </div>
+
+        <!-- Disability (D) -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">ارزیابی اسکلت و احشای توپر (D: Disability - Bones & Solid Organs)</h3>
+          
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-3);">
+            <strong style="color: var(--accent-primary); font-size: 0.95rem;">ستون فقرات و سیستم اسکلتی:</strong>
+            <ul style="margin: var(--space-2) var(--space-4) 0 0; padding: 0; font-size: 0.9rem; line-height: 1.7;">
+              ${skelList}
+            </ul>
+          </div>
+
+          <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--state-warning);">
+            <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+              <strong style="color: var(--state-warning); font-size: 0.95rem;">حاشیه پسواس (Psoas Outline):</strong>
+              <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${dis.psoasOutline || ''}</p>
+            </div>
+          </div>
+
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3); border-radius: var(--radius-md); margin-block-end: var(--space-3);">
+            <strong style="color: var(--text-primary); font-size: 0.95rem;">ارگانومگالی احشای توپر:</strong>
+            <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${dis.organomegaly || ''}</p>
+          </div>
+        </div>
+
+        <!-- Everything Else (E) -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">ادوات درمانی، جراحی و یافته‌های متفرقه (E: Everything Else)</h3>
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3);">
+            ${extras}
           </div>
         </div>
 
