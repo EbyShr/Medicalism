@@ -165,6 +165,10 @@ window.ComponentRenderer = {
       sectionBody = this.renderChapter32Section(section, chapterId);
     } else if (chapterId === 'rad-ch02') {
       sectionBody = this.renderChapterAbdominalSection(section, chapterId);
+    } else if (chapterId === 'rad-ch03') {
+      sectionBody = this.renderChapterBrainCTSection(section, chapterId);
+    } else if (chapterId === 'rad-ch04') {
+      sectionBody = this.renderChapterUrinaryContrastSection(section, chapterId);
     } else {
       sectionBody = `<p>${section.summary || ''}</p>`;
     }
@@ -9109,6 +9113,733 @@ window.ComponentRenderer = {
         ${getGallery('s10')}
       `;
     } else {
+      contentHtml = `<p>${sec.summary || ''}</p>${getGallery(sec.id)}`;
+    }
+
+    return contentHtml;
+  },
+
+
+  /* =========================================================================
+     CHAPTER RENDERERS (BRAIN CT INTERPRETATION & PATHOLOGY - rad-ch03)
+     ========================================================================= */
+  renderChapterBrainCTSection(sec, chapterId = 'rad-ch03') {
+    let contentHtml = '';
+    const activeChId = chapterId || 'rad-ch03';
+    const getGallery = (secId) => {
+      if (window.RadiologyModule && typeof window.RadiologyModule.renderGallery === 'function') {
+        return window.RadiologyModule.renderGallery(secId, activeChId);
+      }
+      return '';
+    };
+
+    if (sec.id === 's1') {
+      const verifyCards = (sec.verificationItems || []).map(item => `
+        <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--accent-primary);">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <strong style="color: var(--accent-primary); font-size: 0.96rem;">${item.title}</strong>
+            <p style="margin: var(--space-2) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${item.desc}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const pearlItems = (sec.clinicalPearls || []).map(pearl => `
+        <li style="margin-block-end: var(--space-2); line-height: 1.7;">${pearl}</li>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">اصول سه‌گانه بررسی هویتی و فنی (Technical & Identification Steps)</h3>
+          ${verifyCards}
+        </div>
+
+        <div class="medical-callout callout-warning" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">⚠️</div>
+          <div class="callout-content">
+            <h4 style="margin: 0 0 var(--space-2) 0; color: var(--state-warning);">نکات طلایی بالینی در تفسیر تصاویر قبلی (Clinical Pearls):</h4>
+            <ul style="margin: 0; padding-inline-start: var(--space-4); font-size: 0.9rem;">
+              ${pearlItems}
+            </ul>
+          </div>
+        </div>
+
+        ${getGallery('s1')}
+      `;
+    }
+    else if (sec.id === 's2') {
+      const winRows = (sec.windowsTable || []).map(w => `
+        <tr>
+          <td style="font-weight: 800; color: var(--accent-primary); white-space: nowrap; width: 22%; min-width: 140px;">${w.type}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; width: 26%;">${w.targets}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; width: 26%;">${w.indication}</td>
+          <td style="font-size: 0.88rem; line-height: 1.65; color: var(--state-danger); width: 26%;">${w.limitation}</td>
+        </tr>
+      `).join('');
+
+      const planeCards = (sec.orthogonalPlanes || []).map(p => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3); margin-block-end: var(--space-3);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-block-end: var(--space-1);">
+            <strong style="color: var(--accent-primary); font-size: 0.95rem;">${p.plane}</strong>
+            <span class="badge badge-neutral" style="font-size: 0.8rem;">Multiplanar Plane</span>
+          </div>
+          <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.65;">${p.role}</p>
+        </div>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">جدول مقایسه‌ای پنجره‌های سی‌تی‌اسکن (CT Windows Comparison)</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>نوع پنجره (Window Type)</th>
+                  <th>بافت‌های هدف</th>
+                  <th>اندیکاسیون‌های تشخیصی</th>
+                  <th>محدودیت اصلی</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${winRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">سطوح سه‌بعدی ارتوگونال (Orthogonal Planes)</h3>
+          <div class="grid-3" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3);">
+            ${planeCards}
+          </div>
+        </div>
+
+        ${getGallery('s2')}
+      `;
+    }
+    else if (sec.id === 's3') {
+      const artCards = (sec.artifacts || []).map(a => `
+        <div class="clinical-card" style="margin-block-end: var(--space-4); border-inline-start: 4px solid var(--state-warning);">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <strong style="color: var(--state-warning); font-size: 0.98rem; display: block; margin-block-end: var(--space-2);">${a.name}</strong>
+            <div style="margin-block-end: var(--space-2); font-size: 0.9rem; line-height: 1.7;">
+              <span style="font-weight: 700; color: var(--text-primary);">مکانیسم ایجاد: </span>${a.mechanism}
+            </div>
+            <div style="font-size: 0.88rem; color: var(--state-danger); line-height: 1.7; background: rgba(239, 68, 68, 0.06); padding: var(--space-2) var(--space-3); border-radius: var(--radius-sm);">
+              <span style="font-weight: 700;">اهمیت و خطای بالینی: </span>${a.clinicalImpact}
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">آرتیفکت‌های شایع و دام‌های تشخیصی (Artifacts & Diagnostic Pitfalls)</h3>
+          ${artCards}
+        </div>
+
+        ${getGallery('s3')}
+      `;
+    }
+    else if (sec.id === 's4') {
+      const compRows = (sec.fractureVsSuture || []).map(r => `
+        <tr>
+          <td style="font-weight: 700; color: var(--text-primary); width: 25%;">${r.feature}</td>
+          <td style="color: var(--state-danger); font-size: 0.9rem; line-height: 1.65; width: 37.5%;">${r.fracture}</td>
+          <td style="color: var(--accent-primary); font-size: 0.9rem; line-height: 1.65; width: 37.5%;">${r.suture}</td>
+        </tr>
+      `).join('');
+
+      const traumaCards = (sec.traumaFindings || []).map(t => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); margin-block-end: var(--space-3);">
+          <strong style="color: var(--state-danger); font-size: 0.95rem; display: block; margin-block-end: var(--space-1);">${t.type}</strong>
+          <p style="margin: 0; font-size: 0.9rem; line-height: 1.7; color: var(--text-secondary);">${t.desc}</p>
+        </div>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">جدول افتراق شکستگی از درزهای جمجمه (Fracture vs. Suture)</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>ویژگی تمایزدهنده</th>
+                  <th style="color: var(--state-danger);">شکستگی جمجمه (Fracture)</th>
+                  <th style="color: var(--accent-primary);">درز طبیعی استخوانی (Suture)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${compRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">یافته‌های تروما و آسیب‌های همراه (Associated Trauma Findings)</h3>
+          ${traumaCards}
+        </div>
+
+        ${getGallery('s4')}
+      `;
+    }
+    else if (sec.id === 's5') {
+      const hemRows = (sec.hemorrhageTable || []).map(h => `
+        <tr>
+          <td style="font-weight: 800; color: var(--state-danger); white-space: nowrap; width: 22%;">${h.type}</td>
+          <td style="font-size: 0.88rem; line-height: 1.6; width: 22%;">${h.space}</td>
+          <td style="font-size: 0.88rem; line-height: 1.6; width: 18%; font-weight: 600;">${h.shape}</td>
+          <td style="font-size: 0.88rem; line-height: 1.6; width: 18%;">${h.sutureLimit}</td>
+          <td style="font-size: 0.86rem; line-height: 1.6; width: 20%; color: var(--text-secondary);">${h.clinicalNotes}</td>
+        </tr>
+      `).join('');
+
+      const sdhCards = (sec.sdhAging || []).map(a => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3); margin-block-end: var(--space-2);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-block-end: 4px;">
+            <strong style="color: var(--accent-primary); font-size: 0.92rem;">${a.phase}</strong>
+            <span class="badge badge-neutral" style="font-size: 0.78rem;">SDH Aging</span>
+          </div>
+          <p style="margin: 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${a.features}</p>
+        </div>
+      `).join('');
+
+      const sahList = (sec.sahPatterns || []).map(p => `
+        <li style="margin-block-end: 6px; line-height: 1.65;">${p}</li>
+      `).join('');
+
+      const ichCards = (sec.ichPatterns || []).map(i => `
+        <div style="background: rgba(239, 68, 68, 0.04); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: var(--radius-md); padding: var(--space-3); margin-block-end: var(--space-2);">
+          <strong style="color: var(--state-danger); font-size: 0.92rem;">${i.type}</strong>
+          <p style="margin: 4px 0 0 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${i.desc}</p>
+        </div>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="medical-callout callout-tip" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">🧠</div>
+          <div class="callout-content">
+            <strong style="color: var(--accent-primary);">لایه‌های مننژ و فضاهای جمجمه به ترتیب از خارج به داخل:</strong>
+            <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7; font-family: monospace;">${sec.meningealLayers || ''}</p>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">جدول مشخصات تشخیصی انواع خونریزی‌های درون‌جمجمه‌ای</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>نوع خونریزی</th>
+                  <th>فضای آناتومیک</th>
+                  <th>شکل هندسی</th>
+                  <th>محدودیت به درز</th>
+                  <th>نکات بالینی و تشخیصی</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${hemRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4); margin-block-end: var(--space-5);">
+          <div class="content-block">
+            <h4 class="block-title" style="margin-block-end: var(--space-2); font-size: 1rem;">سیر تحول زمانی هماتوم سابدورال (SDH Aging)</h4>
+            ${sdhCards}
+          </div>
+          <div class="content-block">
+            <h4 class="block-title" style="margin-block-end: var(--space-2); font-size: 1rem;">الگوهای توزیع SAH و ICH</h4>
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3); margin-block-end: var(--space-3);">
+              <strong style="color: var(--state-warning); font-size: 0.92rem;">محل‌های تجمع خونریزی زیرعنکبوتیه (SAH):</strong>
+              <ul style="margin: var(--space-2) var(--space-3) 0 0; padding: 0; font-size: 0.88rem;">
+                ${sahList}
+              </ul>
+            </div>
+            ${ichCards}
+          </div>
+        </div>
+
+        ${getGallery('s5')}
+      `;
+    }
+    else if (sec.id === 's6') {
+      const terrCards = (sec.vascularTerritories || []).map(t => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3);">
+          <strong style="color: var(--accent-primary); font-size: 0.92rem; display: block; margin-block-end: 4px;">${t.artery}</strong>
+          <p style="margin: 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${t.territory}</p>
+        </div>
+      `).join('');
+
+      const earlyCards = (sec.earlySigns || []).map(e => `
+        <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--state-danger);">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <strong style="color: var(--state-danger); font-size: 0.95rem;">${e.sign}</strong>
+            <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${e.desc}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const compRows = (sec.infarctComparison || []).map(c => `
+        <tr>
+          <td style="font-weight: 700; color: var(--text-primary); width: 24%;">${c.feature}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; color: var(--state-danger); width: 38%;">${c.acute}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; color: var(--accent-primary); width: 38%;">${c.old}</td>
+        </tr>
+      `).join('');
+
+      const svd = sec.smallVesselDisease || {};
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">قلمروهای شریانی خونرسانی مغز (Vascular Territories)</h3>
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--space-3);">
+            ${terrCards}
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">نشانه‌های زودهنگام ایسکمی حاد MCA (Early Ischemia Signs)</h3>
+          ${earlyCards}
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">مقایسه رادیولوژیک انفارکتوس حاد در برابر کهنه و مزمن</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>شاخص رادیولوژیک</th>
+                  <th style="color: var(--state-danger);">انفارکتوس حاد (Acute Infarct)</th>
+                  <th style="color: var(--accent-primary);">انفارکتوس کهنه (Old Infarct)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${compRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-3); margin-block-end: var(--space-5);">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3);">
+            <strong style="color: var(--accent-primary); font-size: 0.92rem;">بیماری عروق کوچک (Small Vessel Disease):</strong>
+            <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${svd.svd || ''}</p>
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3);">
+            <strong style="color: var(--accent-primary); font-size: 0.92rem;">انفارکتوس‌های لاکونار (Lacunar Infarcts):</strong>
+            <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${svd.lacunar || ''}</p>
+          </div>
+        </div>
+
+        ${getGallery('s6')}
+      `;
+    }
+    else if (sec.id === 's7') {
+      const volRows = (sec.volumeTable || []).map(v => `
+        <tr>
+          <td style="font-weight: 800; color: var(--accent-primary); white-space: nowrap; width: 28%; min-width: 150px;">${v.condition}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; width: 24%;">${v.ventricles}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; width: 24%;">${v.sulci}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; width: 24%; font-weight: 600;">${v.differentiation}</td>
+        </tr>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">جدول تحلیل دینامیک حجم مغز، وضعیت بطن‌ها و شیارها</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>شرایط بالینی / سن</th>
+                  <th>وضعیت بطن‌ها (Ventricles)</th>
+                  <th>شیارهای کورتیکال (Sulci)</th>
+                  <th>تمایز ماده سفید و خاکستری</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${volRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        ${getGallery('s7')}
+      `;
+    }
+    else if (sec.id === 's8') {
+      const steps = (sec.cascadeSteps || []).map(s => `
+        <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--state-danger);">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <strong style="color: var(--state-danger); font-size: 0.96rem;">${s.step}</strong>
+            <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${s.desc}</p>
+          </div>
+        </div>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">آبشار ۵ مرحله‌ای اثر توده‌ای و فتق‌های مغزی (Cascade of Mass Effect)</h3>
+          ${steps}
+        </div>
+
+        ${getGallery('s8')}
+      `;
+    }
+    else if (sec.id === 's9') {
+      const g = sec.glioma || {};
+      const m = sec.metastases || {};
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="medical-callout callout-tip" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💉</div>
+          <div class="callout-content">
+            <h4 style="margin: 0 0 var(--space-2) 0; color: var(--accent-primary);">اصول جذب ماده حاجب داخل وریدی در تومورها:</h4>
+            <p style="margin: 0; font-size: 0.9rem; line-height: 1.7;">${sec.contrastPrinciples || ''}</p>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">تومورهای بدخیم اولیه مغز (گلیوما / Glioma)</h3>
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-3);">
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3);">
+              <strong style="color: var(--text-primary); font-size: 0.92rem;">اسکن بدون کنتراست (Non-contrast CT):</strong>
+              <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${g.nonContrast || ''}</p>
+            </div>
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3);">
+              <strong style="color: var(--accent-primary); font-size: 0.92rem;">اسکن با کنتراست (تقویت حلقوی / Ring Enhancement):</strong>
+              <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${g.contrast || ''}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">متاستازهای داخل جمجمه‌ای (Brain & Skull Metastases)</h3>
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-3);">
+            <div class="clinical-card" style="border-inline-start: 4px solid var(--state-danger);">
+              <div class="card-body" style="padding: var(--space-3);">
+                <strong style="color: var(--state-danger); font-size: 0.92rem;">متاستازهای پارانشیم مغز:</strong>
+                <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65;">${m.brain || ''}</p>
+              </div>
+            </div>
+            <div class="clinical-card" style="border-inline-start: 4px solid var(--state-warning);">
+              <div class="card-body" style="padding: var(--space-3);">
+                <strong style="color: var(--state-warning); font-size: 0.92rem;">متاستازهای استخوان جمجمه (پنجره استخوانی):</strong>
+                <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65;">${m.skull || ''}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        ${getGallery('s9')}
+      `;
+    }
+    else {
+      contentHtml = `<p>${sec.summary || ''}</p>${getGallery(sec.id)}`;
+    }
+
+    return contentHtml;
+  },
+
+  /* =========================================================================
+     CHAPTER RENDERERS (CONTRAST STUDIES OF THE URINARY TRACT - rad-ch04)
+     ========================================================================= */
+  renderChapterUrinaryContrastSection(sec, chapterId = 'rad-ch04') {
+    let contentHtml = '';
+    const activeChId = chapterId || 'rad-ch04';
+    const getGallery = (secId) => {
+      if (window.RadiologyModule && typeof window.RadiologyModule.renderGallery === 'function') {
+        return window.RadiologyModule.renderGallery(secId, activeChId);
+      }
+      return '';
+    };
+
+    if (sec.id === 's1') {
+      const indItems = (sec.indications || []).map(ind => `
+        <li style="margin-block-end: 6px; line-height: 1.65;">${ind}</li>
+      `).join('');
+
+      const prepCards = (sec.patientPrep || []).map(p => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3); margin-block-end: var(--space-2);">
+          <strong style="color: var(--accent-primary); font-size: 0.92rem;">${p.step}</strong>
+          <p style="margin: 4px 0 0 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${p.desc}</p>
+        </div>
+      `).join('');
+
+      const tech = sec.technique || {};
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">اندیکاسیون‌های بالینی اوروگرافی داخل وریدی (IVU Indications)</h3>
+          <ul style="margin: 0; padding-inline-start: var(--space-4); font-size: 0.92rem;">
+            ${indItems}
+          </ul>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">مراحل آماده‌سازی و الزامات ایمنی بیمار (Patient Preparation)</h3>
+          ${prepCards}
+        </div>
+
+        <div class="clinical-card" style="margin-block-end: var(--space-5); border-inline-start: 4px solid var(--accent-primary);">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <strong style="color: var(--accent-primary); font-size: 0.95rem;">تکنیک تجویز ماده حاجب:</strong>
+            <p style="margin: var(--space-1) 0; font-size: 0.88rem; line-height: 1.65;"><strong>مسیر تزریق:</strong> ${tech.access || ''}</p>
+            <p style="margin: var(--space-1) 0; font-size: 0.88rem; line-height: 1.65;"><strong>دوزاژ:</strong> ${tech.dosage || ''}</p>
+            <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; line-height: 1.65;"><strong>سرعت تزریق:</strong> ${tech.rate || ''}</p>
+          </div>
+        </div>
+
+        ${getGallery('s1')}
+      `;
+    }
+    else if (sec.id === 's2') {
+      const stepRows = (sec.procedureSteps || []).map(s => `
+        <tr>
+          <td style="font-weight: 800; text-align: center; width: 8%; color: var(--accent-primary);">${s.step}</td>
+          <td style="font-weight: 700; width: 30%; color: var(--text-primary); font-size: 0.88rem;">${s.phase}</td>
+          <td style="font-size: 0.88rem; line-height: 1.65; width: 34%;">${s.action}</td>
+          <td style="font-size: 0.86rem; line-height: 1.6; width: 28%; color: var(--text-secondary);">${s.optional}</td>
+        </tr>
+      `).join('');
+
+      const contraItems = (sec.compressionContraindications || []).map(c => `
+        <li style="margin-block-end: 6px; line-height: 1.65;">${c}</li>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">پروتکل ۸ مرحله‌ای تصویربرداری و فازهای زمانی IVU</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th style="text-align: center;">گام</th>
+                  <th>فاز تصویربرداری و زمان‌بندی</th>
+                  <th>تصویربرداری و اقدام استاندارد</th>
+                  <th>تصاویر انتخابی و تکمیلی</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${stepRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="medical-callout callout-danger" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">🚫</div>
+          <div class="callout-content">
+            <h4 style="margin: 0 0 var(--space-2) 0; color: var(--state-danger);">موارد منع کاربرد کمپرسور شکمی (Abdominal Compression Contraindications):</h4>
+            <ul style="margin: 0; padding-inline-start: var(--space-4); font-size: 0.9rem;">
+              ${contraItems}
+            </ul>
+          </div>
+        </div>
+
+        ${getGallery('s2')}
+      `;
+    }
+    else if (sec.id === 's3') {
+      const pathCards = (sec.pathologies || []).map(p => `
+        <div class="clinical-card" style="margin-block-end: var(--space-4); border-inline-start: 4px solid var(--accent-primary);">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <strong style="color: var(--accent-primary); font-size: 0.98rem; display: block; margin-block-end: var(--space-2);">${p.condition}</strong>
+            <p style="margin: 0; font-size: 0.9rem; line-height: 1.7; color: var(--text-secondary);">${p.features}</p>
+          </div>
+        </div>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">الگوهای پاتولوژیک و تشخیصی سیستم ادراری در IVU</h3>
+          ${pathCards}
+        </div>
+
+        ${getGallery('s3')}
+      `;
+    }
+    else if (sec.id === 's4') {
+      const viewCards = (sec.vcugViews || []).map(v => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3); margin-block-end: var(--space-3);">
+          <strong style="color: var(--accent-primary); font-size: 0.95rem; display: block; margin-block-end: 4px;">${v.view}</strong>
+          <p style="margin: 0; font-size: 0.88rem; line-height: 1.65; color: var(--text-secondary);">${v.desc}</p>
+        </div>
+      `).join('');
+
+      const protoList = (sec.protocolImages || []).map(p => `
+        <li style="margin-block-end: 6px; line-height: 1.65;">${p}</li>
+      `).join('');
+
+      const critList = (sec.normalCriteria || []).map(c => `
+        <li style="margin-block-end: 6px; line-height: 1.65;">${c}</li>
+      `).join('');
+
+      const cap = sec.capacityFormula || {};
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">نماهای استاندارد پنج‌گانه در VCUG (Five Standard Views)</h3>
+          ${viewCards}
+        </div>
+
+        <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-3); margin-block-end: var(--space-5);">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3);">
+            <strong style="color: var(--accent-primary); font-size: 0.92rem;">پروتکل ثبت کلیشه‌ها:</strong>
+            <ul style="margin: var(--space-2) var(--space-3) 0 0; padding: 0; font-size: 0.88rem;">
+              ${protoList}
+            </ul>
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3);">
+            <strong style="color: var(--state-success); font-size: 0.92rem;">معیارهای یک گرافی کاملاً نرمال:</strong>
+            <ul style="margin: var(--space-2) var(--space-3) 0 0; padding: 0; font-size: 0.88rem;">
+              ${critList}
+            </ul>
+          </div>
+        </div>
+
+        <div class="medical-callout callout-tip" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">📐</div>
+          <div class="callout-content">
+            <strong style="color: var(--accent-primary); font-size: 0.95rem;">فرمول محاسبه ظرفیت مثانه (Bladder Capacity Formula):</strong>
+            <p style="margin: var(--space-1) 0; font-size: 0.9rem;"><strong>در کودکان:</strong> <code style="direction: ltr; display: inline-block;">${cap.children || ''}</code></p>
+            <p style="margin: 0; font-size: 0.9rem;"><strong>در بزرگسالان:</strong> ${cap.adults || ''}</p>
+          </div>
+        </div>
+
+        ${getGallery('s4')}
+      `;
+    }
+    else if (sec.id === 's5') {
+      const vurRows = (sec.vurTable || []).map(r => `
+        <tr>
+          <td style="font-weight: 800; color: var(--state-danger); white-space: nowrap; width: 15%;">${r.grade}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; width: 28%;">${r.extent}</td>
+          <td style="font-size: 0.9rem; line-height: 1.65; width: 28%; font-weight: 600;">${r.dilation}</td>
+          <td style="font-size: 0.88rem; line-height: 1.65; width: 29%; color: var(--text-secondary);">${r.fornices}</td>
+        </tr>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">طبقه‌بندی بین‌المللی ریفلاکس وزیکواورترال (International VUR Grading)</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>درجه (Grade)</th>
+                  <th>وسعت بازگشت ادرار</th>
+                  <th>میزان اتساع حالب و لگنچه</th>
+                  <th>تغییرات فورنیکس‌های کالیس</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${vurRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        ${getGallery('s5')}
+      `;
+    }
+    else if (sec.id === 's6') {
+      const pathCards = (sec.pathologies || []).map(p => `
+        <div class="clinical-card" style="margin-block-end: var(--space-4); border-inline-start: 4px solid var(--state-warning);">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <strong style="color: var(--state-warning); font-size: 0.98rem; display: block; margin-block-end: var(--space-2);">${p.name}</strong>
+            <p style="margin: 0; font-size: 0.9rem; line-height: 1.7; color: var(--text-secondary);">${p.features}</p>
+          </div>
+        </div>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">آنومالی‌ها و پاتولوژی‌های اختصاصی در VCUG</h3>
+          ${pathCards}
+        </div>
+
+        ${getGallery('s6')}
+      `;
+    }
+    else {
       contentHtml = `<p>${sec.summary || ''}</p>${getGallery(sec.id)}`;
     }
 

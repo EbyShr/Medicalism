@@ -244,14 +244,14 @@ def run_tests():
         assert sidebar_box["x"] > content_box["x"], f"[Course 2] Sidebar must be on physical RIGHT: sidebar={sidebar_box['x']}, content={content_box['x']}"
         print("[Course 2] PASS: Desktop sidebar is physically on the RIGHT side!")
 
-        # Verify 2 chapters in registry and 18 total sections
+        # Verify 4 chapters in registry and 34 total sections (9 + 10 + 9 + 6)
         rad_chapters = page.locator("#desktopNavTree .nav-chapter-item").all()
-        print(f"[Course 2] Registered chapters in nav: {len(rad_chapters)} (Strict Expected: 2)")
-        assert len(rad_chapters) == 2, f"Expected strictly 2 chapters in Course 2, got {len(rad_chapters)}"
+        print(f"[Course 2] Registered chapters in nav: {len(rad_chapters)} (Strict Expected: 4)")
+        assert len(rad_chapters) == 4, f"Expected strictly 4 chapters in Course 2, got {len(rad_chapters)}"
 
         rad_nav_links = page.locator("#desktopNavTree .nav-heading-link").all()
-        print(f"[Course 2] Total nav heading links: {len(rad_nav_links)} (Expected: 19)")
-        assert len(rad_nav_links) == 19, f"Expected 19 nav links in Course 2, got {len(rad_nav_links)}"
+        print(f"[Course 2] Total nav heading links: {len(rad_nav_links)} (Expected: 34)")
+        assert len(rad_nav_links) == 34, f"Expected 34 nav links in Course 2, got {len(rad_nav_links)}"
 
         # Verify Radiology Folder only
         rad_folder = page.locator('#desktopNavTree .nav-folder-item[data-folder-key="rad"]')
@@ -570,6 +570,154 @@ def run_tests():
         assert "1" in prev_text or "۱" in prev_text or "تروما" in prev_text or "مفصلی" in prev_text
         print(f"[Course 2] PASS: Previous chapter card points to Chapter 1!")
 
+        # 2.5 Test Chapter 3 (Brain CT Interpretation & Pathology)
+        print("\n--- [Course 2] Testing Chapter 3 (Brain CT Interpretation & Pathology) ---")
+        page.goto(rad_url + "#rad-ch03")
+        page.wait_for_load_state("networkidle")
+        page.wait_for_timeout(300)
+
+        ch3_title = page.locator(".chapter-title").inner_text()
+        print(f"[Course 2] Chapter 3 Title: {ch3_title}")
+        assert "مغز" in ch3_title or "سی‌تی‌اسکن" in ch3_title, f"Expected مغز/سی‌تی‌اسکن in Chapter 3 title, got {ch3_title}"
+
+        ch3_sections = page.locator(".study-section").all()
+        print(f"[Course 2] Chapter 3 Rendered sections: {len(ch3_sections)} (Expected: 9)")
+        assert len(ch3_sections) == 9, f"Expected 9 sections in Chapter 3, got {len(ch3_sections)}"
+
+        for i in range(1, 10):
+            sec_id = f"s{i}"
+            badge = page.locator(f"#{sec_id} .section-id-badge")
+            assert badge.is_visible(), f"Chapter 3 badge #{sec_id} should be visible"
+            assert f"#{sec_id}" in badge.inner_text()
+        print("[Course 2] PASS: All 9 Section ID badges (#s1 - #s9) verified on Chapter 3!")
+
+        has_ch3_undefined = page.evaluate("""() => {
+            const stream = document.querySelector('.sections-stream');
+            if (!stream) return false;
+            const text = stream.innerText;
+            const html = stream.innerHTML;
+            return text.includes('undefined') || html.includes('>undefined<') || text.includes('NaN');
+        }""")
+        assert not has_ch3_undefined, "Found undefined or NaN in Chapter 3 DOM!"
+        print("[Course 2] PASS: Chapter 3 is 100% free of undefined and NaN!")
+
+        # Verify Chapter 3 Manifest on disk (9 sections empty arrays)
+        ch3_manifest_file = os.path.join("chapters", "rad-ch03", "images.json")
+        assert os.path.exists(ch3_manifest_file), f"Manifest missing at {ch3_manifest_file}"
+        with open(ch3_manifest_file, "r", encoding="utf-8") as cmf:
+            c3data = json.load(cmf)
+            assert c3data["chapterId"] == "rad-ch03"
+            assert len(c3data["sections"]) == 9
+            for i in range(1, 10):
+                assert f"s{i}" in c3data["sections"]
+        print("PASS: Chapter 3 empty manifest verified on disk with all 9 section keys!")
+
+        # Verify Table Containment in Chapter 3
+        ch3_table_containment = page.evaluate("""() => {
+            const sections = document.querySelectorAll('.study-section');
+            const violations = [];
+            sections.forEach(sec => {
+                const secRect = sec.getBoundingClientRect();
+                const tables = sec.querySelectorAll('.medical-data-table, table');
+                tables.forEach(table => {
+                    const container = table.closest('.table-responsive, .table-scroll-container') || sec;
+                    const containerRect = container.getBoundingClientRect();
+                    if (containerRect.left < secRect.left - 2 || containerRect.right > secRect.right + 2) {
+                        violations.push({
+                            sectionId: sec.id,
+                            issue: 'table container exceeds section borders',
+                            containerLeft: containerRect.left,
+                            secLeft: secRect.left,
+                            containerRight: containerRect.right,
+                            secRight: secRect.right
+                        });
+                    }
+                });
+            });
+            return violations;
+        }""")
+        assert len(ch3_table_containment) == 0, f"Chapter 3 Table containment violations: {ch3_table_containment}"
+        print("[Course 2] PASS: All tables in Chapter 3 are strictly contained within section borders!")
+
+        # Screenshot of Chapter 3
+        shot_ch3_light = os.path.join(screenshot_dir, "desktop_radiology_ch03_light.png")
+        page.screenshot(path=shot_ch3_light, full_page=False)
+        print(f"Saved Chapter 3 screenshot to {shot_ch3_light}")
+
+        # 2.6 Test Chapter 4 (Contrast Studies of the Urinary Tract - IVU & VCUG)
+        print("\n--- [Course 2] Testing Chapter 4 (Urinary Contrast Studies) ---")
+        page.goto(rad_url + "#rad-ch04")
+        page.wait_for_load_state("networkidle")
+        page.wait_for_timeout(300)
+
+        ch4_title = page.locator(".chapter-title").inner_text()
+        print(f"[Course 2] Chapter 4 Title: {ch4_title}")
+        assert "ادراری" in ch4_title or "IVU" in ch4_title or "حاجب" in ch4_title, f"Expected urinary/IVU in Chapter 4 title, got {ch4_title}"
+
+        ch4_sections = page.locator(".study-section").all()
+        print(f"[Course 2] Chapter 4 Rendered sections: {len(ch4_sections)} (Expected: 6)")
+        assert len(ch4_sections) == 6, f"Expected 6 sections in Chapter 4, got {len(ch4_sections)}"
+
+        for i in range(1, 7):
+            sec_id = f"s{i}"
+            badge = page.locator(f"#{sec_id} .section-id-badge")
+            assert badge.is_visible(), f"Chapter 4 badge #{sec_id} should be visible"
+            assert f"#{sec_id}" in badge.inner_text()
+        print("[Course 2] PASS: All 6 Section ID badges (#s1 - #s6) verified on Chapter 4!")
+
+        has_ch4_undefined = page.evaluate("""() => {
+            const stream = document.querySelector('.sections-stream');
+            if (!stream) return false;
+            const text = stream.innerText;
+            const html = stream.innerHTML;
+            return text.includes('undefined') || html.includes('>undefined<') || text.includes('NaN');
+        }""")
+        assert not has_ch4_undefined, "Found undefined or NaN in Chapter 4 DOM!"
+        print("[Course 2] PASS: Chapter 4 is 100% free of undefined and NaN!")
+
+        # Verify Chapter 4 Manifest on disk (6 sections empty arrays)
+        ch4_manifest_file = os.path.join("chapters", "rad-ch04", "images.json")
+        assert os.path.exists(ch4_manifest_file), f"Manifest missing at {ch4_manifest_file}"
+        with open(ch4_manifest_file, "r", encoding="utf-8") as cmf:
+            c4data = json.load(cmf)
+            assert c4data["chapterId"] == "rad-ch04"
+            assert len(c4data["sections"]) == 6
+            for i in range(1, 7):
+                assert f"s{i}" in c4data["sections"]
+        print("PASS: Chapter 4 empty manifest verified on disk with all 6 section keys!")
+
+        # Verify Table Containment in Chapter 4
+        ch4_table_containment = page.evaluate("""() => {
+            const sections = document.querySelectorAll('.study-section');
+            const violations = [];
+            sections.forEach(sec => {
+                const secRect = sec.getBoundingClientRect();
+                const tables = sec.querySelectorAll('.medical-data-table, table');
+                tables.forEach(table => {
+                    const container = table.closest('.table-responsive, .table-scroll-container') || sec;
+                    const containerRect = container.getBoundingClientRect();
+                    if (containerRect.left < secRect.left - 2 || containerRect.right > secRect.right + 2) {
+                        violations.push({
+                            sectionId: sec.id,
+                            issue: 'table container exceeds section borders',
+                            containerLeft: containerRect.left,
+                            secLeft: secRect.left,
+                            containerRight: containerRect.right,
+                            secRight: secRect.right
+                        });
+                    }
+                });
+            });
+            return violations;
+        }""")
+        assert len(ch4_table_containment) == 0, f"Chapter 4 Table containment violations: {ch4_table_containment}"
+        print("[Course 2] PASS: All tables in Chapter 4 are strictly contained within section borders!")
+
+        # Screenshot of Chapter 4
+        shot_ch4_light = os.path.join(screenshot_dir, "desktop_radiology_ch04_light.png")
+        page.screenshot(path=shot_ch4_light, full_page=False)
+        print(f"Saved Chapter 4 screenshot to {shot_ch4_light}")
+
         # Mobile Drawer for Radiology (390px)
         mobile_page = browser.new_page(viewport={"width": 390, "height": 844})
         mobile_page.goto(rad_url)
@@ -579,8 +727,8 @@ def run_tests():
         mobile_page.wait_for_timeout(350)
 
         mob_rad_ch = mobile_page.locator("#mobileNavTree .nav-chapter-item").all()
-        print(f"[Course 2] Mobile nav chapters: {len(mob_rad_ch)} (Expected: 2)")
-        assert len(mob_rad_ch) == 2, f"Expected 2 chapters in mobile drawer, got {len(mob_rad_ch)}"
+        print(f"[Course 2] Mobile nav chapters: {len(mob_rad_ch)} (Expected: 4)")
+        assert len(mob_rad_ch) == 4, f"Expected 4 chapters in mobile drawer, got {len(mob_rad_ch)}"
 
         shot_mob_rad = os.path.join(screenshot_dir, "mobile_nav_drawer_radiology.png")
         mobile_page.screenshot(path=shot_mob_rad)

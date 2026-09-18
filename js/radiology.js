@@ -1396,7 +1396,32 @@ window.RadiologyModule = (function() {
                   }
             ]
       }
-}
+    },
+    'rad-ch03': {
+      "chapterId": "rad-ch03",
+      "sections": {
+        "s1": [],
+        "s2": [],
+        "s3": [],
+        "s4": [],
+        "s5": [],
+        "s6": [],
+        "s7": [],
+        "s8": [],
+        "s9": []
+      }
+    },
+    'rad-ch04': {
+      "chapterId": "rad-ch04",
+      "sections": {
+        "s1": [],
+        "s2": [],
+        "s3": [],
+        "s4": [],
+        "s5": [],
+        "s6": []
+      }
+    }
   };
 
   let manifestDiagnostics = {};
