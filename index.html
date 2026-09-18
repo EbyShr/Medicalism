@@ -3,122 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>سامانه مطالعات بالینی و اپیدمیولوژی | Medical Study Hub</title>
-  <meta name="description" content="مرکز آموزش و تحلیل جامع اپیدمیولوژی بالینی، روند شیوع بیماری‌ها در ایران و استراتژی‌های پیشگیری سلامت">
+  <title>مدیکالیسم البرز | پایگاه جامع آموزش پزشکی و یادگیری بالینی • ویژه دانشجویان پزشکی دانشگاه علوم پزشکی البرز</title>
+  <meta name="description" content="سامانه جامع آموزش پزشکی و یادگیری بالینی، از مبانی بهداشت و اپیدمیولوژی تا کورس‌های ماژور بالینی، ویژه دانشجویان پزشکی دانشگاه علوم پزشکی البرز (ABZUMS).">
   <meta name="theme-color" content="#0284c7">
 
-  <!-- Google Fonts: Vazirmatn & JetBrains Mono -->
+  <!-- Fonts: Vazirmatn & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   
-  <!-- CDN Webfonts for Shabnam & Sahel -->
+  <!-- Webfonts for Shabnam & Sahel -->
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/shabnam-font@v5.0.1/dist/font-face.css" rel="stylesheet" type="text/css">
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" type="text/css">
 
-  <!-- Core Application Stylesheets -->
+  <!-- Core App Styles -->
   <link rel="stylesheet" href="./css/tokens.css">
   <link rel="stylesheet" href="./css/base.css">
   <link rel="stylesheet" href="./css/layout.css">
   <link rel="stylesheet" href="./css/components.css">
   <link rel="stylesheet" href="./css/medical-widgets.css">
   <link rel="stylesheet" href="./css/dark-theme.css">
-  <link rel="stylesheet" href="./css/print.css" media="print">
+  <link rel="stylesheet" href="./css/portal.css">
 </head>
-<body>
-  <!-- Ambient Animated Glowing Mesh Background -->
+<body class="portal-page">
+
+  <!-- Ambient Animated Background -->
   <div class="ambient-bg" aria-hidden="true">
     <div class="ambient-orb ambient-orb-1"></div>
     <div class="ambient-orb ambient-orb-2"></div>
     <div class="ambient-orb ambient-orb-3"></div>
   </div>
 
-  <!-- Real-time Reading Progress Bar -->
-  <div class="reading-progress-bar-container" aria-hidden="true">
-    <div class="reading-progress-bar" id="readingProgressBar"></div>
-  </div>
-
-  <!-- Application Shell -->
-  <div class="app-shell">
-    
-    <!-- Top Sticky Header -->
-    <header class="app-header">
-      <div style="display: flex; align-items: center; gap: var(--space-3); min-width: 0;">
-        <!-- Mobile Navigation Drawer Toggle -->
-        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="باز کردن فهرست فصول و مباحث">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
+  <!-- Sticky Top Navigation Bar -->
+  <header class="portal-header">
+    <div class="portal-container portal-header-inner">
+      <a href="./index.html" class="portal-brand" aria-label="مدیکالیسم البرز صفحه اصلی">
+        <div class="portal-brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
           </svg>
-        </button>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 4px;">
+          <span class="portal-brand-title">مدیکالیسم</span>
+          <span class="portal-brand-badge">دانشگاه علوم پزشکی البرز</span>
+        </div>
+      </a>
 
-        <!-- Brand Identity -->
-        <a href="#ch-01" class="header-brand">
-          <div class="brand-icon-wrapper">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2v20M2 12h20"></path>
-              <circle cx="12" cy="12" r="9"></circle>
+      <!-- Desktop Nav Links -->
+      <nav class="portal-nav-links" aria-label="ناوبری پورتال">
+        <!-- Animated Dropdown for Courses & Chapters -->
+        <div class="portal-dropdown" id="coursesDropdown">
+          <button class="portal-dropdown-trigger" type="button" id="coursesDropdownBtn" aria-expanded="false" aria-haspopup="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
             </svg>
+            <span>سرفصل‌ها و دوره‌های آموزشی</span>
+            <svg class="portal-dropdown-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          <div class="portal-dropdown-menu" id="coursesDropdownMenu" role="menu">
+            <div class="dropdown-section-label">دوره آموزشی فعال</div>
+            
+            <div class="dropdown-course-card" style="margin-block-end: 0;">
+              <div class="dropdown-course-header">
+                <div class="dropdown-course-icon-active">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="dropdown-course-title">بیماری‌های واگیر و غیرواگیر</div>
+                  <div class="dropdown-course-meta">۲۹ سرفصل جامع • آماده مطالعه</div>
+                </div>
+              </div>
+              <div class="dropdown-subfolders">
+                <a href="./course.html#ch-27" class="dropdown-folder-link" role="menuitem">
+                  <span>📁 بخش اول: بیماری‌های واگیر (۱۵ فصل)</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </a>
+                <a href="./course.html#ch-17" class="dropdown-folder-link" role="menuitem">
+                  <span>📁 بخش دوم: بیماری‌های غیرواگیر (۱۴ فصل)</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </a>
+              </div>
+            </div>
           </div>
-          <div class="brand-title-group">
-            <span class="brand-title">سامانه مطالعات بالینی</span>
-            <span class="brand-subtitle">پایگاه جامع آموزش پزشکی</span>
-          </div>
-        </a>
-      </div>
-
-      <!-- Action & Study Controls Toolbar -->
-      <div class="header-actions">
-        
-        <!-- Search Trigger Button -->
-        <button class="search-trigger-btn btn-search-trigger" aria-label="جستجوی بالینی در فصول">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <span style="display: none; @media(min-width: 640px) { display: inline; }">جستجو...</span>
-          <span class="search-shortcut-badge">⌘K</span>
-        </button>
-
-
-        <!-- Font Family Selector -->
-        <div class="font-selector-wrapper" title="انتخاب قلم متن">
-          <select class="font-select" id="fontSelect" aria-label="انتخاب نوع قلم">
-            <option value="vazirmatn">وزیرمتن (Vazirmatn)</option>
-            <option value="shabnam">شبنم (Shabnam)</option>
-            <option value="sahel">ساحل (Sahel)</option>
-          </select>
         </div>
+      </nav>
 
-        <!-- Continuous Font-Size Zoom Controls (A- / A+) -->
-        <div class="font-zoom-control" title="تنظیم پیوسته اندازه قلم متن">
-          <button class="zoom-btn" id="zoomOutBtn" aria-label="کوچک‌تر کردن اندازه متن (A−)">A−</button>
-          <span class="zoom-display" id="zoomDisplay" title="اندازه فعلی متن - کلیک برای بازنشانی">100%</span>
-          <button class="zoom-btn" id="zoomInBtn" aria-label="بزرگ‌تر کردن اندازه متن (A+)">A+</button>
-        </div>
+      <!-- Action Buttons (Theme, Font) -->
+      <div class="portal-header-actions">
+        <!-- Font Selector -->
+        <select class="font-select" id="portalFontSelect" title="تغییر قلم" style="font-size: 12px; padding: 5px 8px;">
+          <option value="vazirmatn">وزیرمتن</option>
+          <option value="shabnam">شبنم</option>
+          <option value="sahel">ساحل</option>
+        </select>
 
-        <!-- Bookmarks Modal Trigger -->
-        <button class="btn-icon" id="bookmarksToggleBtn" title="مشاهده بخش‌های نشانک‌گذاری شده" aria-label="نشانک‌های مطالعه">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-          </svg>
-          <span id="bookmarksCountBadge" style="display: none; position: absolute; top: -4px; right: -4px; width: 17px; height: 17px; border-radius: 50%; background-color: var(--accent-primary); color: #fff; font-size: 10px; font-weight: 800; align-items: center; justify-content: center;">0</span>
-        </button>
-
-        <!-- Distraction-Free Focus Mode Toggle -->
-        <button class="btn-icon" id="focusModeToggleBtn" title="ورود به حالت تمرکز مطالعه (پنهان‌سازی حاشیه‌ها)" aria-label="حالت تمرکز">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="15 3 21 3 21 9"></polyline>
-            <polyline points="9 21 3 21 3 15"></polyline>
-            <line x1="21" y1="3" x2="14" y2="10"></line>
-            <line x1="3" y1="21" x2="10" y2="14"></line>
-          </svg>
-        </button>
-
-        <!-- Theme Toggle (Light / Dark) -->
-        <button class="btn-icon" id="themeToggleBtn" title="تغییر تم (روشن / تاریک)" aria-label="تغییر تم">
-          <!-- Sun Icon (shown in dark mode) -->
+        <!-- Dark/Light Theme Toggle -->
+        <button class="btn-icon" id="portalThemeToggleBtn" title="تغییر حالت تم (روشن / تاریک)" aria-label="تغییر تم">
           <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
             <circle cx="12" cy="12" r="5"></circle>
             <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -130,129 +120,325 @@
             <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
           </svg>
-          <!-- Moon Icon (shown in light mode) -->
           <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
         </button>
-
       </div>
-    </header>
+    </div>
+  </header>
 
-    <!-- Main Responsive Two-Column Layout -->
-    <div class="app-layout">
+  <!-- Hero Section -->
+  <section class="portal-hero">
+    <div class="portal-container">
       
-      <!-- Right-Side Desktop Study Navigation Panel -->
-      <aside class="app-sidebar" aria-label="فهرست سرفصل‌های مطالعه">
-        <div class="sidebar-header">
-          <div class="sidebar-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-            </svg>
-            <span>فهرست فصول و مباحث</span>
-          </div>
-          <span style="font-size: 11px; color: var(--text-muted);">ناوبری سریع</span>
-        </div>
-        <nav class="sidebar-scroll-container">
-          <ul class="nav-tree" id="desktopNavTree">
-            <!-- Injected dynamically via AppNavigation -->
-          </ul>
-        </nav>
-      </aside>
+      <!-- Main Headline -->
+      <h1 class="portal-hero-title">
+        پایگاه جامع آموزش پزشکی، یادگیری بالینی و <span class="hero-gradient-text">مدیریت دانش سلامت البرز</span>
+      </h1>
 
-      <!-- Central Reading Area (Chapter & Sections) -->
-      <main class="app-content" id="chapterContentArea" tabindex="-1">
-        <!-- Content injected dynamically via ComponentRenderer -->
-      </main>
 
-    </div>
-  </div>
-
-  <!-- Mobile Navigation Drawer (RTL Edge Slide-in) -->
-  <div class="drawer-backdrop" id="drawerBackdrop" aria-hidden="true"></div>
-  <aside class="mobile-drawer" id="mobileDrawer" aria-label="منوی ناوبری موبایل" aria-hidden="true">
-    <div class="drawer-header">
-      <div class="sidebar-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2">
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-        </svg>
-        <span>فهرست فصول و مباحث</span>
-      </div>
-      <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="بستن منو">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
-    </div>
-    <div class="drawer-content">
-      <div style="margin-block-end: var(--space-4); padding: var(--space-3); background-color: var(--bg-body-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-        <label for="mobileFontSelect" style="display: block; font-size: 11px; font-weight: 700; margin-block-end: 4px; color: var(--text-muted);">قلم مطالعه:</label>
-        <select class="font-select" id="mobileFontSelect" style="width: 100%;">
-          <option value="vazirmatn">وزیرمتن (Vazirmatn)</option>
-          <option value="shabnam">شبنم (Shabnam)</option>
-          <option value="sahel">ساحل (Sahel)</option>
-        </select>
-      </div>
-      <ul class="nav-tree" id="mobileNavTree">
-        <!-- Injected dynamically via AppNavigation -->
-      </ul>
-    </div>
-  </aside>
-
-  <!-- Search Modal Dialog -->
-  <div class="search-modal-backdrop" id="searchModalBackdrop" role="dialog" aria-modal="true" aria-label="جستجوی بالینی">
-    <div class="search-dialog" id="searchDialog">
-      <div class="search-input-wrapper">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <input type="text" class="search-input" id="searchInput" placeholder="جستجوی سریع بیماری، دارو، معیار، شاخص، متد و..." autocomplete="off">
-        <span class="search-shortcut-badge">Esc</span>
-      </div>
-      <div class="search-results-list" id="searchResultsList">
-        <!-- Search results injected here -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Bookmarks Modal Dialog -->
-  <div class="search-modal-backdrop" id="bookmarksModalBackdrop" role="dialog" aria-modal="true" aria-label="نشانک‌های من">
-    <div class="search-dialog" id="bookmarksDialog">
-      <div class="search-input-wrapper" style="justify-content: space-between;">
-        <div style="display: flex; align-items: center; gap: var(--space-2); font-weight: 700;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--state-warning)" stroke="var(--state-warning)">
-            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+      <!-- Interactive Instant Hero Search -->
+      <div class="hero-search-wrapper">
+        <div class="hero-search-input-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <span>نشانک‌های مطالعه من</span>
+          <input type="text" id="heroSearchInput" class="hero-search-input" placeholder="جستجوی فوری در سرفصل‌ها، بیماری‌ها، داروها، شاخص‌ها و نشانه‌ها..." autocomplete="off">
+          <span class="search-shortcut-badge" style="font-size: 11px;">کاوش سریع</span>
         </div>
-        <button class="action-mini-btn" id="bookmarksCloseBtn" aria-label="بستن پنجره نشانک‌ها">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
+
+        <!-- Floating Search Results Dropdown -->
+        <div class="hero-search-results-dropdown" id="heroSearchResults"></div>
+
+        <!-- Filter Chips Under Search -->
+        <div class="hero-search-tags">
+          <span style="font-size: 11px; color: var(--text-muted); margin-inline-end: 4px;">جستجوهای شایع:</span>
+          <button type="button" class="hero-search-tag-chip" data-query="مالاریا">مالاریا و ناقلین</button>
+          <button type="button" class="hero-search-tag-chip" data-query="Ira-PEN">بسته Ira-PEN</button>
+          <button type="button" class="hero-search-tag-chip" data-query="سل">کنترل سل (TB)</button>
+          <button type="button" class="hero-search-tag-chip" data-query="سرطان">نظام ثبت سرطان</button>
+          <button type="button" class="hero-search-tag-chip" data-query="واکسن">بیماری‌های واکسن‌پذیر</button>
+          <button type="button" class="hero-search-tag-chip" data-query="هاری">هاری و بروسلوز</button>
+        </div>
       </div>
-      <div class="search-results-list" id="bookmarksList">
-        <!-- Bookmarked items injected here -->
+
+    </div>
+  </section>
+
+  <!-- Vision Banner for Alborz Medical Students -->
+  <section class="portal-container" id="vision" style="scroll-margin-top: 90px;">
+    <div class="vision-callout-box">
+      <div class="abzums-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+          <path d="M2 17l10 5 10-5"></path>
+          <path d="M2 12l10 5 10-5"></path>
+        </svg>
+        <span>ویژه دانشجویان و کادر آموزشی دانشگاه علوم پزشکی البرز (ABZUMS)</span>
+      </div>
+
+      <h3 style="font-size: clamp(20px, 2.5vw, 26px); font-weight: 900; margin-block-end: 12px; color: var(--text-primary);">
+        چشم‌انداز مدیکالیسم: مرجعیت متمرکز آموزش پزشکی، از کلاس درس تا بالین بیمار
+      </h3>
+      
+      <p style="font-size: 14.5px; color: var(--text-secondary); line-height: 1.8; margin-block-end: 16px;">
+        دانشجویان پزشکی در دوره‌های مختلف همواره با چالش حجم عظیم و پراکنده جزوات، فایل‌های متفرقه و دشواری دسترسی سریع به پروتکل‌ها مواجه هستند. <strong>مدیکالیسم البرز</strong> راه‌اندازی شده تا این گره را باز کند: پایگاهی منظم، همیشه در دسترس، با گرافیک استاندارد و بدون نیاز به اینترنت پرسرعت، که امکان مطالعه عمیق تئوری و مرور سریع نکات تشخیصی و درمانی را در حین راند و کشیک فراهم می‌سازد.
+      </p>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; font-weight: 700; color: var(--accent-primary);">
+        <span>✓ آماده‌سازی برای آزمون‌های دانشگاهی و جامع</span>
+        <span>✓ راهنماهای تشخیصی بر بالین بیمار</span>
+        <span>✓ به‌روزرسانی مستمر بر اساس رفرنس‌های مصوب وزارت بهداشت</span>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Toast Container -->
-  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+  <!-- Portal Footer -->
+  <footer class="portal-footer">
+    <div class="portal-container portal-footer-inner">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="portal-brand-icon" style="width: 32px; height: 32px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+          </svg>
+        </div>
+        <span style="font-weight: 900; font-size: 16px;">مدیکالیسم البرز | سامانه جامع آموزش علوم پزشکی و بالینی (ABZUMS)</span>
+      </div>
+      
+      <p class="footer-copy">
+        بستری اختصاصی برای دانشجویان پزشکی دانشگاه علوم پزشکی البرز؛ پایگاه یکپارچه آموزش علوم پایه و دوره‌های ماژور بالینی، عاری از پراکندگی جزوات و آماده برای استفاده در کلاس و بر بالین بیمار.
+      </p>
+
+      <div style="font-size: 12px; color: var(--text-muted); margin-block-start: 12px;">
+        پایگاه جامع آموزش علوم پزشکی دانشگاه علوم پزشکی و خدمات بهداشتی درمانی البرز • پاییز ۱۴۰۵
+      </div>
+    </div>
+  </footer>
 
   <!-- Scripts -->
   <script src="./js/data/chapters-registry.js"></script>
-  <script src="./js/state.js"></script>
-  <script src="./js/components.js"></script>
-  <script src="./js/navigation.js"></script>
-  <script src="./js/search.js"></script>
-  <script src="./js/study-features.js"></script>
-  <script src="./js/router.js"></script>
-  <script src="./js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const chapters = window.CHAPTERS_REGISTRY || [];
+      const heroSearch = document.getElementById('heroSearchInput');
+      const searchResults = document.getElementById('heroSearchResults');
+      const dropdown = document.getElementById('coursesDropdown');
+      const dropdownBtn = document.getElementById('coursesDropdownBtn');
+
+      // 1. Navigation Dropdown Toggle & Hover
+      if (dropdown && dropdownBtn) {
+        let closeTimer = null;
+        let openTimer = null;
+
+        const openDropdown = () => {
+          clearTimeout(closeTimer);
+          clearTimeout(openTimer);
+          dropdown.classList.add('is-open');
+          dropdownBtn.setAttribute('aria-expanded', 'true');
+        };
+
+        const closeDropdown = (immediate = false) => {
+          clearTimeout(closeTimer);
+          clearTimeout(openTimer);
+          if (immediate) {
+            dropdown.classList.remove('is-open');
+            dropdownBtn.setAttribute('aria-expanded', 'false');
+          } else {
+            closeTimer = setTimeout(() => {
+              dropdown.classList.remove('is-open');
+              dropdownBtn.setAttribute('aria-expanded', 'false');
+            }, 60);
+          }
+        };
+
+        // Micro-intent hover (60ms) to avoid accidental triggers when passing through
+        dropdownBtn.addEventListener('mouseenter', () => {
+          clearTimeout(closeTimer);
+          openTimer = setTimeout(() => openDropdown(), 60);
+        });
+
+        dropdown.addEventListener('mouseenter', () => {
+          clearTimeout(closeTimer);
+        });
+
+        dropdown.addEventListener('mouseleave', () => {
+          clearTimeout(openTimer);
+          closeDropdown(false);
+        });
+
+        dropdownBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (dropdown.classList.contains('is-open')) {
+            closeDropdown(true);
+          } else {
+            openDropdown();
+          }
+        });
+
+        // Instant close as soon as the mouse moves into the main page (hero)
+        const heroSection = document.querySelector('.portal-hero');
+        if (heroSection) {
+          heroSection.addEventListener('mouseenter', () => {
+            closeDropdown(true);
+          });
+          heroSection.addEventListener('mousemove', () => {
+            if (dropdown.classList.contains('is-open')) {
+              closeDropdown(true);
+            }
+          });
+        }
+
+        document.addEventListener('click', (e) => {
+          if (!dropdown.contains(e.target)) {
+            closeDropdown(true);
+          }
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            closeDropdown(true);
+          }
+        });
+      }
+
+      // 2. Real-time Floating Search on Hero
+      function performSearch(query) {
+        if (!searchResults) return;
+        const q = query.trim().toLowerCase();
+        if (!q) {
+          searchResults.style.display = 'none';
+          searchResults.innerHTML = '';
+          return;
+        }
+
+        const hits = chapters.filter(ch => {
+          const text = [
+            ch.title,
+            ch.shortTitle,
+            ch.author,
+            (ch.sections || []).map(s => s.title + ' ' + (s.summary || '')).join(' ')
+          ].join(' ').toLowerCase();
+          return text.includes(q);
+        });
+
+        if (hits.length === 0) {
+          searchResults.innerHTML = `
+            <div style="padding: 14px; text-align: center; color: var(--text-muted); font-size: 13px;">
+              سرفصلی مطابق با «${query}» یافت نشد
+            </div>
+          `;
+        } else {
+          searchResults.innerHTML = hits.slice(0, 7).map(ch => {
+            const isComm = ch.number <= 15;
+            const trackLabel = isComm ? 'واگیر' : 'غیرواگیر';
+            const trackPillClass = isComm ? 'pill-comm' : 'pill-ncd';
+            const numPadded = ch.number.toString().padStart(2, '۰');
+            return `
+              <a href="./course.html#${ch.id}" class="hero-search-result-item">
+                <div style="min-width: 0;">
+                  <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-primary); margin-inline-end: 6px;">فصل ${numPadded}</span>
+                  <span class="search-result-title">${ch.title}</span>
+                </div>
+                <span class="search-result-track ${trackPillClass}">${trackLabel}</span>
+              </a>
+            `;
+          }).join('');
+        }
+        searchResults.style.display = 'block';
+      }
+
+      if (heroSearch) {
+        heroSearch.addEventListener('input', (e) => {
+          performSearch(e.target.value);
+        });
+
+        heroSearch.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            const firstResult = searchResults ? searchResults.querySelector('.hero-search-result-item') : null;
+            if (firstResult) {
+              window.location.href = firstResult.getAttribute('href');
+            }
+          }
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!heroSearch.contains(e.target) && (!searchResults || !searchResults.contains(e.target))) {
+            if (searchResults) searchResults.style.display = 'none';
+          }
+        });
+      }
+
+      // 3. Quick Chips click
+      document.querySelectorAll('.hero-search-tag-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const q = chip.getAttribute('data-query');
+          if (heroSearch) {
+            heroSearch.value = q;
+            performSearch(q);
+            heroSearch.focus();
+          }
+        });
+      });
+
+      // 4. Theme Toggle Synchronization
+      const themeToggleBtn = document.getElementById('portalThemeToggleBtn');
+      const iconSun = themeToggleBtn ? themeToggleBtn.querySelector('.icon-sun') : null;
+      const iconMoon = themeToggleBtn ? themeToggleBtn.querySelector('.icon-moon') : null;
+
+      function updateThemeIcons(theme) {
+        if (iconSun && iconMoon) {
+          if (theme === 'dark') {
+            iconSun.style.display = 'block';
+            iconMoon.style.display = 'none';
+          } else {
+            iconSun.style.display = 'none';
+            iconMoon.style.display = 'block';
+          }
+        }
+      }
+
+      const savedTheme = localStorage.getItem('med_theme') || 
+        (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeIcons(savedTheme);
+
+      if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+          const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+          const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', nextTheme);
+          localStorage.setItem('med_theme', nextTheme);
+          updateThemeIcons(nextTheme);
+        });
+      }
+
+      // 5. Font Selector Synchronization
+      const fontSelect = document.getElementById('portalFontSelect');
+      const savedFont = localStorage.getItem('med_font_family') || 'vazirmatn';
+      if (fontSelect) {
+        fontSelect.value = savedFont;
+        applyFont(savedFont);
+
+        fontSelect.addEventListener('change', (e) => {
+          const newFont = e.target.value;
+          localStorage.setItem('med_font_family', newFont);
+          applyFont(newFont);
+        });
+      }
+
+      function applyFont(font) {
+        const root = document.documentElement;
+        if (font === 'shabnam') {
+          root.style.setProperty('--font-current', 'var(--font-shabnam)');
+        } else if (font === 'sahel') {
+          root.style.setProperty('--font-current', 'var(--font-sahel)');
+        } else {
+          root.style.setProperty('--font-current', 'var(--font-vazirmatn)');
+        }
+      }
+    });
+  </script>
 </body>
 </html>

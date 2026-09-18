@@ -9,6 +9,10 @@ window.AppNavigation = {
   mobileDrawer: null,
   drawerBackdrop: null,
   observer: null,
+  expandedFolders: {
+    comm: true,
+    ncd: true
+  },
 
   init() {
     this.desktopTreeContainer = document.getElementById('desktopNavTree');
@@ -20,23 +24,95 @@ window.AppNavigation = {
     this.bindDrawerEvents();
     this.initScrollspy();
 
-    // Re-render when active chapter or bookmarks change
+    // Reactive updates without full DOM re-rendering (prevents scroll jumps)
     if (window.appState) {
-      window.appState.subscribe('activeChapterId', () => this.renderNavigation());
+      window.appState.subscribe('activeChapterId', (newId) => this.onChapterChanged(newId));
       window.appState.subscribe('activeSectionId', (secId) => this.updateActiveLink(secId));
-      window.appState.subscribe('bookmarks', () => this.renderNavigation());
+      window.appState.subscribe('bookmarks', () => this.updateBookmarks());
     }
   },
 
   /**
-   * Renders the persistent chapter tree into both desktop and mobile containers
+   * Updates active and expanded classes on chapter elements without resetting scroll position
+   */
+  onChapterChanged(newChapterId) {
+    const containers = [this.desktopTreeContainer, this.mobileTreeContainer].filter(Boolean);
+
+    containers.forEach(container => {
+      // 1. Remove active & expanded from previously active chapter
+      container.querySelectorAll('.nav-chapter-item.is-active').forEach(item => {
+        item.classList.remove('is-active', 'is-expanded');
+      });
+
+      // 2. Add active & expanded to the newly active chapter
+      const targetItem = container.querySelector(`.nav-chapter-item[data-nav-chapter="${newChapterId}"]`);
+      if (targetItem) {
+        targetItem.classList.add('is-active', 'is-expanded');
+
+        // 3. Ensure parent folder is open
+        const parentFolder = targetItem.closest('.nav-folder-item');
+        if (parentFolder) {
+          parentFolder.classList.add('is-expanded');
+          const fHeader = parentFolder.querySelector('.nav-folder-header');
+          if (fHeader) fHeader.setAttribute('aria-expanded', 'true');
+          const fKey = parentFolder.getAttribute('data-folder-key');
+          if (fKey) this.expandedFolders[fKey] = true;
+        }
+
+        // 4. Scroll smoothly into view in desktop sidebar container without resetting scroll
+        if (container === this.desktopTreeContainer) {
+          targetItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+      }
+    });
+  },
+
+  /**
+   * Updates bookmark icons in the navigation tree
+   */
+  updateBookmarks() {
+    if (!window.appState) return;
+    document.querySelectorAll('.nav-heading-link').forEach(link => {
+      const secId = link.getAttribute('data-target-id');
+      const isBookmarked = window.appState.isBookmarked(secId);
+      const existingBadge = link.querySelector('.nav-bookmark-indicator');
+      if (isBookmarked && !existingBadge) {
+        const span = document.createElement('span');
+        span.className = 'nav-bookmark-indicator';
+        span.innerHTML = `
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--state-warning)" stroke="var(--state-warning)">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+        `;
+        link.appendChild(span);
+      } else if (!isBookmarked && existingBadge) {
+        existingBadge.remove();
+      }
+    });
+  },
+
+  /**
+   * Renders the persistent chapter tree organized into folder categories
    */
   renderNavigation() {
     const chapters = window.CHAPTERS_REGISTRY || [];
     const activeChapterId = window.appState ? window.appState.activeChapterId : 'ch-01';
     const activeSectionId = window.appState ? window.appState.activeSectionId : '';
 
-    const html = chapters.map(ch => {
+    const commChapters = chapters.filter(ch => ch.number <= 15);
+    const ncdChapters = chapters.filter(ch => ch.number > 15);
+
+    // Ensure the folder containing active chapter is open
+    const activeCh = chapters.find(ch => ch.id === activeChapterId);
+    if (activeCh) {
+      if (activeCh.number <= 15) {
+        this.expandedFolders.comm = true;
+      } else {
+        this.expandedFolders.ncd = true;
+      }
+    }
+
+    const renderChapterItem = (ch) => {
       const isCurrentChapter = ch.id === activeChapterId;
       const isExpanded = isCurrentChapter; // Current chapter starts expanded
 
@@ -49,20 +125,24 @@ window.AppNavigation = {
             <a href="#${sec.id}" class="nav-heading-link ${isActive ? 'is-active' : ''}" data-target-id="${sec.id}">
               <span class="nav-heading-text">${sec.title}</span>
               ${isBookmarked ? `
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--state-warning)" stroke="var(--state-warning)">
-                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                </svg>
+                <span class="nav-bookmark-indicator">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--state-warning)" stroke="var(--state-warning)">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </span>
               ` : ''}
             </a>
           </li>
         `;
       }).join('');
 
+      const numPadded = ch.number.toString().padStart(2, '۰');
+
       return `
         <li class="nav-chapter-item ${isCurrentChapter ? 'is-active' : ''} ${isExpanded ? 'is-expanded' : ''}" data-nav-chapter="${ch.id}">
           <div class="nav-chapter-header" data-chapter-id="${ch.id}">
             <div class="nav-chapter-title-group">
-              <span class="nav-chapter-badge">فصل ${ch.number}</span>
+              <span class="nav-chapter-badge">فصل ${numPadded}</span>
               <span class="nav-chapter-label" title="${ch.title}">${ch.shortTitle || ch.title}</span>
             </div>
             <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -74,9 +154,58 @@ window.AppNavigation = {
           </ul>
         </li>
       `;
-    }).join('');
+    };
 
-    const fullTreeHtml = html;
+    const commHtml = commChapters.map(renderChapterItem).join('');
+    const ncdHtml = ncdChapters.map(renderChapterItem).join('');
+
+    const fullTreeHtml = `
+      <!-- Folder 1: Communicable Diseases (واگیر) -->
+      <li class="nav-folder-item ${this.expandedFolders.comm ? 'is-expanded' : ''}" data-folder-key="comm">
+        <div class="nav-folder-header" data-folder-key="comm" role="button" aria-expanded="${this.expandedFolders.comm ? 'true' : 'false'}" tabindex="0">
+          <div class="nav-folder-title-group">
+            <div class="nav-folder-icon folder-icon-comm">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+            <span class="nav-folder-title">بیماری‌های واگیر</span>
+          </div>
+          <div class="nav-folder-meta">
+            <span class="nav-folder-badge badge-comm">۱۵ فصل</span>
+            <svg class="nav-folder-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+        <ul class="nav-folder-content">
+          ${commHtml}
+        </ul>
+      </li>
+
+      <!-- Folder 2: Non-Communicable Diseases (غیرواگیر) -->
+      <li class="nav-folder-item ${this.expandedFolders.ncd ? 'is-expanded' : ''}" data-folder-key="ncd">
+        <div class="nav-folder-header" data-folder-key="ncd" role="button" aria-expanded="${this.expandedFolders.ncd ? 'true' : 'false'}" tabindex="0">
+          <div class="nav-folder-title-group">
+            <div class="nav-folder-icon folder-icon-ncd">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+            <span class="nav-folder-title">بیماری‌های غیرواگیر</span>
+          </div>
+          <div class="nav-folder-meta">
+            <span class="nav-folder-badge badge-ncd">۱۴ فصل</span>
+            <svg class="nav-folder-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+        <ul class="nav-folder-content">
+          ${ncdHtml}
+        </ul>
+      </li>
+    `;
 
     if (this.desktopTreeContainer) {
       this.desktopTreeContainer.innerHTML = fullTreeHtml;
@@ -93,10 +222,32 @@ window.AppNavigation = {
    * Bind accordion toggling and anchor scrolling
    */
   bindTreeClicks(container, isMobile) {
+    // 1. Folder Header Toggle
+    container.querySelectorAll('.nav-folder-header').forEach(fHeader => {
+      const toggleHandler = (e) => {
+        e.stopPropagation();
+        const folderKey = fHeader.getAttribute('data-folder-key');
+        const folderItem = fHeader.closest('.nav-folder-item');
+        if (folderItem && folderKey) {
+          const isExp = folderItem.classList.toggle('is-expanded');
+          this.expandedFolders[folderKey] = isExp;
+          fHeader.setAttribute('aria-expanded', isExp ? 'true' : 'false');
+        }
+      };
 
-    // Chapter Header Toggle & Switch
+      fHeader.addEventListener('click', toggleHandler);
+      fHeader.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleHandler(e);
+        }
+      });
+    });
+
+    // 2. Chapter Header Toggle & Switch
     container.querySelectorAll('.nav-chapter-header').forEach(header => {
-      header.addEventListener('click', () => {
+      header.addEventListener('click', (e) => {
+        e.stopPropagation();
         const chapterId = header.getAttribute('data-chapter-id');
         const item = header.closest('.nav-chapter-item');
         if (window.appState && chapterId && window.appState.activeChapterId !== chapterId) {
@@ -112,7 +263,7 @@ window.AppNavigation = {
       });
     });
 
-    // Heading Anchor Click
+    // 3. Heading Anchor Click
     container.querySelectorAll('.nav-heading-link').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
@@ -138,23 +289,29 @@ window.AppNavigation = {
       window.appState.setActiveChapter(targetChapter.id);
     }
 
-    const el = document.getElementById(sectionId);
-    if (el) {
-      const headerOffset = 80;
-      const elementPosition = el.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+    const performScroll = () => {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        const headerOffset = 80;
+        const elementPosition = el.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
 
-      // Update URL hash without jumping
-      history.pushState(null, null, `#${sectionId}`);
-      if (window.appState) {
-        window.appState.setActiveSection(sectionId);
+        // Update URL hash without jumping
+        history.pushState(null, null, `#${sectionId}`);
+        if (window.appState) {
+          window.appState.setActiveSection(sectionId);
+        }
       }
-    }
+    };
+
+    requestAnimationFrame(() => {
+      performScroll();
+    });
   },
 
   /**

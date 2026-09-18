@@ -8,7 +8,7 @@ if hasattr(sys.stdout, 'reconfigure'):
 
 
 def run_tests():
-    file_path = os.path.abspath("index.html")
+    file_path = os.path.abspath("course.html")
     file_url = f"file:///{file_path.replace(os.sep, '/')}"
     print(f"Testing URL: {file_url}")
 

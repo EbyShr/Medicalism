@@ -48,6 +48,14 @@
   text-decoration: none;
 }
 
+.header-brand .brand-title {
+  transition: color var(--transition-fast);
+}
+
+.header-brand:hover .brand-title {
+  color: var(--accent-primary);
+}
+
 .brand-icon-wrapper {
   width: 38px;
   height: 38px;
