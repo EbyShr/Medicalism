@@ -1400,17 +1400,371 @@ window.RadiologyModule = (function() {
     'rad-ch03': {
       "chapterId": "rad-ch03",
       "sections": {
-        "s1": [],
-        "s2": [],
-        "s3": [],
-        "s4": [],
-        "s5": [],
-        "s6": [],
-        "s7": [],
-        "s8": [],
-        "s9": []
+            "s1": [
+                  {
+                        "file": "image1.jpeg"
+                  },
+                  {
+                        "file": "image2.jpeg"
+                  }
+            ],
+            "s2": [
+                  {
+                        "file": "image3.jpeg"
+                  },
+                  {
+                        "file": "image4.jpeg"
+                  },
+                  {
+                        "file": "image5.jpeg"
+                  },
+                  {
+                        "file": "image6.jpeg"
+                  },
+                  {
+                        "file": "image7.jpeg"
+                  },
+                  {
+                        "file": "image8.jpeg"
+                  }
+            ],
+            "s3": [
+                  {
+                        "file": "image9.jpeg"
+                  },
+                  {
+                        "file": "image10.jpeg"
+                  },
+                  {
+                        "file": "image11.jpeg"
+                  },
+                  {
+                        "file": "image12.jpeg"
+                  },
+                  {
+                        "file": "image13.jpeg"
+                  },
+                  {
+                        "file": "image14.jpeg"
+                  },
+                  {
+                        "file": "image15.jpeg"
+                  },
+                  {
+                        "file": "image16.jpeg"
+                  },
+                  {
+                        "file": "image17.jpeg"
+                  }
+            ],
+            "s4": [
+                  {
+                        "file": "image21.jpeg"
+                  },
+                  {
+                        "file": "image22.jpeg"
+                  },
+                  {
+                        "file": "image23.jpeg"
+                  },
+                  {
+                        "file": "image24.jpeg"
+                  },
+                  {
+                        "file": "image25.jpeg"
+                  },
+                  {
+                        "file": "image26.jpeg"
+                  },
+                  {
+                        "file": "image27.jpeg"
+                  },
+                  {
+                        "file": "image28.jpeg"
+                  },
+                  {
+                        "file": "image29.jpeg"
+                  },
+                  {
+                        "file": "image86.jpeg"
+                  }
+            ],
+            "s5": [
+                  {
+                        "file": "image51.jpeg"
+                  },
+                  {
+                        "file": "image52.jpeg"
+                  },
+                  {
+                        "file": "image53.jpeg"
+                  },
+                  {
+                        "file": "image54.jpeg"
+                  },
+                  {
+                        "file": "image55.jpeg"
+                  },
+                  {
+                        "file": "image56.jpeg"
+                  },
+                  {
+                        "file": "image57.jpeg"
+                  },
+                  {
+                        "file": "image58.jpeg"
+                  },
+                  {
+                        "file": "image59.jpeg"
+                  },
+                  {
+                        "file": "image60.jpeg"
+                  },
+                  {
+                        "file": "image61.jpeg"
+                  },
+                  {
+                        "file": "image62.jpeg"
+                  },
+                  {
+                        "file": "image63.jpeg"
+                  },
+                  {
+                        "file": "image64.jpeg"
+                  },
+                  {
+                        "file": "image65.jpeg"
+                  },
+                  {
+                        "file": "image66.jpeg"
+                  },
+                  {
+                        "file": "image67.jpeg"
+                  },
+                  {
+                        "file": "image68.jpeg"
+                  },
+                  {
+                        "file": "image69.jpeg"
+                  },
+                  {
+                        "file": "image90.jpeg"
+                  },
+                  {
+                        "file": "image91.jpeg"
+                  },
+                  {
+                        "file": "image92.jpeg"
+                  },
+                  {
+                        "file": "image93.jpeg"
+                  },
+                  {
+                        "file": "image94.jpeg"
+                  },
+                  {
+                        "file": "image95.jpeg"
+                  },
+                  {
+                        "file": "image96.jpeg"
+                  },
+                  {
+                        "file": "image97.jpeg"
+                  },
+                  {
+                        "file": "image98.jpeg"
+                  },
+                  {
+                        "file": "image99.jpeg"
+                  },
+                  {
+                        "file": "image100.jpeg"
+                  },
+                  {
+                        "file": "image101.jpeg"
+                  },
+                  {
+                        "file": "image102.jpeg"
+                  },
+                  {
+                        "file": "image103.jpeg"
+                  },
+                  {
+                        "file": "image104.jpeg"
+                  },
+                  {
+                        "file": "image105.jpeg"
+                  },
+                  {
+                        "file": "image106.jpeg"
+                  },
+                  {
+                        "file": "image107.jpeg"
+                  },
+                  {
+                        "file": "image108.jpeg"
+                  },
+                  {
+                        "file": "image109.jpeg"
+                  },
+                  {
+                        "file": "image110.jpeg"
+                  },
+                  {
+                        "file": "image111.jpeg"
+                  },
+                  {
+                        "file": "image112.jpeg"
+                  },
+                  {
+                        "file": "image113.jpeg"
+                  },
+                  {
+                        "file": "image114.jpeg"
+                  }
+            ],
+            "s6": [
+                  {
+                        "file": "image38.jpeg"
+                  },
+                  {
+                        "file": "image39.jpeg"
+                  },
+                  {
+                        "file": "image40.jpeg"
+                  },
+                  {
+                        "file": "image41.jpeg"
+                  },
+                  {
+                        "file": "image42.jpeg"
+                  },
+                  {
+                        "file": "image43.jpeg"
+                  },
+                  {
+                        "file": "image44.jpeg"
+                  },
+                  {
+                        "file": "image45.jpeg"
+                  },
+                  {
+                        "file": "image46.jpeg"
+                  },
+                  {
+                        "file": "image47.jpeg"
+                  },
+                  {
+                        "file": "image48.jpeg"
+                  },
+                  {
+                        "file": "image49.jpeg"
+                  },
+                  {
+                        "file": "image50.jpeg"
+                  },
+                  {
+                        "file": "image88.jpeg"
+                  },
+                  {
+                        "file": "image89.jpeg"
+                  }
+            ],
+            "s7": [
+                  {
+                        "file": "image30.jpeg"
+                  },
+                  {
+                        "file": "image31.jpeg"
+                  },
+                  {
+                        "file": "image32.jpeg"
+                  },
+                  {
+                        "file": "image33.jpeg"
+                  },
+                  {
+                        "file": "image34.jpeg"
+                  },
+                  {
+                        "file": "image35.jpeg"
+                  },
+                  {
+                        "file": "image36.jpeg"
+                  },
+                  {
+                        "file": "image37.jpeg"
+                  }
+            ],
+            "s8": [
+                  {
+                        "file": "image76.jpeg"
+                  },
+                  {
+                        "file": "image77.jpeg"
+                  },
+                  {
+                        "file": "image78.jpeg"
+                  },
+                  {
+                        "file": "image79.jpeg"
+                  },
+                  {
+                        "file": "image80.jpeg"
+                  },
+                  {
+                        "file": "image81.jpeg"
+                  },
+                  {
+                        "file": "image82.jpeg"
+                  },
+                  {
+                        "file": "image83.jpeg"
+                  },
+                  {
+                        "file": "image84.jpeg"
+                  },
+                  {
+                        "file": "image85.jpeg"
+                  }
+            ],
+            "s9": [
+                  {
+                        "file": "image70.jpeg"
+                  },
+                  {
+                        "file": "image71.jpeg"
+                  },
+                  {
+                        "file": "image72.jpeg"
+                  },
+                  {
+                        "file": "image73.jpeg"
+                  },
+                  {
+                        "file": "image74.jpeg"
+                  },
+                  {
+                        "file": "image75.jpeg"
+                  },
+                  {
+                        "file": "image87.jpeg"
+                  },
+                  {
+                        "file": "image115.jpeg"
+                  },
+                  {
+                        "file": "image116.jpeg"
+                  },
+                  {
+                        "file": "image117.jpeg"
+                  },
+                  {
+                        "file": "image118.jpeg"
+                  }
+            ]
       }
-    },
+},
     'rad-ch04': {
       "chapterId": "rad-ch04",
       "sections": {

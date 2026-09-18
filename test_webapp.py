@@ -601,16 +601,55 @@ def run_tests():
         assert not has_ch3_undefined, "Found undefined or NaN in Chapter 3 DOM!"
         print("[Course 2] PASS: Chapter 3 is 100% free of undefined and NaN!")
 
-        # Verify Chapter 3 Manifest on disk (9 sections empty arrays)
+        # Verify Chapter 3 Manifest on disk (115 images across 9 sections)
+        print("\n--- [Course 2] Verifying Chapter 3 Manifest on Disk (115 images) ---")
         ch3_manifest_file = os.path.join("chapters", "rad-ch03", "images.json")
         assert os.path.exists(ch3_manifest_file), f"Manifest missing at {ch3_manifest_file}"
         with open(ch3_manifest_file, "r", encoding="utf-8") as cmf:
             c3data = json.load(cmf)
             assert c3data["chapterId"] == "rad-ch03"
             assert len(c3data["sections"]) == 9
-            for i in range(1, 10):
-                assert f"s{i}" in c3data["sections"]
-        print("PASS: Chapter 3 empty manifest verified on disk with all 9 section keys!")
+            assert len(c3data["sections"]["s1"]) == 2
+            assert len(c3data["sections"]["s2"]) == 6
+            assert len(c3data["sections"]["s3"]) == 9
+            assert len(c3data["sections"]["s4"]) == 10
+            assert len(c3data["sections"]["s5"]) == 44
+            assert len(c3data["sections"]["s6"]) == 15
+            assert len(c3data["sections"]["s7"]) == 8
+            assert len(c3data["sections"]["s8"]) == 10
+            assert len(c3data["sections"]["s9"]) == 11
+            ch3_total_imgs = sum(len(v) for v in c3data["sections"].values())
+            assert ch3_total_imgs == 115, f"Expected strictly 115 images in Chapter 3, got {ch3_total_imgs}"
+            print(f"PASS: Chapter 3 manifest verified with strictly 115 images across all 9 sections!")
+
+        # Verify all 9 Chapter 3 Section Galleries are Rendered in DOM
+        for i in range(1, 10):
+            sec_id = f"s{i}"
+            gal = page.locator(f"#gallery-{sec_id}")
+            assert gal.is_visible(), f"Chapter 3 gallery for {sec_id} must be visible in DOM"
+        print("PASS: All 9 Chapter 3 section galleries successfully rendered at section ends!")
+
+        # Verify Clean Preview System on Chapter 3 Dense Section (s5: 44 images)
+        gallery_s5 = page.locator("#gallery-s5")
+        visible_s5 = gallery_s5.locator(".radiology-card:not(.radiology-card-overflow):not(.radiology-card-more)").count()
+        more_s5 = gallery_s5.locator(".radiology-card-more").is_visible()
+        overflow_s5 = gallery_s5.locator(".radiology-card-overflow").count()
+        expand_s5 = gallery_s5.locator(".radiology-expand-btn")
+        assert visible_s5 == 5, f"Expected 5 visible preview cards in s5, got {visible_s5}"
+        assert more_s5, "More card (+39) should be visible when s5 is collapsed"
+        assert overflow_s5 == 39, f"Expected 39 overflow cards in s5, got {overflow_s5}"
+        assert expand_s5.is_visible(), "Expand button must be visible for dense gallery s5"
+        print("PASS: Clean Preview System verified for Chapter 3 dense section s5 (5 visible cards + 1 more-card with 39 overflow)!")
+
+        # Test Expand & Collapse Toggle in Chapter 3 s5
+        expand_s5.click()
+        page.wait_for_timeout(200)
+        assert not gallery_s5.locator(".radiology-card-more").is_visible(), "More card should hide when s5 expanded"
+        assert gallery_s5.locator(".radiology-card-overflow").first.is_visible(), "Overflow cards must become visible on expand"
+        expand_s5.click()
+        page.wait_for_timeout(200)
+        assert gallery_s5.locator(".radiology-card-more").is_visible(), "More card should reappear when collapsed"
+        print("PASS: Chapter 3 gallery expand/collapse toggle verified smoothly!")
 
         # Verify Table Containment in Chapter 3
         ch3_table_containment = page.evaluate("""() => {
