@@ -5,44 +5,7 @@
  */
 
 /* ==========================================================================
-   1. SECTION ID DISCOVERABILITY BADGE
-   ========================================================================== */
-.section-id-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--accent-primary);
-  background-color: var(--accent-primary-subtle);
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border-subtle);
-  margin-inline-start: var(--space-2);
-  vertical-align: middle;
-  cursor: pointer;
-  user-select: none;
-  transition: all var(--transition-fast);
-}
-
-.section-id-badge:hover {
-  background-color: var(--accent-primary);
-  color: #ffffff;
-  border-color: var(--accent-primary);
-  transform: translateY(-1px);
-}
-
-.section-id-badge:active {
-  transform: translateY(0);
-}
-
-.section-id-badge svg {
-  opacity: 0.7;
-}
-
-/* ==========================================================================
-   2. INLINE GALLERY AT SECTION END
+   1. INLINE GALLERY AT SECTION END
    ========================================================================== */
 .radiology-gallery-wrapper {
   margin-block-start: var(--space-6);

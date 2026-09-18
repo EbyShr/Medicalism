@@ -2855,21 +2855,6 @@ window.RadiologyModule = (function() {
         btn.setAttribute('aria-expanded', isExp ? 'true' : 'false');
       });
     });
-
-    // Section ID copy badges
-    container.querySelectorAll('.section-id-badge').forEach(badge => {
-      badge.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const id = badge.getAttribute('data-id');
-        if (id && navigator.clipboard) {
-          navigator.clipboard.writeText(id).then(() => {
-            const originalText = badge.innerHTML;
-            badge.innerHTML = `<span>کپی شد!</span>`;
-            setTimeout(() => { badge.innerHTML = originalText; }, 1200);
-          }).catch(() => {});
-        }
-      });
-    });
   }
 
   return {

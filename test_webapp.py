@@ -827,9 +827,11 @@ def run_tests():
         card2_text = cards[1].inner_text()
         assert "بیماری‌های واگیر و غیرواگیر" in card1_text
         assert "رادیولوژی و تصویربرداری بالینی" in card2_text
-        assert cards[1].get_attribute("href") == "./radiology.html", "Radiology card must link directly to ./radiology.html"
-        assert cards[1].locator(".dropdown-subfolders").count() == 0, "Radiology card must not have subfolders in dropdown"
-        print("[Portal] PASS: Dropdown presents both Course 1 and Course 2 clearly!")
+        assert cards[0].get_attribute("href") == "./communicable-and-noncommunicable-diseases.html", "Course 1 card must link directly to course 1"
+        assert cards[0].locator(".dropdown-subfolders").count() == 0, "Course 1 card must not have subfolders in dropdown"
+        assert cards[1].get_attribute("href") == "./radiology.html", "Course 2 card must link directly to ./radiology.html"
+        assert cards[1].locator(".dropdown-subfolders").count() == 0, "Course 2 card must not have subfolders in dropdown"
+        print("[Portal] PASS: Dropdown presents both Course 1 and Course 2 clearly as direct clickable cards with no subfolders!")
 
         # Verify Hero Search handles queries from both courses
         print("\n--- [Portal] Testing Hero Search across both courses ---")
