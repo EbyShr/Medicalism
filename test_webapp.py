@@ -338,19 +338,19 @@ def run_tests():
             assert "s1" in mdata["sections"] and "s9" in mdata["sections"]
             print("PASS: chapters/rad-ch01/images.json verified on disk with all 9 section keys!")
 
-        # Verify Manifest on disk: 131 images across 9 sections
+        # Verify Manifest on disk: 123 images across 9 sections
         assert len(mdata["sections"]["s1"]) == 3, f"Expected 3 images in s1, got {len(mdata['sections']['s1'])}"
         assert len(mdata["sections"]["s2"]) == 2, f"Expected 2 images in s2, got {len(mdata['sections']['s2'])}"
-        assert len(mdata["sections"]["s3"]) == 14, f"Expected 14 images in s3, got {len(mdata['sections']['s3'])}"
-        assert len(mdata["sections"]["s4"]) == 37, f"Expected 37 images in s4, got {len(mdata['sections']['s4'])}"
-        assert len(mdata["sections"]["s5"]) == 7, f"Expected 7 images in s5, got {len(mdata['sections']['s5'])}"
+        assert len(mdata["sections"]["s3"]) == 13, f"Expected 13 images in s3, got {len(mdata['sections']['s3'])}"
+        assert len(mdata["sections"]["s4"]) == 31, f"Expected 31 images in s4, got {len(mdata['sections']['s4'])}"
+        assert len(mdata["sections"]["s5"]) == 6, f"Expected 6 images in s5, got {len(mdata['sections']['s5'])}"
         assert len(mdata["sections"]["s6"]) == 8, f"Expected 8 images in s6, got {len(mdata['sections']['s6'])}"
         assert len(mdata["sections"]["s7"]) == 12, f"Expected 12 images in s7, got {len(mdata['sections']['s7'])}"
         assert len(mdata["sections"]["s8"]) == 18, f"Expected 18 images in s8, got {len(mdata['sections']['s8'])}"
         assert len(mdata["sections"]["s9"]) == 30, f"Expected 30 images in s9, got {len(mdata['sections']['s9'])}"
         total_manifest_images = sum(len(v) for v in mdata["sections"].values())
-        assert total_manifest_images == 131, f"Expected 131 total images, got {total_manifest_images}"
-        print(f"PASS: Real manifest verified on disk with strictly 131 images across all 9 sections!")
+        assert total_manifest_images == 123, f"Expected 123 total images, got {total_manifest_images}"
+        print(f"PASS: Real manifest verified on disk with strictly 123 images across all 9 sections!")
 
         # Verify All 9 Section Galleries are Rendered in DOM
         for i in range(1, 10):
@@ -359,15 +359,15 @@ def run_tests():
             assert gal.is_visible(), f"Gallery for {sec_id} must be visible in DOM"
         print("PASS: All 9 section galleries successfully rendered at section ends!")
 
-        # Verify Clean Preview System on Dense Section (s4: 37 images)
+        # Verify Clean Preview System on Dense Section (s4: 31 images)
         gallery_s4 = page.locator("#gallery-s4")
         visible_s4 = gallery_s4.locator(".radiology-card:not(.radiology-card-overflow):not(.radiology-card-more)").count()
         more_s4 = gallery_s4.locator(".radiology-card-more").is_visible()
         overflow_s4 = gallery_s4.locator(".radiology-card-overflow").count()
         expand_s4 = gallery_s4.locator(".radiology-expand-btn")
         assert visible_s4 == 5, f"Expected 5 visible preview cards in s4, got {visible_s4}"
-        assert more_s4, "More card (+32) should be visible when s4 is collapsed"
-        assert overflow_s4 == 32, f"Expected 32 overflow cards in s4, got {overflow_s4}"
+        assert more_s4, "More card (+26) should be visible when s4 is collapsed"
+        assert overflow_s4 == 26, f"Expected 26 overflow cards in s4, got {overflow_s4}"
         assert expand_s4.is_visible(), "Expand button must be visible for dense gallery s4"
         print("PASS: Clean Preview System verified for dense section s4 (5 visible cards + 1 more-card)!")
 
@@ -381,7 +381,7 @@ def run_tests():
         assert gallery_s4.locator(".radiology-card-more").is_visible(), "More card should reappear when collapsed"
         print("PASS: Gallery expand/collapse toggle verified smoothly!")
 
-        # Missing File Placeholder verification (e.g. image8.jpeg)
+        # Missing File Placeholder verification (simulated error)
         img_err_card = page.locator("#gallery-s3 .radiology-card").first
         img_err_card.locator("img").evaluate("img => img.dispatchEvent(new Event('error'))")
         page.wait_for_timeout(100)
@@ -400,7 +400,7 @@ def run_tests():
         assert page.evaluate("document.body.classList.contains('viewer-open')"), "body should have viewer-open"
 
         counter_badge = page.locator("#viewerCounterBadge").inner_text()
-        assert "1 / 37" in counter_badge, f"Expected 1 / 37, got {counter_badge}"
+        assert "1 / 31" in counter_badge, f"Expected 1 / 31, got {counter_badge}"
 
         # Zoom in and Reset
         page.click("#viewerZoomInBtn")
@@ -423,7 +423,7 @@ def run_tests():
         page.click("#viewerNextBtn")
         page.wait_for_timeout(150)
         counter_badge_2 = page.locator("#viewerCounterBadge").inner_text()
-        assert "2 / 37" in counter_badge_2, f"Expected 2 / 37, got {counter_badge_2}"
+        assert "2 / 31" in counter_badge_2, f"Expected 2 / 31, got {counter_badge_2}"
 
         # Screenshot of viewer
         shot_viewer = os.path.join(screenshot_dir, "desktop_radiology_viewer.png")

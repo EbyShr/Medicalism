@@ -45,9 +45,6 @@ window.RadiologyModule = (function() {
                         "file": "image7.jpeg"
                   },
                   {
-                        "file": "image8.jpeg"
-                  },
-                  {
                         "file": "image9.jpeg"
                   },
                   {
@@ -86,9 +83,6 @@ window.RadiologyModule = (function() {
                         "file": "image20.jpeg"
                   },
                   {
-                        "file": "image21.jpeg"
-                  },
-                  {
                         "file": "image22.jpeg"
                   },
                   {
@@ -101,19 +95,10 @@ window.RadiologyModule = (function() {
                         "file": "image25.jpeg"
                   },
                   {
-                        "file": "image26.jpeg"
-                  },
-                  {
-                        "file": "image27.jpeg"
-                  },
-                  {
                         "file": "image28.jpeg"
                   },
                   {
                         "file": "image29.jpeg"
-                  },
-                  {
-                        "file": "image30.jpeg"
                   },
                   {
                         "file": "image38.jpeg"
@@ -137,13 +122,7 @@ window.RadiologyModule = (function() {
                         "file": "image44.jpeg"
                   },
                   {
-                        "file": "image45.jpeg"
-                  },
-                  {
                         "file": "image46.jpeg"
-                  },
-                  {
-                        "file": "image47.jpeg"
                   },
                   {
                         "file": "image48.jpeg"
@@ -209,9 +188,6 @@ window.RadiologyModule = (function() {
                   },
                   {
                         "file": "image35.jpeg"
-                  },
-                  {
-                        "file": "image36.jpeg"
                   },
                   {
                         "file": "image37.jpeg"
@@ -461,9 +437,6 @@ window.RadiologyModule = (function() {
                         "file": "image7.jpeg"
                   },
                   {
-                        "file": "image8.jpeg"
-                  },
-                  {
                         "file": "image9.jpeg"
                   },
                   {
@@ -502,9 +475,6 @@ window.RadiologyModule = (function() {
                         "file": "image20.jpeg"
                   },
                   {
-                        "file": "image21.jpeg"
-                  },
-                  {
                         "file": "image22.jpeg"
                   },
                   {
@@ -517,19 +487,10 @@ window.RadiologyModule = (function() {
                         "file": "image25.jpeg"
                   },
                   {
-                        "file": "image26.jpeg"
-                  },
-                  {
-                        "file": "image27.jpeg"
-                  },
-                  {
                         "file": "image28.jpeg"
                   },
                   {
                         "file": "image29.jpeg"
-                  },
-                  {
-                        "file": "image30.jpeg"
                   },
                   {
                         "file": "image38.jpeg"
@@ -553,13 +514,7 @@ window.RadiologyModule = (function() {
                         "file": "image44.jpeg"
                   },
                   {
-                        "file": "image45.jpeg"
-                  },
-                  {
                         "file": "image46.jpeg"
-                  },
-                  {
-                        "file": "image47.jpeg"
                   },
                   {
                         "file": "image48.jpeg"
@@ -625,9 +580,6 @@ window.RadiologyModule = (function() {
                   },
                   {
                         "file": "image35.jpeg"
-                  },
-                  {
-                        "file": "image36.jpeg"
                   },
                   {
                         "file": "image37.jpeg"
