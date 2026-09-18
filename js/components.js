@@ -177,9 +177,8 @@ window.ComponentRenderer = {
       <section class="study-section" id="${section.id}" data-chapter-id="${chapterId}">
         <div class="section-header-row">
           <div>
-            <h2 style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <h2>
               <span>${section.title}</span>
-              <span class="section-id-badge" data-id="${section.id}" title="شناسه بخش در مانیفست تصاویر (کلیک جهت کپی)">#${section.id}</span>
             </h2>
             ${section.latinTitle ? `<div class="brand-subtitle latin-term">${section.latinTitle}</div>` : ''}
           </div>

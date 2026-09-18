@@ -253,11 +253,9 @@ def run_tests():
         print(f"[Course 2] Total nav heading links: {len(rad_nav_links)} (Expected: 34)")
         assert len(rad_nav_links) == 34, f"Expected 34 nav links in Course 2, got {len(rad_nav_links)}"
 
-        # Verify Radiology Folder only
-        rad_folder = page.locator('#desktopNavTree .nav-folder-item[data-folder-key="rad"]')
-        assert rad_folder.is_visible(), "[Course 2] Radiology folder must exist"
-        assert page.locator('#desktopNavTree .nav-folder-item[data-folder-key="comm"]').count() == 0, "Comm folder must not exist in Radiology"
-        assert page.locator('#desktopNavTree .nav-folder-item[data-folder-key="ncd"]').count() == 0, "NCD folder must not exist in Radiology"
+        # Verify Radiology chapters are directly at top-level in nav tree (no folder wrapper)
+        assert page.locator('#desktopNavTree .nav-folder-item').count() == 0, "[Course 2] Nav tree should have no folder wrapper for Radiology"
+        assert len(rad_chapters) == 4, "[Course 2] Nav tree should have 4 top-level chapter items"
 
         # Verify Chapter 1 Title & 9 Sections
         rad_title = page.locator(".chapter-title").inner_text()
@@ -268,15 +266,13 @@ def run_tests():
         print(f"[Course 2] Rendered sections: {len(rad_sections)} (Expected: 9)")
         assert len(rad_sections) == 9, f"Expected 9 sections in Course 2 Chapter 1, got {len(rad_sections)}"
 
-        # Verify Section ID Badges (#s1 - #s9)
-        print("\n--- [Course 2] Verifying Section ID Badges (#s1 - #s9) ---")
+        # Verify Section ID Badges are removed (#s1 - #s9 no longer in headers)
+        print("\n--- [Course 2] Verifying Section ID Badges are removed ---")
+        assert page.locator('.section-id-badge').count() == 0, "Section ID badges should be removed from DOM"
         for i in range(1, 10):
             sec_id = f"s{i}"
-            badge = page.locator(f"#{sec_id} .section-id-badge")
-            assert badge.is_visible(), f"Section ID badge #{sec_id} should be visible"
-            badge_text = badge.inner_text()
-            assert f"#{sec_id}" in badge_text, f"Expected #{sec_id} in badge, got {badge_text}"
-        print("[Course 2] PASS: All 9 Section ID badges (#s1 - #s9) verified with discoverability!")
+            assert page.locator(f"#{sec_id}").is_visible(), f"Section #{sec_id} should be visible"
+        print("[Course 2] PASS: All 9 sections visible without section-id-badges!")
 
         # Verify zero undefined & zero NaN
         has_undefined = page.evaluate("""() => {
@@ -463,12 +459,11 @@ def run_tests():
         print(f"[Course 2] Chapter 2 Rendered sections: {len(ch2_sections)} (Expected: 10)")
         assert len(ch2_sections) == 10, f"Expected 10 sections in Chapter 2, got {len(ch2_sections)}"
 
+        assert page.locator('.section-id-badge').count() == 0, "Section ID badges should be removed from DOM"
         for i in range(1, 11):
             sec_id = f"s{i}"
-            badge = page.locator(f"#{sec_id} .section-id-badge")
-            assert badge.is_visible(), f"Chapter 2 badge #{sec_id} should be visible"
-            assert f"#{sec_id}" in badge.inner_text()
-        print("[Course 2] PASS: All 10 Section ID badges (#s1 - #s10) verified on Chapter 2!")
+            assert page.locator(f"#{sec_id}").is_visible(), f"Chapter 2 section #{sec_id} should be visible"
+        print("[Course 2] PASS: All 10 sections visible without section-id-badges on Chapter 2!")
 
         has_ch2_undefined = page.evaluate("""() => {
             const stream = document.querySelector('.sections-stream');
@@ -584,12 +579,11 @@ def run_tests():
         print(f"[Course 2] Chapter 3 Rendered sections: {len(ch3_sections)} (Expected: 9)")
         assert len(ch3_sections) == 9, f"Expected 9 sections in Chapter 3, got {len(ch3_sections)}"
 
+        assert page.locator('.section-id-badge').count() == 0, "Section ID badges should be removed from DOM"
         for i in range(1, 10):
             sec_id = f"s{i}"
-            badge = page.locator(f"#{sec_id} .section-id-badge")
-            assert badge.is_visible(), f"Chapter 3 badge #{sec_id} should be visible"
-            assert f"#{sec_id}" in badge.inner_text()
-        print("[Course 2] PASS: All 9 Section ID badges (#s1 - #s9) verified on Chapter 3!")
+            assert page.locator(f"#{sec_id}").is_visible(), f"Chapter 3 section #{sec_id} should be visible"
+        print("[Course 2] PASS: All 9 sections visible without section-id-badges on Chapter 3!")
 
         has_ch3_undefined = page.evaluate("""() => {
             const stream = document.querySelector('.sections-stream');
@@ -697,12 +691,11 @@ def run_tests():
         print(f"[Course 2] Chapter 4 Rendered sections: {len(ch4_sections)} (Expected: 6)")
         assert len(ch4_sections) == 6, f"Expected 6 sections in Chapter 4, got {len(ch4_sections)}"
 
+        assert page.locator('.section-id-badge').count() == 0, "Section ID badges should be removed from DOM"
         for i in range(1, 7):
             sec_id = f"s{i}"
-            badge = page.locator(f"#{sec_id} .section-id-badge")
-            assert badge.is_visible(), f"Chapter 4 badge #{sec_id} should be visible"
-            assert f"#{sec_id}" in badge.inner_text()
-        print("[Course 2] PASS: All 6 Section ID badges (#s1 - #s6) verified on Chapter 4!")
+            assert page.locator(f"#{sec_id}").is_visible(), f"Chapter 4 section #{sec_id} should be visible"
+        print("[Course 2] PASS: All 6 sections visible without section-id-badges on Chapter 4!")
 
         has_ch4_undefined = page.evaluate("""() => {
             const stream = document.querySelector('.sections-stream');
@@ -805,6 +798,7 @@ def run_tests():
         mob_rad_ch = mobile_page.locator("#mobileNavTree .nav-chapter-item").all()
         print(f"[Course 2] Mobile nav chapters: {len(mob_rad_ch)} (Expected: 4)")
         assert len(mob_rad_ch) == 4, f"Expected 4 chapters in mobile drawer, got {len(mob_rad_ch)}"
+        assert mobile_page.locator("#mobileNavTree .nav-folder-item").count() == 0, "Mobile nav tree should have no folder wrapper for Radiology"
 
         shot_mob_rad = os.path.join(screenshot_dir, "mobile_nav_drawer_radiology.png")
         mobile_page.screenshot(path=shot_mob_rad)
@@ -833,6 +827,8 @@ def run_tests():
         card2_text = cards[1].inner_text()
         assert "بیماری‌های واگیر و غیرواگیر" in card1_text
         assert "رادیولوژی و تصویربرداری بالینی" in card2_text
+        assert cards[1].get_attribute("href") == "./radiology.html", "Radiology card must link directly to ./radiology.html"
+        assert cards[1].locator(".dropdown-subfolders").count() == 0, "Radiology card must not have subfolders in dropdown"
         print("[Portal] PASS: Dropdown presents both Course 1 and Course 2 clearly!")
 
         # Verify Hero Search handles queries from both courses

@@ -176,32 +176,7 @@ window.AppNavigation = {
 
     let fullTreeHtml = '';
     if (isRadiology) {
-      fullTreeHtml = `
-        <!-- Folder: Radiology Course -->
-        <li class="nav-folder-item ${this.expandedFolders.rad ? 'is-expanded' : ''}" data-folder-key="rad">
-          <div class="nav-folder-header" data-folder-key="rad" role="button" aria-expanded="${this.expandedFolders.rad ? 'true' : 'false'}" tabindex="0">
-            <div class="nav-folder-title-group">
-              <div class="nav-folder-icon folder-icon-rad" style="background: rgba(14, 165, 233, 0.12); color: #0ea5e9;">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                  <polyline points="21 15 16 10 5 21"></polyline>
-                </svg>
-              </div>
-              <span class="nav-folder-title">رادیولوژی و تصویربرداری بالینی</span>
-            </div>
-            <div class="nav-folder-meta">
-              <span class="nav-folder-badge badge-rad" style="background: rgba(14, 165, 233, 0.12); color: #0ea5e9;">${radChapters.length} فصل</span>
-              <svg class="nav-folder-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </div>
-          </div>
-          <ul class="nav-folder-content">
-            ${radHtml}
-          </ul>
-        </li>
-      `;
+      fullTreeHtml = radHtml;
     } else {
       fullTreeHtml = `
         <!-- Folder 1: Communicable Diseases (واگیر) -->
