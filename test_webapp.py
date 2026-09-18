@@ -250,8 +250,8 @@ def run_tests():
         assert len(rad_chapters) == 2, f"Expected strictly 2 chapters in Course 2, got {len(rad_chapters)}"
 
         rad_nav_links = page.locator("#desktopNavTree .nav-heading-link").all()
-        print(f"[Course 2] Total nav heading links: {len(rad_nav_links)} (Expected: 18)")
-        assert len(rad_nav_links) == 18, f"Expected 18 nav links in Course 2, got {len(rad_nav_links)}"
+        print(f"[Course 2] Total nav heading links: {len(rad_nav_links)} (Expected: 19)")
+        assert len(rad_nav_links) == 19, f"Expected 19 nav links in Course 2, got {len(rad_nav_links)}"
 
         # Verify Radiology Folder only
         rad_folder = page.locator('#desktopNavTree .nav-folder-item[data-folder-key="rad"]')
@@ -460,15 +460,15 @@ def run_tests():
         assert "شکم" in ch2_title, f"Expected شکم in Chapter 2 title, got {ch2_title}"
 
         ch2_sections = page.locator(".study-section").all()
-        print(f"[Course 2] Chapter 2 Rendered sections: {len(ch2_sections)} (Expected: 9)")
-        assert len(ch2_sections) == 9, f"Expected 9 sections in Chapter 2, got {len(ch2_sections)}"
+        print(f"[Course 2] Chapter 2 Rendered sections: {len(ch2_sections)} (Expected: 10)")
+        assert len(ch2_sections) == 10, f"Expected 10 sections in Chapter 2, got {len(ch2_sections)}"
 
-        for i in range(1, 10):
+        for i in range(1, 11):
             sec_id = f"s{i}"
             badge = page.locator(f"#{sec_id} .section-id-badge")
             assert badge.is_visible(), f"Chapter 2 badge #{sec_id} should be visible"
             assert f"#{sec_id}" in badge.inner_text()
-        print("[Course 2] PASS: All 9 Section ID badges (#s1 - #s9) verified on Chapter 2!")
+        print("[Course 2] PASS: All 10 Section ID badges (#s1 - #s10) verified on Chapter 2!")
 
         has_ch2_undefined = page.evaluate("""() => {
             const stream = document.querySelector('.sections-stream');
@@ -479,6 +479,89 @@ def run_tests():
         }""")
         assert not has_ch2_undefined, "Found undefined or NaN in Chapter 2 DOM!"
         print("[Course 2] PASS: Chapter 2 is 100% free of undefined and NaN!")
+
+        # Verify Chapter 2 Manifest on disk (191 images across 10 sections)
+        print("\n--- [Course 2] Verifying Chapter 2 Manifest on Disk (191 images) ---")
+        ch2_manifest_file = os.path.join("chapters", "rad-ch02", "images.json")
+        assert os.path.exists(ch2_manifest_file), f"Manifest missing at {ch2_manifest_file}"
+        with open(ch2_manifest_file, "r", encoding="utf-8") as cmf:
+            cmdata = json.load(cmf)
+            assert cmdata["chapterId"] == "rad-ch02"
+            assert len(cmdata["sections"]) == 10, f"Expected 10 sections in Chapter 2 manifest, got {len(cmdata['sections'])}"
+            assert len(cmdata["sections"]["s1"]) == 1
+            assert len(cmdata["sections"]["s2"]) == 2
+            assert len(cmdata["sections"]["s3"]) == 5
+            assert len(cmdata["sections"]["s4"]) == 14
+            assert len(cmdata["sections"]["s5"]) == 22
+            assert len(cmdata["sections"]["s6"]) == 3
+            assert len(cmdata["sections"]["s7"]) == 26
+            assert len(cmdata["sections"]["s8"]) == 16
+            assert len(cmdata["sections"]["s9"]) == 16
+            assert len(cmdata["sections"]["s10"]) == 86
+            ch2_total_imgs = sum(len(v) for v in cmdata["sections"].values())
+            assert ch2_total_imgs == 191, f"Expected strictly 191 images in Chapter 2, got {ch2_total_imgs}"
+            print(f"PASS: Chapter 2 manifest verified with strictly 191 images across all 10 sections!")
+
+        # Verify All 10 Section Galleries are Rendered in Chapter 2 DOM
+        for i in range(1, 11):
+            sec_id = f"s{i}"
+            gal = page.locator(f"#gallery-{sec_id}")
+            assert gal.is_visible(), f"Chapter 2 gallery for {sec_id} must be visible in DOM"
+        print("PASS: All 10 Chapter 2 section galleries successfully rendered at section ends!")
+
+        # Verify Clean Preview System on Chapter 2 Dense Section (s10: 86 images)
+        gallery_s10 = page.locator("#gallery-s10")
+        visible_s10 = gallery_s10.locator(".radiology-card:not(.radiology-card-overflow):not(.radiology-card-more)").count()
+        more_s10 = gallery_s10.locator(".radiology-card-more").is_visible()
+        overflow_s10 = gallery_s10.locator(".radiology-card-overflow").count()
+        expand_s10 = gallery_s10.locator(".radiology-expand-btn")
+        assert visible_s10 == 5, f"Expected 5 visible preview cards in s10, got {visible_s10}"
+        assert more_s10, "More card (+81) should be visible when s10 is collapsed"
+        assert overflow_s10 == 81, f"Expected 81 overflow cards in s10, got {overflow_s10}"
+        assert expand_s10.is_visible(), "Expand button must be visible for dense gallery s10"
+        print("PASS: Clean Preview System verified for Chapter 2 dense section s10 (5 visible cards + 1 more-card with 81 overflow)!")
+
+        # Test Expand & Collapse Toggle in Chapter 2 s10
+        expand_s10.click()
+        page.wait_for_timeout(200)
+        assert not gallery_s10.locator(".radiology-card-more").is_visible(), "More card should hide when s10 expanded"
+        assert gallery_s10.locator(".radiology-card-overflow").first.is_visible(), "Overflow cards must become visible on expand"
+        expand_s10.click()
+        page.wait_for_timeout(200)
+        assert gallery_s10.locator(".radiology-card-more").is_visible(), "More card should reappear when collapsed"
+        print("PASS: Chapter 2 gallery expand/collapse toggle verified smoothly!")
+
+        # Verify Table Containment in Chapter 2 (Zero border spillover)
+        ch2_table_containment = page.evaluate("""() => {
+            const sections = document.querySelectorAll('.study-section');
+            const violations = [];
+            sections.forEach(sec => {
+                const secRect = sec.getBoundingClientRect();
+                const tables = sec.querySelectorAll('.medical-data-table, table');
+                tables.forEach(table => {
+                    const container = table.closest('.table-responsive, .table-scroll-container') || sec;
+                    const containerRect = container.getBoundingClientRect();
+                    if (containerRect.left < secRect.left - 2 || containerRect.right > secRect.right + 2) {
+                        violations.push({
+                            sectionId: sec.id,
+                            issue: 'table container exceeds section borders',
+                            containerLeft: containerRect.left,
+                            secLeft: secRect.left,
+                            containerRight: containerRect.right,
+                            secRight: secRect.right
+                        });
+                    }
+                });
+            });
+            return violations;
+        }""")
+        assert len(ch2_table_containment) == 0, f"Chapter 2 Table containment violations: {ch2_table_containment}"
+        print("[Course 2] PASS: All tables in Chapter 2 are strictly contained within section borders!")
+
+        # Take Chapter 2 Light Screenshot
+        shot_ch2_light = os.path.join(screenshot_dir, "desktop_radiology_ch02_light.png")
+        page.screenshot(path=shot_ch2_light, full_page=False)
+        print(f"Saved Chapter 2 screenshot to {shot_ch2_light}")
 
         # Verify previous chapter card on Chapter 2 points to Chapter 1
         prev_btn = page.locator(".prev-chapter-card")
