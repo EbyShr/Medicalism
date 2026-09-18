@@ -2,10 +2,153 @@
   "chapterId": "rad-ch04",
   "sections": {
     "s1": [],
-    "s2": [],
-    "s3": [],
-    "s4": [],
-    "s5": [],
-    "s6": []
+    "s2": [
+      {
+        "file": "image2.png"
+      },
+      {
+        "file": "image3.jpeg"
+      },
+      {
+        "file": "image4.jpeg"
+      },
+      {
+        "file": "image5.jpeg"
+      },
+      {
+        "file": "image6.jpeg"
+      },
+      {
+        "file": "image7.jpeg"
+      },
+      {
+        "file": "image8.jpeg"
+      },
+      {
+        "file": "image9.png"
+      },
+      {
+        "file": "image10.png"
+      },
+      {
+        "file": "image11.png"
+      },
+      {
+        "file": "image12.png"
+      },
+      {
+        "file": "image13.png"
+      },
+      {
+        "file": "image14.png"
+      }
+    ],
+    "s3": [
+      {
+        "file": "image15.png"
+      },
+      {
+        "file": "image16.png"
+      },
+      {
+        "file": "image17.jpeg"
+      },
+      {
+        "file": "image18.jpeg"
+      },
+      {
+        "file": "image19.png"
+      },
+      {
+        "file": "image20.png"
+      },
+      {
+        "file": "image21.png"
+      },
+      {
+        "file": "image22.png"
+      },
+      {
+        "file": "image23.png"
+      },
+      {
+        "file": "image24.png"
+      },
+      {
+        "file": "image25.png"
+      },
+      {
+        "file": "image26.png"
+      },
+      {
+        "file": "image27.png"
+      },
+      {
+        "file": "image28.png"
+      },
+      {
+        "file": "image29.png"
+      },
+      {
+        "file": "image31.png"
+      },
+      {
+        "file": "image32.png"
+      },
+      {
+        "file": "image34.png"
+      }
+    ],
+    "s4": [
+      {
+        "file": "image36.jpeg"
+      },
+      {
+        "file": "image37.png"
+      }
+    ],
+    "s5": [
+      {
+        "file": "image38.jpeg"
+      },
+      {
+        "file": "image39.png"
+      },
+      {
+        "file": "image40.png"
+      },
+      {
+        "file": "image41.jpeg"
+      }
+    ],
+    "s6": [
+      {
+        "file": "image42.jpeg"
+      },
+      {
+        "file": "image43.jpeg"
+      },
+      {
+        "file": "image44.jpeg"
+      },
+      {
+        "file": "image45.jpeg"
+      },
+      {
+        "file": "image46.jpeg"
+      },
+      {
+        "file": "image47.jpeg"
+      },
+      {
+        "file": "image48.jpeg"
+      },
+      {
+        "file": "image49.jpeg"
+      },
+      {
+        "file": "image50.png"
+      }
+    ]
   }
 }

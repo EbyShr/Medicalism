@@ -612,15 +612,15 @@ def run_tests():
             assert len(c3data["sections"]["s1"]) == 2
             assert len(c3data["sections"]["s2"]) == 6
             assert len(c3data["sections"]["s3"]) == 9
-            assert len(c3data["sections"]["s4"]) == 10
+            assert len(c3data["sections"]["s4"]) == 9  # image28 removed
             assert len(c3data["sections"]["s5"]) == 44
             assert len(c3data["sections"]["s6"]) == 15
             assert len(c3data["sections"]["s7"]) == 8
             assert len(c3data["sections"]["s8"]) == 10
             assert len(c3data["sections"]["s9"]) == 11
             ch3_total_imgs = sum(len(v) for v in c3data["sections"].values())
-            assert ch3_total_imgs == 115, f"Expected strictly 115 images in Chapter 3, got {ch3_total_imgs}"
-            print(f"PASS: Chapter 3 manifest verified with strictly 115 images across all 9 sections!")
+            assert ch3_total_imgs == 114, f"Expected strictly 114 images in Chapter 3, got {ch3_total_imgs}"
+            print(f"PASS: Chapter 3 manifest verified with strictly 114 images across all 9 sections (image28 cleanly removed)!")
 
         # Verify all 9 Chapter 3 Section Galleries are Rendered in DOM
         for i in range(1, 10):
@@ -714,16 +714,53 @@ def run_tests():
         assert not has_ch4_undefined, "Found undefined or NaN in Chapter 4 DOM!"
         print("[Course 2] PASS: Chapter 4 is 100% free of undefined and NaN!")
 
-        # Verify Chapter 4 Manifest on disk (6 sections empty arrays)
+        # Verify Chapter 4 Manifest on disk (46 images across 6 sections)
+        print("\n--- [Course 2] Verifying Chapter 4 Manifest on Disk (46 images) ---")
         ch4_manifest_file = os.path.join("chapters", "rad-ch04", "images.json")
         assert os.path.exists(ch4_manifest_file), f"Manifest missing at {ch4_manifest_file}"
         with open(ch4_manifest_file, "r", encoding="utf-8") as cmf:
             c4data = json.load(cmf)
             assert c4data["chapterId"] == "rad-ch04"
             assert len(c4data["sections"]) == 6
-            for i in range(1, 7):
-                assert f"s{i}" in c4data["sections"]
-        print("PASS: Chapter 4 empty manifest verified on disk with all 6 section keys!")
+            assert len(c4data["sections"]["s1"]) == 0
+            assert len(c4data["sections"]["s2"]) == 13
+            assert len(c4data["sections"]["s3"]) == 18
+            assert len(c4data["sections"]["s4"]) == 2
+            assert len(c4data["sections"]["s5"]) == 4
+            assert len(c4data["sections"]["s6"]) == 9
+            ch4_total_imgs = sum(len(v) for v in c4data["sections"].values())
+            assert ch4_total_imgs == 46, f"Expected strictly 46 images in Chapter 4, got {ch4_total_imgs}"
+            print(f"PASS: Chapter 4 manifest verified with strictly 46 images across sections (s1: 0, s2: 13, s3: 18, s4: 2, s5: 4, s6: 9)!")
+
+        # Verify Chapter 4 galleries rendered for s2..s6, and none for s1
+        assert not page.locator("#gallery-s1").is_visible(), "Section 1 must not render a gallery when empty"
+        for i in range(2, 7):
+            sec_id = f"s{i}"
+            gal = page.locator(f"#gallery-{sec_id}")
+            assert gal.is_visible(), f"Chapter 4 gallery for {sec_id} must be visible in DOM"
+        print("PASS: Chapter 4 galleries successfully verified in DOM (none for s1, visible for s2-s6)!")
+
+        # Verify Clean Preview on Chapter 4 dense section s3 (18 images)
+        gallery_ch4_s3 = page.locator("#gallery-s3")
+        visible_ch4_s3 = gallery_ch4_s3.locator(".radiology-card:not(.radiology-card-overflow):not(.radiology-card-more)").count()
+        more_ch4_s3 = gallery_ch4_s3.locator(".radiology-card-more").is_visible()
+        overflow_ch4_s3 = gallery_ch4_s3.locator(".radiology-card-overflow").count()
+        expand_ch4_s3 = gallery_ch4_s3.locator(".radiology-expand-btn")
+        assert visible_ch4_s3 == 5, f"Expected 5 visible preview cards in s3, got {visible_ch4_s3}"
+        assert more_ch4_s3, "More card (+13) should be visible when s3 is collapsed"
+        assert overflow_ch4_s3 == 13, f"Expected 13 overflow cards in s3, got {overflow_ch4_s3}"
+        assert expand_ch4_s3.is_visible(), "Expand button must be visible for dense gallery s3"
+        print("PASS: Clean Preview System verified for Chapter 4 dense section s3 (5 visible cards + 1 more-card with 13 overflow)!")
+
+        # Test Expand & Collapse Toggle in Chapter 4 s3
+        expand_ch4_s3.click()
+        page.wait_for_timeout(200)
+        assert not gallery_ch4_s3.locator(".radiology-card-more").is_visible(), "More card should hide when expanded"
+        assert gallery_ch4_s3.locator(".radiology-card-overflow").first.is_visible(), "Overflow cards must become visible on expand"
+        expand_ch4_s3.click()
+        page.wait_for_timeout(200)
+        assert gallery_ch4_s3.locator(".radiology-card-more").is_visible(), "More card should reappear when collapsed"
+        print("PASS: Chapter 4 gallery expand/collapse toggle verified smoothly!")
 
         # Verify Table Containment in Chapter 4
         ch4_table_containment = page.evaluate("""() => {
