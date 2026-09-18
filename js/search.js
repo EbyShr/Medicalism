@@ -79,6 +79,18 @@ window.AppSearch = {
     this.isOpen = true;
     this.backdrop.classList.add('is-active');
     document.body.style.overflow = 'hidden';
+
+    // If mobile navigation drawer is open, close it cleanly
+    if (window.AppNavigation && typeof window.AppNavigation.closeMobileDrawer === 'function') {
+      window.AppNavigation.closeMobileDrawer();
+    }
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    const mobileBackdrop = document.getElementById('mobileDrawerBackdrop') || document.getElementById('drawerBackdrop');
+    if (mobileDrawer && mobileDrawer.classList.contains('is-open')) {
+      mobileDrawer.classList.remove('is-open');
+      if (mobileBackdrop) mobileBackdrop.classList.remove('is-active');
+    }
+
     if (this.input) {
       this.input.value = '';
       setTimeout(() => this.input.focus(), 100);

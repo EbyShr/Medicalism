@@ -326,6 +326,53 @@ body.focus-mode-active .app-content {
   #focusModeToggleBtn {
     display: none !important; /* Sidebars already hidden on mobile/tablet */
   }
+
+  /* On Android / Mobile: Search moved to the right-side mobile drawer */
+  .app-header .search-trigger-btn {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   MOBILE DRAWER SEARCH (Android / Mobile)
+   ========================================================================== */
+.mobile-drawer-search {
+  margin-block-end: var(--space-3);
+}
+
+.mobile-search-trigger-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg-body-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mobile-search-trigger-btn:hover,
+.mobile-search-trigger-btn:active {
+  border-color: var(--accent-primary);
+  background: var(--bg-surface);
+  color: var(--accent-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.mobile-search-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  background: rgba(2, 132, 199, 0.12);
+  color: var(--accent-primary);
+  border: 1px solid rgba(2, 132, 199, 0.2);
 }
 
 @media (max-width: 768px) {

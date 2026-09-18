@@ -188,6 +188,21 @@ def run_tests():
         assert drawer_box["width"] <= 390, f"Drawer width {drawer_box['width']} exceeds mobile width!"
         assert drawer_box["x"] >= 0, f"Drawer renders offscreen to the left: {drawer_box['x']}"
         
+        # Verify header search is hidden on mobile and moved into drawer
+        assert not mobile_page.locator(".app-header .search-trigger-btn").is_visible(), "[Course 1] Header search must be hidden on mobile"
+        drawer_search = mobile_page.locator("#mobileDrawer .mobile-search-trigger-btn")
+        assert drawer_search.is_visible(), "[Course 1] Search must be visible inside mobile drawer"
+        drawer_search.click()
+        mobile_page.wait_for_selector("#searchModalBackdrop.is-active")
+        assert mobile_page.locator("#searchModalBackdrop").is_visible(), "[Course 1] Search modal should open from drawer"
+        mobile_page.keyboard.press("Escape")
+        mobile_page.wait_for_timeout(200)
+
+        # Reopen drawer for chapter verification
+        mobile_page.click("#mobileNavToggle")
+        mobile_page.wait_for_selector("#mobileDrawer.is-open")
+        mobile_page.wait_for_timeout(250)
+
         mobile_ch = mobile_page.locator("#mobileNavTree .nav-chapter-item").all()
         print(f"[Course 1] Mobile nav chapters: {len(mobile_ch)} (Expected: 29)")
         assert len(mobile_ch) == 29, f"Expected 29 chapters in mobile drawer, got {len(mobile_ch)}"
@@ -795,6 +810,21 @@ def run_tests():
         mobile_page.wait_for_selector("#mobileDrawer.is-open")
         mobile_page.wait_for_timeout(350)
 
+        # Verify header search is hidden on mobile and moved into drawer
+        assert not mobile_page.locator(".app-header .search-trigger-btn").is_visible(), "[Course 2] Header search must be hidden on mobile"
+        rad_drawer_search = mobile_page.locator("#mobileDrawer .mobile-search-trigger-btn")
+        assert rad_drawer_search.is_visible(), "[Course 2] Search must be visible inside mobile drawer"
+        rad_drawer_search.click()
+        mobile_page.wait_for_selector("#searchModalBackdrop.is-active")
+        assert mobile_page.locator("#searchModalBackdrop").is_visible(), "[Course 2] Search modal should open from drawer in Radiology"
+        mobile_page.keyboard.press("Escape")
+        mobile_page.wait_for_timeout(200)
+
+        # Reopen drawer for chapter verification
+        mobile_page.click("#mobileNavToggle")
+        mobile_page.wait_for_selector("#mobileDrawer.is-open")
+        mobile_page.wait_for_timeout(250)
+
         mob_rad_ch = mobile_page.locator("#mobileNavTree .nav-chapter-item").all()
         print(f"[Course 2] Mobile nav chapters: {len(mob_rad_ch)} (Expected: 4)")
         assert len(mob_rad_ch) == 4, f"Expected 4 chapters in mobile drawer, got {len(mob_rad_ch)}"
@@ -815,6 +845,20 @@ def run_tests():
         page = browser.new_page(viewport={"width": 1440, "height": 900})
         page.goto(index_url)
         page.wait_for_load_state("networkidle")
+
+        # Verify Dropdown is visible and works across all viewports including mobile (Android)
+        print("\n--- [Portal] Testing Dropdown visibility across mobile & desktop ---")
+        for bp in [320, 360, 390, 430, 768]:
+            mb_page = browser.new_page(viewport={"width": bp, "height": 800})
+            mb_page.goto(index_url)
+            mb_page.wait_for_load_state("networkidle")
+            assert mb_page.locator("#coursesDropdownBtn").is_visible(), f"Courses dropdown button must be visible at {bp}px"
+            mb_page.click("#coursesDropdownBtn")
+            mb_page.wait_for_selector(".portal-dropdown.is-open")
+            mb_cards = mb_page.locator("#coursesDropdownMenu .dropdown-course-card").all()
+            assert len(mb_cards) == 2, f"Expected 2 courses in dropdown at {bp}px"
+            mb_page.close()
+        print("[Portal] PASS: Dropdown button and menu perfectly visible across all mobile viewports!")
 
         # Verify Dropdown displays both courses
         page.click("#coursesDropdownBtn")

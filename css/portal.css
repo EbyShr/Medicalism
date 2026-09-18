@@ -113,14 +113,40 @@ html {
 }
 
 .portal-nav-links {
-  display: none;
+  display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
 }
 
-@media (min-width: 860px) {
-  .portal-nav-links {
-    display: flex;
+.portal-dropdown-text-desktop {
+  display: inline;
+}
+
+.portal-dropdown-text-mobile {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .portal-dropdown-text-desktop {
+    display: none;
+  }
+  .portal-dropdown-text-mobile {
+    display: inline;
+  }
+  .portal-dropdown-trigger {
+    padding: 6px 10px;
+    font-size: 12.5px;
+    gap: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .portal-dropdown-trigger {
+    padding: 5px 8px;
+    font-size: 11.5px;
+  }
+  #portalFontSelect {
+    display: none;
   }
 }
 
@@ -194,6 +220,19 @@ html {
   transform-origin: top right;
   transition: opacity 120ms ease, transform 120ms ease, visibility 120ms;
   pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .portal-dropdown-menu {
+    position: fixed;
+    top: 66px;
+    inset-inline-start: 12px;
+    inset-inline-end: 12px;
+    width: auto;
+    max-width: calc(100vw - 24px);
+    margin: 0 auto;
+    z-index: 1000;
+  }
 }
 
 /* Invisible hover bridge connecting trigger and menu */
