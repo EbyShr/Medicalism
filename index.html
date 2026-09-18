@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="./css/components.css">
   <link rel="stylesheet" href="./css/medical-widgets.css">
   <link rel="stylesheet" href="./css/dark-theme.css">
+  <link rel="stylesheet" href="./css/radiology.css">
   <link rel="stylesheet" href="./css/portal.css">
 </head>
 <body class="portal-page">
@@ -65,9 +66,10 @@
           </button>
 
           <div class="portal-dropdown-menu" id="coursesDropdownMenu" role="menu">
-            <div class="dropdown-section-label">دوره آموزشی فعال</div>
+            <div class="dropdown-section-label">دوره‌های آموزشی فعال البرز</div>
             
-            <div class="dropdown-course-card" style="margin-block-end: 0;">
+            <!-- Course 1: Communicable & Non-Communicable Diseases -->
+            <div class="dropdown-course-card">
               <div class="dropdown-course-header">
                 <div class="dropdown-course-icon-active">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -75,19 +77,44 @@
                   </svg>
                 </div>
                 <div>
-                  <div class="dropdown-course-title">بیماری‌های واگیر و غیرواگیر</div>
+                  <div class="dropdown-course-title"><a href="./communicable-and-noncommunicable-diseases.html" style="color: inherit; text-decoration: none;">بیماری‌های واگیر و غیرواگیر</a></div>
                   <div class="dropdown-course-meta">۲۹ سرفصل جامع • آماده مطالعه</div>
                 </div>
               </div>
               <div class="dropdown-subfolders">
-                <a href="./course.html#ch-27" class="dropdown-folder-link" role="menuitem">
+                <a href="./communicable-and-noncommunicable-diseases.html#ch-27" class="dropdown-folder-link" role="menuitem">
                   <span>📁 بخش اول: بیماری‌های واگیر (۱۵ فصل)</span>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="15 18 9 12 15 6"></polyline>
                   </svg>
                 </a>
-                <a href="./course.html#ch-17" class="dropdown-folder-link" role="menuitem">
+                <a href="./communicable-and-noncommunicable-diseases.html#ch-17" class="dropdown-folder-link" role="menuitem">
                   <span>📁 بخش دوم: بیماری‌های غیرواگیر (۱۴ فصل)</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- Course 2: Radiology & Clinical Imaging -->
+            <div class="dropdown-course-card" style="margin-block-end: 0; border-color: rgba(14, 165, 233, 0.3);">
+              <div class="dropdown-course-header">
+                <div class="dropdown-course-icon-active" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                </div>
+                <div>
+                  <div class="dropdown-course-title"><a href="./radiology.html" style="color: inherit; text-decoration: none;">رادیولوژی و تصویربرداری بالینی</a></div>
+                  <div class="dropdown-course-meta">کلیشه‌های تعاملی و تحلیل تشخیصی</div>
+                </div>
+              </div>
+              <div class="dropdown-subfolders">
+                <a href="./radiology.html#rad-ch01" class="dropdown-folder-link" role="menuitem">
+                  <span>📁 سرفصل اول: بیماری‌های مفصلی و تروما (۹ بخش)</span>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="15 18 9 12 15 6"></polyline>
                   </svg>
@@ -161,6 +188,7 @@
           <button type="button" class="hero-search-tag-chip" data-query="سرطان">نظام ثبت سرطان</button>
           <button type="button" class="hero-search-tag-chip" data-query="واکسن">بیماری‌های واکسن‌پذیر</button>
           <button type="button" class="hero-search-tag-chip" data-query="هاری">هاری و بروسلوز</button>
+          <button type="button" class="hero-search-tag-chip" data-query="شکستگی">رادیولوژی و شکستگی‌ها</button>
         </div>
       </div>
 
@@ -219,9 +247,23 @@
 
   <!-- Scripts -->
   <script src="./js/data/chapters-registry.js"></script>
+  <script src="./js/data/radiology-registry.js"></script>
+  <script src="./js/radiology.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const chapters = window.CHAPTERS_REGISTRY || [];
+      const commAndNcd = (window.CHAPTERS_REGISTRY || []).map(ch => ({
+        ...ch,
+        targetUrl: `./communicable-and-noncommunicable-diseases.html#${ch.id}`,
+        trackLabel: ch.number <= 15 ? 'واگیر' : 'غیرواگیر',
+        trackPillClass: ch.number <= 15 ? 'pill-comm' : 'pill-ncd'
+      }));
+      const rad = (window.RADIOLOGY_REGISTRY || []).map(ch => ({
+        ...ch,
+        targetUrl: `./radiology.html#${ch.id}`,
+        trackLabel: 'رادیولوژی',
+        trackPillClass: 'pill-rad'
+      }));
+      const chapters = [...commAndNcd, ...rad];
       const heroSearch = document.getElementById('heroSearchInput');
       const searchResults = document.getElementById('heroSearchResults');
       const dropdown = document.getElementById('coursesDropdown');
@@ -331,17 +373,14 @@
           `;
         } else {
           searchResults.innerHTML = hits.slice(0, 7).map(ch => {
-            const isComm = ch.number <= 15;
-            const trackLabel = isComm ? 'واگیر' : 'غیرواگیر';
-            const trackPillClass = isComm ? 'pill-comm' : 'pill-ncd';
             const numPadded = ch.number.toString().padStart(2, '۰');
             return `
-              <a href="./course.html#${ch.id}" class="hero-search-result-item">
+              <a href="${ch.targetUrl}" class="hero-search-result-item">
                 <div style="min-width: 0;">
                   <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-primary); margin-inline-end: 6px;">فصل ${numPadded}</span>
                   <span class="search-result-title">${ch.title}</span>
                 </div>
-                <span class="search-result-track ${trackPillClass}">${trackLabel}</span>
+                <span class="search-result-track ${ch.trackPillClass}">${ch.trackLabel}</span>
               </a>
             `;
           }).join('');

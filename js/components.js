@@ -48,7 +48,7 @@ window.ComponentRenderer = {
     `;
 
     // Chapter Navigation Footer (Progression between chapters)
-    const chapters = window.CHAPTERS_REGISTRY || [];
+    const chapters = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
     const currentIndex = chapters.findIndex(c => c.id === chapter.id);
     const prevChapter = currentIndex > 0 ? chapters[currentIndex - 1] : null;
     const nextChapter = currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null;
@@ -88,6 +88,9 @@ window.ComponentRenderer = {
 
     container.innerHTML = html;
     this.bindSectionActions(container);
+    if (window.RadiologyModule && typeof window.RadiologyModule.bindContainerEvents === 'function') {
+      window.RadiologyModule.bindContainerEvents(container);
+    }
   },
 
   /**
@@ -158,6 +161,8 @@ window.ComponentRenderer = {
       sectionBody = this.renderChapter30Section(section);
     } else if (chapterId === 'ch-31') {
       sectionBody = this.renderChapter31Section(section);
+    } else if (chapterId === 'ch-32' || chapterId === 'rad-ch01') {
+      sectionBody = this.renderChapter32Section(section, chapterId);
     } else {
       sectionBody = `<p>${section.summary || ''}</p>`;
     }
@@ -166,7 +171,10 @@ window.ComponentRenderer = {
       <section class="study-section" id="${section.id}" data-chapter-id="${chapterId}">
         <div class="section-header-row">
           <div>
-            <h2>${section.title}</h2>
+            <h2 style="display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <span>${section.title}</span>
+              <span class="section-id-badge" data-id="${section.id}" title="شناسه بخش در مانیفست تصاویر (کلیک جهت کپی)">#${section.id}</span>
+            </h2>
             ${section.latinTitle ? `<div class="brand-subtitle latin-term">${section.latinTitle}</div>` : ''}
           </div>
           <div class="section-actions">
@@ -7664,5 +7672,560 @@ window.ComponentRenderer = {
     return `<p>${sec.summary || ''}</p>`;
   },
 
-};
 
+  /* =========================================================================
+     CHAPTER RENDERERS (RADIOLOGY & SKELETAL TRAUMA - rad-ch01 / ch-32)
+     ========================================================================= */
+  renderChapter32Section(sec, chapterId = 'rad-ch01') {
+    let contentHtml = '';
+    const activeChId = chapterId || 'rad-ch01';
+    const getGallery = (secId) => {
+      if (window.RadiologyModule && typeof window.RadiologyModule.renderGallery === 'function') {
+        return window.RadiologyModule.renderGallery(secId, activeChId);
+      }
+      return '';
+    };
+
+    if (sec.id === 's1') {
+      const boneApps = (sec.boneAppearance || []).map(b => `
+        <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--accent-primary);">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <strong style="color: var(--accent-primary); font-size: 0.95rem;">${b.structure}:</strong>
+            <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${b.findings}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const divisions = (sec.longBoneDivisions || []).map(d => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3); border-radius: var(--radius-md);">
+          <strong style="color: var(--accent-primary);">${d.division}</strong>
+          <p style="margin: var(--space-1) 0 0 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.6;">${d.desc}</p>
+        </div>
+      `).join('');
+
+      const syn = sec.synovialJoint || {};
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">💡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">نمای رادیولوژیک و سی‌تی‌اسکن استخوان نرمال (Normal Bone Appearance)</h3>
+          ${boneApps}
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">ساختار مفصل سینوویال حقیقی و تظاهر در تصویربرداری</h3>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-3);">
+            <strong style="color: var(--text-primary);">اجزای شش‌گانه آناتومیک:</strong>
+            <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${syn.components || ''}</p>
+          </div>
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-3);">
+            <div style="background: rgba(2, 132, 199, 0.05); border: 1px solid rgba(2, 132, 199, 0.2); padding: var(--space-4); border-radius: var(--radius-md);">
+              <h4 style="margin: 0 0 var(--space-2) 0; color: var(--accent-primary); font-size: 0.95rem;">تظاهر در رادیوگرافی ساده (Plain Radiography)</h4>
+              <p style="margin: 0; font-size: 0.88rem; line-height: 1.7;">${syn.plainRadiography || ''}</p>
+            </div>
+            <div style="background: rgba(99, 102, 241, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); padding: var(--space-4); border-radius: var(--radius-md);">
+              <h4 style="margin: 0 0 var(--space-2) 0; color: #6366f1; font-size: 0.95rem;">تظاهر در ام‌آر‌آی (T1-Weighted MRI)</h4>
+              <p style="margin: 0; font-size: 0.88rem; line-height: 1.7;">${syn.mriT1 || ''}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">تقسیم‌بندی ساختاری استخوان‌های طویل (Long Bone Divisions)</h3>
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-3);">
+            ${divisions}
+          </div>
+        </div>
+
+        ${getGallery('s1')}
+      `;
+    } else if (sec.id === 's2') {
+      const rows = (sec.checklist || []).map(item => `
+        <tr>
+          <td style="font-weight: 800; white-space: nowrap; color: var(--accent-primary);">${item.part}</td>
+          <td>
+            <ul style="margin: 0; padding-inline-start: 20px; font-size: 0.88rem; line-height: 1.7;">
+              ${item.variables.map(v => `<li>${v}</li>`).join('')}
+            </ul>
+          </td>
+          <td style="font-size: 0.88rem; line-height: 1.7;">${item.note}</td>
+        </tr>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">📋</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">چک‌لیست سیستماتیک تفسیر رادیوگرافی استخوان</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th style="width: 22%; min-width: 120px;">جزء ارزیابی</th>
+                  <th style="width: 40%; min-width: 180px;">متغیرهای کلیدی بررسی</th>
+                  <th style="width: 38%; min-width: 180px;">اهمیت بالینی و نکات تشخیصی</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        ${getGallery('s2')}
+      `;
+    } else if (sec.id === 's3') {
+      const patternRows = (sec.patterns || []).map(p => {
+        let badgeClass = 'badge-info';
+        if (p.name.includes('یکپارچه')) badgeClass = 'badge-primary';
+        else if (p.name.includes('پوست')) badgeClass = 'badge-warning';
+        else badgeClass = 'badge-danger';
+
+        return `
+          <tr>
+            <td style="font-weight: 700; white-space: nowrap;">
+              ${p.name}
+              <div style="margin-block-start: 4px;"><span class="badge ${badgeClass}">${p.name.includes('یکپارچه') ? 'خوش‌خیم' : 'تهاجمی'}</span></div>
+            </td>
+            <td style="font-size: 0.88rem; line-height: 1.7;">${p.morphology}</td>
+            <td style="font-size: 0.88rem; line-height: 1.7;"><strong style="color: var(--text-primary);">${p.aggressiveness}</strong></td>
+          </tr>
+        `;
+      }).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-warning" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">⚠️</div>
+          <div class="callout-content">
+            <strong style="display: block; margin-block-end: 4px;">پاتوفیزیولوژی و علت‌شناسی:</strong>
+            <p style="margin: 0; line-height: 1.7;">${sec.pathophysiology || ''}</p>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">الگوهای چهارگانه واکنش پریوستی و میزان تهاجم ضایعه</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th style="width: 24%; min-width: 130px;">الگوی واکنش پریوستی</th>
+                  <th style="width: 46%; min-width: 180px;">ویژگی مورفولوژیک</th>
+                  <th style="width: 30%; min-width: 140px;">درجه تهاجم / ماهیت بالینی</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${patternRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="medical-callout callout-danger" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">🚨</div>
+          <div class="callout-content">
+            <strong style="display: block; margin-block-end: 4px;">نکته تفسیری ضایعات تهاجمی استخوان:</strong>
+            <p style="margin: 0; line-height: 1.7;">${sec.interpretivePearl || ''}</p>
+          </div>
+        </div>
+
+        ${getGallery('s3')}
+      `;
+    } else if (sec.id === 's4') {
+      const coreParams = (sec.coreParameters || []).map(cp => `
+        <div class="clinical-card" style="margin-block-end: var(--space-4); border-inline-start: 4px solid var(--accent-primary);">
+          <div class="card-header bg-light d-flex justify-between align-center" style="padding: var(--space-3) var(--space-4); background: var(--bg-surface-secondary);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="badge badge-primary" style="font-weight: 800; border-radius: var(--radius-full);">${cp.num}</span>
+              <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700;">${cp.name}</h4>
+            </div>
+          </div>
+          <div class="card-body" style="padding: var(--space-4);">
+            <ul style="margin: 0; padding-inline-start: 20px; font-size: 0.9rem; line-height: 1.75;">
+              ${cp.details.map(d => `<li style="margin-block-end: 4px;">${d}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">🔍</div>
+          <div class="callout-content">
+            <strong style="display: block; margin-block-end: 4px;">تظاهرات اختلال کورتکس:</strong>
+            <p style="margin: 0 0 4px 0;">${sec.corticalDisruption ? sec.corticalDisruption.margins : ''}</p>
+            <p style="margin: 0;">${sec.corticalDisruption ? sec.corticalDisruption.continuity : ''}</p>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-4);">پارامترهای شش‌گانه توصیف جامع شکستگی (Six Core Fracture Parameters)</h3>
+          ${coreParams}
+        </div>
+
+        ${getGallery('s4')}
+      `;
+    } else if (sec.id === 's5') {
+      const fCards = (sec.fractureTypes || []).map(f => `
+        <div class="clinical-card" style="margin-block-end: var(--space-4); border-top: 4px solid var(--state-warning);">
+          <div class="card-header bg-light" style="padding: var(--space-3) var(--space-4); background: var(--bg-surface-secondary);">
+            <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--text-primary);">${f.name}</h4>
+          </div>
+          <div class="card-body" style="padding: var(--space-4);">
+            <div style="margin-block-end: var(--space-2);"><strong style="color: var(--accent-primary);">مکانیسم تروما:</strong> <span style="font-size: 0.9rem;">${f.mechanism}</span></div>
+            <div style="margin-block-end: var(--space-2);"><strong style="color: var(--state-warning);">تظاهر رادیولوژیک:</strong> <span style="font-size: 0.9rem;">${f.manifestation}</span></div>
+            <div><strong style="color: var(--text-secondary);">شایع‌ترین محل درگیری:</strong> <span style="font-size: 0.9rem;">${f.commonSite}</span></div>
+          </div>
+        </div>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-warning" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">👶</div>
+          <div class="callout-content">
+            <strong style="display: block; margin-block-end: 4px;">ویژگی‌های عمومی رادیوگرافی شکستگی‌های ناقص در اطفال:</strong>
+            <ul style="margin: 0; padding-inline-start: 20px; line-height: 1.7;">
+              ${(sec.generalFeatures || []).map(gf => `<li>${gf}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-4);">انواع شایع شکستگی‌های ناقص اطفال</h3>
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-4);">
+            ${fCards}
+          </div>
+        </div>
+
+        ${getGallery('s5')}
+      `;
+    } else if (sec.id === 's6') {
+      const pitRows = (sec.pitfalls || []).map(p => `
+        <tr>
+          <td style="font-weight: 800; white-space: nowrap; color: var(--accent-primary);">${p.structure}</td>
+          <td style="font-size: 0.88rem; line-height: 1.7; background: rgba(16, 185, 129, 0.03);">${p.differentialFeatures}</td>
+          <td style="font-size: 0.88rem; line-height: 1.7; background: rgba(239, 68, 68, 0.03);"><strong style="color: var(--state-danger);">${p.acuteFeatures}</strong></td>
+        </tr>
+      `).join('');
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">🎯</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">تشخیص‌های افتراقی و خطاهای تشخیصی شکستگی (Pitfalls in Fracture Diagnosis)</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th style="width: 24%; min-width: 130px;">ساختار غیرشکستگی</th>
+                  <th style="width: 38%; min-width: 180px; color: var(--state-success);">ویژگی‌های تفریقی ساختار طبیعی</th>
+                  <th style="width: 38%; min-width: 180px; color: var(--state-danger);">ویژگی‌های شکستگی واقعی</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${pitRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        ${getGallery('s6')}
+      `;
+    } else if (sec.id === 's7') {
+      const cvs = sec.collesVsSmith || {};
+      const colles = cvs.colles || {};
+      const smith = cvs.smith || {};
+
+      const fifthMeta = (sec.fifthMetatarsal || []).map(m => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-3);">
+          <strong style="color: var(--accent-primary); font-size: 0.95rem;">${m.type}:</strong>
+          <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${m.desc}</p>
+        </div>
+      `).join('');
+
+      const handWrist = (sec.handAndWrist || []).map(hw => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-3);">
+          <strong style="color: var(--accent-primary); font-size: 0.95rem;">${hw.name}:</strong>
+          <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${hw.desc}</p>
+        </div>
+      `).join('');
+
+      const march = sec.marchFracture || {};
+      const hip = sec.hipAndFemur || {};
+      const nonunion = sec.nonunionAndPseudarthrosis || {};
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">⚡</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <!-- March Fracture -->
+        <div class="clinical-card" style="margin-block-end: var(--space-5); border-inline-start: 4px solid var(--accent-primary);">
+          <div class="card-body" style="padding: var(--space-4);">
+            <h4 style="margin: 0 0 var(--space-2) 0; color: var(--accent-primary);">شکستگی استرسی / رژه (Stress / March Fracture)</h4>
+            <p style="margin: 0 0 var(--space-2) 0; font-size: 0.9rem; line-height: 1.7;">${march.def || ''}</p>
+            <div style="background: var(--bg-surface-secondary); padding: var(--space-3); border-radius: var(--radius-sm); font-size: 0.88rem; line-height: 1.7;">
+              <strong>رفتار رادیولوژیک وابسته به زمان:</strong> ${march.timeBehavior || ''}
+            </div>
+          </div>
+        </div>
+
+        <!-- Colles vs Smith Table -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">شکستگی‌های انتهای دیستال رادیوس (کالیس در برابر اسمیت)</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th style="width: 26%; min-width: 120px;">ویژگی تفریقی</th>
+                  <th style="width: 37%; min-width: 150px; color: var(--accent-primary);">${colles.name || 'شکستگی کالیس'}</th>
+                  <th style="width: 37%; min-width: 150px; color: #6366f1;">${smith.name || 'شکستگی اسمیت'}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight: 700;">مکانیسم تروما</td>
+                  <td>${colles.mechanism || ''}</td>
+                  <td>${smith.mechanism || ''}</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 700;">راستای قطعه دیستال</td>
+                  <td><strong style="color: var(--accent-primary);">${colles.angulation || ''}</strong></td>
+                  <td><strong style="color: #6366f1;">${smith.angulation || ''}</strong></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 700;">ضایعات همراه شایع</td>
+                  <td>${colles.associated || ''}</td>
+                  <td>${smith.associated || ''}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 5th Metatarsal Spectrum -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">طیف شکستگی‌های قاعده متاتارس پنجم (5th Metatarsal Base Lesions)</h3>
+          ${fifthMeta}
+        </div>
+
+        <!-- Hand & Wrist Fractures -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">شکستگی‌های اختصاصی دست، مچ و شست</h3>
+          ${handWrist}
+        </div>
+
+        <!-- Hip Fractures & Nonunion -->
+        <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-4); margin-block-end: var(--space-5);">
+          <div class="clinical-card" style="border-inline-start: 4px solid var(--state-warning);">
+            <div class="card-body" style="padding: var(--space-4);">
+              <h4 style="margin: 0 0 var(--space-2) 0; color: var(--state-warning);">شکستگی‌های پروگزیمال فمور و هیپ</h4>
+              <p style="font-size: 0.88rem; line-height: 1.7; margin-block-end: var(--space-2);"><strong>طبقه‌بندی:</strong> ${hip.classification || ''}</p>
+              <p style="font-size: 0.88rem; line-height: 1.7;"><strong>شکستگی فشرده ساب‌کپیتال:</strong> ${hip.impactedSubcapital || ''}</p>
+            </div>
+          </div>
+
+          <div class="clinical-card" style="border-inline-start: 4px solid var(--state-danger);">
+            <div class="card-body" style="padding: var(--space-4);">
+              <h4 style="margin: 0 0 var(--space-2) 0; color: var(--state-danger);">جوش‌نخوردگی و مفصل کاذب (Nonunion & Pseudarthrosis)</h4>
+              <p style="font-size: 0.88rem; line-height: 1.7; margin-block-end: var(--space-2);"><strong>تعریف:</strong> ${nonunion.def || ''}</p>
+              <p style="font-size: 0.88rem; line-height: 1.7;"><strong>یافته‌های رادیوگرافی:</strong> ${nonunion.findings || ''}</p>
+            </div>
+          </div>
+        </div>
+
+        ${getGallery('s7')}
+      `;
+    } else if (sec.id === 's8') {
+      const defs = (sec.alignmentDefinitions || []).map(d => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-3);">
+          <strong style="color: var(--accent-primary);">${d.term}:</strong>
+          <p style="margin: var(--space-1) 0 0 0; font-size: 0.9rem; line-height: 1.7;">${d.desc}</p>
+        </div>
+      `).join('');
+
+      const shoulder = sec.shoulderDislocations || {};
+      const elbow = sec.elbowFatPads || {};
+      const wrist = sec.wristAndAHL || {};
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">🔍</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">تعاریف اختلالات همراستایی مفصلی</h3>
+          ${defs}
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">دررفتگی‌های مفصل شانه (قدامی در برابر خلفی)</h3>
+          <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-3);">
+            <div style="background: rgba(2, 132, 199, 0.05); border: 1px solid rgba(2, 132, 199, 0.2); padding: var(--space-4); border-radius: var(--radius-md);">
+              <h4 style="margin: 0 0 var(--space-2) 0; color: var(--accent-primary);">دررفتگی قدامی (شایع‌ترین)</h4>
+              <p style="margin: 0; font-size: 0.88rem; line-height: 1.7;">${shoulder.anterior || ''}</p>
+            </div>
+            <div style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); padding: var(--space-4); border-radius: var(--radius-md);">
+              <h4 style="margin: 0 0 var(--space-2) 0; color: var(--state-warning);">دررفتگی خلفی (علامت حباب لامپ)</h4>
+              <p style="margin: 0; font-size: 0.88rem; line-height: 1.7;">${shoulder.posterior || ''}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">نشانه‌های چربی مفصل آرنج و افیوژن مفصلی</h3>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-3);">
+            <p style="margin: 0 0 var(--space-2) 0; font-size: 0.9rem; line-height: 1.7;"><strong>آناتومی بالشتک‌ها:</strong> ${elbow.normal || ''}</p>
+            <p style="margin: 0 0 var(--space-2) 0; font-size: 0.9rem; line-height: 1.7;"><strong>تغییرات پاتولوژیک:</strong> ${elbow.pathologic || ''}</p>
+          </div>
+          <div class="medical-callout callout-danger">
+            <div class="callout-icon">🚨</div>
+            <div class="callout-content">
+              <strong>تفسیر بالینی کلیدی:</strong> ${elbow.clinicalPearl || ''}
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-3); margin-block-end: var(--space-5);">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-4); border-radius: var(--radius-md);">
+            <h4 style="margin: 0 0 var(--space-2) 0; color: var(--accent-primary);">خط چربی پروناتور کوادراتوس</h4>
+            <p style="margin: 0; font-size: 0.88rem; line-height: 1.7;">${wrist.pronatorFat || ''}</p>
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-4); border-radius: var(--radius-md);">
+            <h4 style="margin: 0 0 var(--space-2) 0; color: var(--accent-primary);">خط هومرال قدامی اطفال (AHL)</h4>
+            <p style="margin: 0; font-size: 0.88rem; line-height: 1.7;">${wrist.ahl || ''}</p>
+          </div>
+        </div>
+
+        ${getGallery('s8')}
+      `;
+    } else if (sec.id === 's9') {
+      const cLines = (sec.cervicalLines || []).map(cl => `
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-subtle); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-block-end: var(--space-2);">
+          <strong style="color: var(--accent-primary);">${cl.line}:</strong>
+          <span style="font-size: 0.88rem; color: var(--text-secondary); margin-inline-start: 6px;">${cl.desc}</span>
+        </div>
+      `).join('');
+
+      const denisRows = (sec.denisModel || []).map(dm => {
+        let badge = 'badge-primary';
+        if (dm.column.includes('میانی')) badge = 'badge-danger';
+        else if (dm.column.includes('خلفی')) badge = 'badge-warning';
+
+        return `
+          <tr>
+            <td style="font-weight: 800; white-space: nowrap;">
+              ${dm.column}
+              <div style="margin-block-start: 4px;"><span class="badge ${badge}">${dm.column.includes('میانی') ? 'ناپایدار قطعی' : 'آناتومیک'}</span></div>
+            </td>
+            <td style="font-size: 0.88rem; line-height: 1.7;">${dm.components}</td>
+            <td style="font-size: 0.88rem; line-height: 1.7;"><strong style="color: ${dm.column.includes('میانی') ? 'var(--state-danger)' : 'var(--text-primary)'};">${dm.clinicalOutcome}</strong></td>
+          </tr>
+        `;
+      }).join('');
+
+      const denisPatterns = (sec.denisFracturePatterns || []).map(dp => `
+        <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid ${dp.pattern.includes('شانس') ? 'var(--state-danger)' : (dp.pattern.includes('انفجاری') ? 'var(--state-warning)' : 'var(--state-success)')};">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <h4 style="margin: 0 0 var(--space-1) 0; font-size: 0.95rem; font-weight: 700;">${dp.pattern}</h4>
+            <p style="margin: 0; font-size: 0.88rem; line-height: 1.7;">${dp.desc}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const hj = sec.hangmanAndJefferson || {};
+
+      contentHtml = `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-5);">
+          <div class="callout-icon">🛡️</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <!-- 3 Cervical Lines -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">خطوط قوسی سه‌گانه ستون فقرات گردنی (Three Cervical Lines)</h3>
+          ${cLines}
+        </div>
+
+        <!-- Hangman & Jefferson -->
+        <div class="grid-2" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-4); margin-block-end: var(--space-5);">
+          <div class="clinical-card" style="border-top: 4px solid var(--state-danger);">
+            <div class="card-header bg-light" style="padding: var(--space-3) var(--space-4); background: var(--bg-surface-secondary);">
+              <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--state-danger);">شکستگی هنگمن (Hangman’s Fracture)</h4>
+            </div>
+            <div class="card-body" style="padding: var(--space-4); font-size: 0.88rem; line-height: 1.75;">
+              ${hj.hangman || ''}
+            </div>
+          </div>
+
+          <div class="clinical-card" style="border-top: 4px solid var(--state-warning);">
+            <div class="card-header bg-light" style="padding: var(--space-3) var(--space-4); background: var(--bg-surface-secondary);">
+              <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--state-warning);">اتصالات C1-C2 و شکستگی جفرسون</h4>
+            </div>
+            <div class="card-body" style="padding: var(--space-4); font-size: 0.88rem; line-height: 1.75;">
+              ${hj.jefferson || ''}
+            </div>
+          </div>
+        </div>
+
+        <!-- Denis 3-Column Model -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">مدل سه‌ستونی دنیس در ستون فقرات توراکولومبار (Denis Three-Column Model)</h3>
+          <div class="table-responsive" style="margin-block-end: var(--space-3);">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th style="width: 22%; min-width: 130px;">ستون آناتومیک</th>
+                  <th style="width: 44%; min-width: 180px;">اجزای درگیر</th>
+                  <th style="width: 34%; min-width: 160px;">پیامد بالینی آسیب</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${denisRows}
+              </tbody>
+            </table>
+          </div>
+          <div class="medical-callout callout-danger" style="margin-block-end: var(--space-4);">
+            <div class="callout-icon">⚠️</div>
+            <div class="callout-content">
+              <strong>معیار ناپایداری ستون مهره‌ها:</strong> آسیب و گسیختگی همزمان در دو یا هر سه ستون، یا هرگونه آسیب درگیرکننده ستون میانی، نشان‌دهنده ناپایداری مکانیکی و خطر بالای آسیب عصبی است.
+            </div>
+          </div>
+        </div>
+
+        <!-- Denis Fracture Patterns -->
+        <div class="content-block" style="margin-block-end: var(--space-5);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">الگوهای شکستگی توراکولومبار بر اساس مدل دنیس</h3>
+          ${denisPatterns}
+        </div>
+
+        <!-- Hyperflexion Teardrop -->
+        <div class="clinical-card" style="margin-block-end: var(--space-5); border-inline-start: 4px solid var(--state-danger);">
+          <div class="card-body" style="padding: var(--space-4);">
+            <h4 style="margin: 0 0 var(--space-2) 0; color: var(--state-danger);">آسیب‌های هایپرفلکشن گردنی و شکستگی قطره‌اشکی (Cervical Hyperflexion & Teardrop)</h4>
+            <p style="margin: 0; font-size: 0.9rem; line-height: 1.75;">${sec.hyperflexionTeardrop || ''}</p>
+          </div>
+        </div>
+
+        ${getGallery('s9')}
+      `;
+    } else {
+      contentHtml = `<p>${sec.summary || ''}</p>${getGallery(sec.id)}`;
+    }
+
+    return contentHtml;
+  },
+
+};

@@ -5,10 +5,10 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   const contentContainer = document.getElementById('chapterContentArea');
-  const chapters = window.CHAPTERS_REGISTRY || [];
+  const chapters = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
   
   if (chapters.length === 0) {
-    console.error('No chapters found in CHAPTERS_REGISTRY.');
+    console.error('No chapters found in ACTIVE_REGISTRY or CHAPTERS_REGISTRY.');
     return;
   }
 
@@ -31,7 +31,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Initial chapter mount
-  const initialChapterId = window.appState ? window.appState.activeChapterId : chapters[0].id;
+  let initialChapterId = window.appState ? window.appState.activeChapterId : chapters[0].id;
+  if (!chapters.some(c => c.id === initialChapterId)) {
+    initialChapterId = chapters[0].id;
+    if (window.appState) {
+      window.appState.activeChapterId = initialChapterId;
+    }
+  }
   mountChapter(initialChapterId);
 
   // 2. Initialize Navigation (Desktop right sidebar & RTL mobile drawer)

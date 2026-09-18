@@ -126,8 +126,16 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+[data-theme="dark"] .table-responsive,
+[data-theme="dark"] .table-responsive-container,
+[data-theme="dark"] .table-scroll-container {
+  background-color: #152038;
+  border-color: #2b3d63;
+}
+
 [data-theme="dark"] .data-table th,
-[data-theme="dark"] .medical-table th {
+[data-theme="dark"] .medical-table th,
+[data-theme="dark"] .medical-data-table th {
   background-color: #1e2c4c;
   color: #f1f5f9;
   border-block-end: 2px solid var(--accent-primary);
@@ -135,14 +143,16 @@
 }
 
 [data-theme="dark"] .data-table td,
-[data-theme="dark"] .medical-table td {
+[data-theme="dark"] .medical-table td,
+[data-theme="dark"] .medical-data-table td {
   border-block-end: 1px solid #243556;
   border-inline-end: 1px solid #243556;
   color: #e2e8f0;
 }
 
 [data-theme="dark"] .data-table tr:nth-child(even) td,
-[data-theme="dark"] .medical-table tr:nth-child(even) td {
+[data-theme="dark"] .medical-table tr:nth-child(even) td,
+[data-theme="dark"] .medical-data-table tr:nth-child(even) td {
   background-color: rgba(26, 38, 66, 0.45);
 }
 

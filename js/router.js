@@ -14,7 +14,7 @@ window.AppRouter = {
     const hash = window.location.hash.replace(/^#/, '');
     if (!hash) return;
 
-    const chapters = window.CHAPTERS_REGISTRY || [];
+    const chapters = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
 
     // 3. Direct Chapter Route (e.g. #ch-01, #ch-02)
     const chapterMatch = chapters.find(c => c.id === hash);

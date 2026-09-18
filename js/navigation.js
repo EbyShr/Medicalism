@@ -11,7 +11,8 @@ window.AppNavigation = {
   observer: null,
   expandedFolders: {
     comm: true,
-    ncd: true
+    ncd: true,
+    rad: true
   },
 
   init() {
@@ -95,17 +96,22 @@ window.AppNavigation = {
    * Renders the persistent chapter tree organized into folder categories
    */
   renderNavigation() {
-    const chapters = window.CHAPTERS_REGISTRY || [];
-    const activeChapterId = window.appState ? window.appState.activeChapterId : 'ch-01';
+    const chapters = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
+    const activeChapterId = window.appState ? window.appState.activeChapterId : (chapters[0] ? chapters[0].id : 'ch-01');
     const activeSectionId = window.appState ? window.appState.activeSectionId : '';
 
-    const commChapters = chapters.filter(ch => ch.number <= 15);
-    const ncdChapters = chapters.filter(ch => ch.number > 15);
+    const isRadiology = chapters.some(ch => ch.id.startsWith('rad-') || ch.courseId === 'radiology');
+
+    const commChapters = isRadiology ? [] : chapters.filter(ch => ch.number <= 15);
+    const ncdChapters = isRadiology ? [] : chapters.filter(ch => ch.number > 15 && ch.number <= 29);
+    const radChapters = isRadiology ? chapters : [];
 
     // Ensure the folder containing active chapter is open
     const activeCh = chapters.find(ch => ch.id === activeChapterId);
     if (activeCh) {
-      if (activeCh.number <= 15) {
+      if (isRadiology) {
+        this.expandedFolders.rad = true;
+      } else if (activeCh.number <= 15) {
         this.expandedFolders.comm = true;
       } else {
         this.expandedFolders.ncd = true;
@@ -120,10 +126,18 @@ window.AppNavigation = {
         const isActive = sec.id === activeSectionId;
         const isBookmarked = window.appState ? window.appState.isBookmarked(sec.id) : false;
 
+        const imageCount = (window.RadiologyModule && ch.id) ? window.RadiologyModule.getSectionImages(ch.id, sec.id).length : 0;
+
         return `
           <li class="nav-heading-item">
             <a href="#${sec.id}" class="nav-heading-link ${isActive ? 'is-active' : ''}" data-target-id="${sec.id}">
               <span class="nav-heading-text">${sec.title}</span>
+              ${imageCount > 0 ? `
+                <span class="nav-has-images-badge" title="${imageCount} کلیشه تصویربرداری">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                  <span>${imageCount}</span>
+                </span>
+              ` : ''}
               ${isBookmarked ? `
                 <span class="nav-bookmark-indicator">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--state-warning)" stroke="var(--state-warning)">
@@ -158,54 +172,85 @@ window.AppNavigation = {
 
     const commHtml = commChapters.map(renderChapterItem).join('');
     const ncdHtml = ncdChapters.map(renderChapterItem).join('');
+    const radHtml = radChapters.map(renderChapterItem).join('');
 
-    const fullTreeHtml = `
-      <!-- Folder 1: Communicable Diseases (واگیر) -->
-      <li class="nav-folder-item ${this.expandedFolders.comm ? 'is-expanded' : ''}" data-folder-key="comm">
-        <div class="nav-folder-header" data-folder-key="comm" role="button" aria-expanded="${this.expandedFolders.comm ? 'true' : 'false'}" tabindex="0">
-          <div class="nav-folder-title-group">
-            <div class="nav-folder-icon folder-icon-comm">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+    let fullTreeHtml = '';
+    if (isRadiology) {
+      fullTreeHtml = `
+        <!-- Folder: Radiology Course -->
+        <li class="nav-folder-item ${this.expandedFolders.rad ? 'is-expanded' : ''}" data-folder-key="rad">
+          <div class="nav-folder-header" data-folder-key="rad" role="button" aria-expanded="${this.expandedFolders.rad ? 'true' : 'false'}" tabindex="0">
+            <div class="nav-folder-title-group">
+              <div class="nav-folder-icon folder-icon-rad" style="background: rgba(14, 165, 233, 0.12); color: #0ea5e9;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+              </div>
+              <span class="nav-folder-title">رادیولوژی و تروماهای اسکلتی</span>
+            </div>
+            <div class="nav-folder-meta">
+              <span class="nav-folder-badge badge-rad" style="background: rgba(14, 165, 233, 0.12); color: #0ea5e9;">${radChapters.length} فصل</span>
+              <svg class="nav-folder-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
             </div>
-            <span class="nav-folder-title">بیماری‌های واگیر</span>
           </div>
-          <div class="nav-folder-meta">
-            <span class="nav-folder-badge badge-comm">۱۵ فصل</span>
-            <svg class="nav-folder-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </div>
-        </div>
-        <ul class="nav-folder-content">
-          ${commHtml}
-        </ul>
-      </li>
-
-      <!-- Folder 2: Non-Communicable Diseases (غیرواگیر) -->
-      <li class="nav-folder-item ${this.expandedFolders.ncd ? 'is-expanded' : ''}" data-folder-key="ncd">
-        <div class="nav-folder-header" data-folder-key="ncd" role="button" aria-expanded="${this.expandedFolders.ncd ? 'true' : 'false'}" tabindex="0">
-          <div class="nav-folder-title-group">
-            <div class="nav-folder-icon folder-icon-ncd">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          <ul class="nav-folder-content">
+            ${radHtml}
+          </ul>
+        </li>
+      `;
+    } else {
+      fullTreeHtml = `
+        <!-- Folder 1: Communicable Diseases (واگیر) -->
+        <li class="nav-folder-item ${this.expandedFolders.comm ? 'is-expanded' : ''}" data-folder-key="comm">
+          <div class="nav-folder-header" data-folder-key="comm" role="button" aria-expanded="${this.expandedFolders.comm ? 'true' : 'false'}" tabindex="0">
+            <div class="nav-folder-title-group">
+              <div class="nav-folder-icon folder-icon-comm">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+              <span class="nav-folder-title">بیماری‌های واگیر</span>
+            </div>
+            <div class="nav-folder-meta">
+              <span class="nav-folder-badge badge-comm">۱۵ فصل</span>
+              <svg class="nav-folder-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
             </div>
-            <span class="nav-folder-title">بیماری‌های غیرواگیر</span>
           </div>
-          <div class="nav-folder-meta">
-            <span class="nav-folder-badge badge-ncd">۱۴ فصل</span>
-            <svg class="nav-folder-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
+          <ul class="nav-folder-content">
+            ${commHtml}
+          </ul>
+        </li>
+
+        <!-- Folder 2: Non-Communicable Diseases (غیرواگیر) -->
+        <li class="nav-folder-item ${this.expandedFolders.ncd ? 'is-expanded' : ''}" data-folder-key="ncd">
+          <div class="nav-folder-header" data-folder-key="ncd" role="button" aria-expanded="${this.expandedFolders.ncd ? 'true' : 'false'}" tabindex="0">
+            <div class="nav-folder-title-group">
+              <div class="nav-folder-icon folder-icon-ncd">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+              <span class="nav-folder-title">بیماری‌های غیرواگیر</span>
+            </div>
+            <div class="nav-folder-meta">
+              <span class="nav-folder-badge badge-ncd">۱۴ فصل</span>
+              <svg class="nav-folder-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
           </div>
-        </div>
-        <ul class="nav-folder-content">
-          ${ncdHtml}
-        </ul>
-      </li>
-    `;
+          <ul class="nav-folder-content">
+            ${ncdHtml}
+          </ul>
+        </li>
+      `;
+    }
 
     if (this.desktopTreeContainer) {
       this.desktopTreeContainer.innerHTML = fullTreeHtml;
@@ -282,7 +327,7 @@ window.AppNavigation = {
    * Smoothly scrolls to the targeted section element, switching chapters if necessary
    */
   scrollToSection(sectionId) {
-    const chapters = window.CHAPTERS_REGISTRY || [];
+    const chapters = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
     const targetChapter = chapters.find(ch => ch.sections.some(s => s.id === sectionId));
 
     if (targetChapter && window.appState && window.appState.activeChapterId !== targetChapter.id) {

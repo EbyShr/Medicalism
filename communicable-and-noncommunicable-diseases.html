@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>بیماری‌های واگیر و غیرواگیر | مدیکالیسم البرز (ABZUMS)</title>
+  <meta name="description" content="سامانه جامع آموزش و تحلیل اپیدمیولوژی بالینی، بیماری‌های واگیر و غیرواگیر در ایران ویژه دانشجویان دانشگاه علوم پزشکی البرز">
+  <meta name="theme-color" content="#0284c7">
+
+  <!-- Google Fonts: Vazirmatn & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- CDN Webfonts for Shabnam & Sahel -->
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/shabnam-font@v5.0.1/dist/font-face.css" rel="stylesheet" type="text/css">
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" type="text/css">
+
+  <!-- Core Application Stylesheets -->
+  <link rel="stylesheet" href="./css/tokens.css">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/medical-widgets.css">
+  <link rel="stylesheet" href="./css/dark-theme.css">
+  <link rel="stylesheet" href="./css/radiology.css">
+  <link rel="stylesheet" href="./css/print.css" media="print">
+</head>
+<body>
+  <!-- Ambient Animated Glowing Mesh Background -->
+  <div class="ambient-bg" aria-hidden="true">
+    <div class="ambient-orb ambient-orb-1"></div>
+    <div class="ambient-orb ambient-orb-2"></div>
+    <div class="ambient-orb ambient-orb-3"></div>
+  </div>
+
+  <!-- Real-time Reading Progress Bar -->
+  <div class="reading-progress-bar-container" aria-hidden="true">
+    <div class="reading-progress-bar" id="readingProgressBar"></div>
+  </div>
+
+  <!-- Application Shell -->
+  <div class="app-shell">
+    
+    <!-- Top Sticky Header -->
+    <header class="app-header">
+      <div style="display: flex; align-items: center; gap: var(--space-3); min-width: 0;">
+        <!-- Mobile Navigation Drawer Toggle -->
+        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="باز کردن فهرست فصول و مباحث">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <!-- Brand Identity (Links to Portal Homepage) -->
+        <a href="./index.html" class="header-brand" title="بازگشت به صفحه اصلی مدیکالیسم البرز" aria-label="بازگشت به صفحه اصلی پورتال مدیکالیسم">
+          <div class="brand-icon-wrapper">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M2 12h20"></path>
+              <circle cx="12" cy="12" r="9"></circle>
+            </svg>
+          </div>
+          <div class="brand-title-group">
+            <div style="display: flex; align-items: baseline; gap: 6px;">
+              <span class="brand-title">بیماری‌های واگیر و غیرواگیر</span>
+              <span style="font-size: 10px; font-weight: 700; color: var(--accent-primary); background: var(--accent-primary-subtle); padding: 1px 6px; border-radius: var(--radius-full); border: 1px solid var(--border-subtle);">البرز</span>
+            </div>
+            <span class="brand-subtitle">سامانه جامع آموزش علوم پزشکی مدیکالیسم (ABZUMS)</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Action & Study Controls Toolbar -->
+      <div class="header-actions">
+        
+        <!-- Search Trigger Button -->
+        <button class="search-trigger-btn btn-search-trigger" aria-label="جستجوی بالینی در فصول">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span style="display: none; @media(min-width: 640px) { display: inline; }">جستجو...</span>
+          <span class="search-shortcut-badge">⌘K</span>
+        </button>
+
+
+        <!-- Font Family Selector -->
+        <div class="font-selector-wrapper" title="انتخاب قلم متن">
+          <select class="font-select" id="fontSelect" aria-label="انتخاب نوع قلم">
+            <option value="vazirmatn">وزیرمتن (Vazirmatn)</option>
+            <option value="shabnam">شبنم (Shabnam)</option>
+            <option value="sahel">ساحل (Sahel)</option>
+          </select>
+        </div>
+
+        <!-- Continuous Font-Size Zoom Controls (A- / A+) -->
+        <div class="font-zoom-control" title="تنظیم پیوسته اندازه قلم متن">
+          <button class="zoom-btn" id="zoomOutBtn" aria-label="کوچک‌تر کردن اندازه متن (A−)">A−</button>
+          <span class="zoom-display" id="zoomDisplay" title="اندازه فعلی متن - کلیک برای بازنشانی">100%</span>
+          <button class="zoom-btn" id="zoomInBtn" aria-label="بزرگ‌تر کردن اندازه متن (A+)">A+</button>
+        </div>
+
+        <!-- Bookmarks Modal Trigger -->
+        <button class="btn-icon" id="bookmarksToggleBtn" title="مشاهده بخش‌های نشانک‌گذاری شده" aria-label="نشانک‌های مطالعه">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span id="bookmarksCountBadge" style="display: none; position: absolute; top: -4px; right: -4px; width: 17px; height: 17px; border-radius: 50%; background-color: var(--accent-primary); color: #fff; font-size: 10px; font-weight: 800; align-items: center; justify-content: center;">0</span>
+        </button>
+
+        <!-- Distraction-Free Focus Mode Toggle -->
+        <button class="btn-icon" id="focusModeToggleBtn" title="ورود به حالت تمرکز مطالعه (پنهان‌سازی حاشیه‌ها)" aria-label="حالت تمرکز">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+        </button>
+
+        <!-- Theme Toggle (Light / Dark) -->
+        <button class="btn-icon" id="themeToggleBtn" title="تغییر تم (روشن / تاریک)" aria-label="تغییر تم">
+          <!-- Sun Icon (shown in dark mode) -->
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <!-- Moon Icon (shown in light mode) -->
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+      </div>
+    </header>
+
+    <!-- Main Responsive Two-Column Layout -->
+    <div class="app-layout">
+      
+      <!-- Right-Side Desktop Study Navigation Panel -->
+      <aside class="app-sidebar" aria-label="فهرست سرفصل‌های مطالعه">
+        <div class="sidebar-header">
+          <div class="sidebar-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>بیماری‌های واگیر و غیرواگیر</span>
+          </div>
+          <span style="font-size: 11px; color: var(--text-muted);">۲۹ سرفصل</span>
+        </div>
+        <nav class="sidebar-scroll-container">
+          <ul class="nav-tree" id="desktopNavTree">
+            <!-- Injected dynamically via AppNavigation -->
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Central Reading Area (Chapter & Sections) -->
+      <main class="app-content" id="chapterContentArea" tabindex="-1">
+        <!-- Content injected dynamically via ComponentRenderer -->
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Mobile Navigation Drawer (RTL Edge Slide-in) -->
+  <div class="drawer-backdrop" id="drawerBackdrop" aria-hidden="true"></div>
+  <aside class="mobile-drawer" id="mobileDrawer" aria-label="منوی ناوبری موبایل" aria-hidden="true">
+    <div class="drawer-header">
+      <a href="./index.html" class="sidebar-title" style="text-decoration: none;" title="بازگشت به صفحه اصلی مدیکالیسم">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span>بیماری‌های واگیر و غیرواگیر</span>
+      </a>
+      <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="بستن منو">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="drawer-content">
+      <div style="margin-block-end: var(--space-4); padding: var(--space-3); background-color: var(--bg-body-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+        <label for="mobileFontSelect" style="display: block; font-size: 11px; font-weight: 700; margin-block-end: 4px; color: var(--text-muted);">قلم مطالعه:</label>
+        <select class="font-select" id="mobileFontSelect" style="width: 100%;">
+          <option value="vazirmatn">وزیرمتن (Vazirmatn)</option>
+          <option value="shabnam">شبنم (Shabnam)</option>
+          <option value="sahel">ساحل (Sahel)</option>
+        </select>
+      </div>
+      <ul class="nav-tree" id="mobileNavTree">
+        <!-- Injected dynamically via AppNavigation -->
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Search Modal Dialog -->
+  <div class="search-modal-backdrop" id="searchModalBackdrop" role="dialog" aria-modal="true" aria-label="جستجوی بالینی">
+    <div class="search-dialog" id="searchDialog">
+      <div class="search-input-wrapper">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="جستجوی سریع بیماری، دارو، معیار، شاخص، متد و..." autocomplete="off">
+        <span class="search-shortcut-badge">Esc</span>
+      </div>
+      <div class="search-results-list" id="searchResultsList">
+        <!-- Search results injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Bookmarks Modal Dialog -->
+  <div class="search-modal-backdrop" id="bookmarksModalBackdrop" role="dialog" aria-modal="true" aria-label="نشانک‌های من">
+    <div class="search-dialog" id="bookmarksDialog">
+      <div class="search-input-wrapper" style="justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: var(--space-2); font-weight: 700;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--state-warning)" stroke="var(--state-warning)">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>نشانک‌های مطالعه من</span>
+        </div>
+        <button class="action-mini-btn" id="bookmarksCloseBtn" aria-label="بستن پنجره نشانک‌ها">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="search-results-list" id="bookmarksList">
+        <!-- Bookmarked items injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="./js/data/chapters-registry.js"></script>
+  <script src="./js/state.js"></script>
+  <script src="./js/radiology.js"></script>
+  <script src="./js/components.js"></script>
+  <script src="./js/navigation.js"></script>
+  <script src="./js/search.js"></script>
+  <script src="./js/study-features.js"></script>
+  <script src="./js/router.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

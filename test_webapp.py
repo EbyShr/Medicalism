@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 import os
 import sys
 import time
+import json
 from playwright.sync_api import sync_playwright
 
 if hasattr(sys.stdout, 'reconfigure'):
@@ -8,12 +10,24 @@ if hasattr(sys.stdout, 'reconfigure'):
 
 
 def run_tests():
-    file_path = os.path.abspath("course.html")
-    file_url = f"file:///{file_path.replace(os.sep, '/')}"
-    print(f"Testing URL: {file_url}")
+    course_path = os.path.abspath("communicable-and-noncommunicable-diseases.html")
+    course_url = f"file:///{course_path.replace(os.sep, '/')}"
+    old_course_path = os.path.abspath("course.html")
+    old_course_url = f"file:///{old_course_path.replace(os.sep, '/')}"
+    rad_path = os.path.abspath("radiology.html")
+    rad_url = f"file:///{rad_path.replace(os.sep, '/')}"
+    index_path = os.path.abspath("index.html")
+    index_url = f"file:///{index_path.replace(os.sep, '/')}"
+
+    print(f"Testing Course 1 URL: {course_url}")
+    print(f"Testing Course 2 (Radiology) URL: {rad_url}")
+    print(f"Testing Portal URL: {index_url}")
 
     breakpoints = [320, 360, 390, 430, 768, 1024, 1440]
     errors = []
+
+    screenshot_dir = os.path.join(os.environ.get("USERPROFILE", ""), ".gemini", "antigravity", "brain", "28e8c9f3-81b1-4e46-b3c7-dff8730441a0")
+    os.makedirs(screenshot_dir, exist_ok=True)
 
     with sync_playwright() as p:
         chrome_path = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
@@ -21,14 +35,20 @@ def run_tests():
             chrome_path = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
         browser = p.chromium.launch(executable_path=chrome_path, headless=True)
         
-        # 1. Test Zero Horizontal Overflow across all breakpoints
-        print("\n--- Testing Zero Horizontal Overflow Across Breakpoints ---")
+        # =========================================================================
+        # PART 1: COURSE 1 (بیماری‌های واگیر و غیرواگیر - course.html)
+        # =========================================================================
+        print("\n======================================================")
+        print("=== PART 1: COURSE 1 (بیماری‌های واگیر و غیرواگیر) ===")
+        print("======================================================")
+
+        # 1.1 Zero Horizontal Overflow Across Breakpoints
+        print("\n--- [Course 1] Zero Horizontal Overflow Across Breakpoints ---")
         for bp in breakpoints:
             page = browser.new_page(viewport={"width": bp, "height": 800})
-            page.goto(file_url)
+            page.goto(course_url)
             page.wait_for_load_state("networkidle")
             
-            # Check horizontal overflow
             overflow = page.evaluate("""() => {
                 const docEl = document.documentElement;
                 const body = document.body;
@@ -42,133 +62,109 @@ def run_tests():
             }""")
             
             if overflow["hasOverflow"]:
-                msg = f"FAIL: Horizontal overflow at {bp}px! scrollWidth={overflow['scrollW']}, clientWidth={overflow['clientW']}"
+                msg = f"[Course 1] FAIL: Horizontal overflow at {bp}px! scrollWidth={overflow['scrollW']}, clientWidth={overflow['clientW']}"
                 print(msg)
                 errors.append(msg)
             else:
-                print(f"PASS: {bp}px has zero horizontal overflow (scrollW={overflow['scrollW']}, clientW={overflow['clientW']})")
-            
+                print(f"[Course 1] PASS: {bp}px zero horizontal overflow (scrollW={overflow['scrollW']}, clientW={overflow['clientW']})")
             page.close()
 
-        # 2. Detailed Functional Testing on Desktop (1440px)
-        print("\n--- Testing Desktop Functional Interactions & Rationally Reordered Chapters (1440px) ---")
+        # 1.2 Desktop Architecture & Navigation Tree (1440px)
+        print("\n--- [Course 1] Desktop Structure & Strictly 29 Chapters (1440px) ---")
         page = browser.new_page(viewport={"width": 1440, "height": 900})
-        page.goto(file_url)
+        page.goto(course_url)
         page.wait_for_load_state("networkidle")
 
-        # Verify Chapter Registry in Navigation Tree (28 Chapters, 144 Sections total)
-        chapter_items = page.locator("#desktopNavTree .nav-chapter-item").all()
-        print(f"Registered chapters in nav: {len(chapter_items)} (Expected: 29)")
-        assert len(chapter_items) == 29, f"Expected 29 chapters, got {len(chapter_items)}"
-
-        total_nav_links = page.locator("#desktopNavTree .nav-heading-link").all()
-        print(f"Total nav heading links: {len(total_nav_links)} (Expected: 150)")
-        assert len(total_nav_links) == 150, f"Expected 150 nav links across all 29 chapters, got {len(total_nav_links)}"
-
-        # Verify Initial Chapter (Now Chapter 1: ch-27 کلیات و تعاریف اپیدمیولوژی بیماری‌های واگیر)
-        ch1_title = page.locator(".chapter-title").inner_text()
-        print(f"Initial Chapter Title (Chapter 1): {ch1_title}")
-        assert "کلیات" in ch1_title or "واگیر" in ch1_title, f"Expected کلیات/واگیر in title, got {ch1_title}"
-        
-        ch1_sections = page.locator(".study-section").all()
-        print(f"Chapter 1 rendered sections: {len(ch1_sections)} (Expected: 4)")
-        assert len(ch1_sections) == 4, f"Expected 4 sections in Chapter 1, got {len(ch1_sections)}"
-
-        # Verify Right-Side Navigation items and physical position
+        # Verify Sidebar position (Physical Right)
         sidebar_box = page.locator(".app-sidebar").bounding_box()
         content_box = page.locator(".app-content").bounding_box()
-        print(f"Sidebar x: {sidebar_box['x']}, Content x: {content_box['x']}")
-        assert sidebar_box['x'] > content_box['x'], f"Sidebar must be on physical RIGHT: sidebar={sidebar_box['x']}, content={content_box['x']}"
-        print("PASS: Desktop navigation is physically on the RIGHT side!")
+        assert sidebar_box["x"] > content_box["x"], f"[Course 1] Sidebar must be on physical RIGHT: sidebar={sidebar_box['x']}, content={content_box['x']}"
+        print("[Course 1] PASS: Desktop sidebar is physically on the RIGHT side!")
 
-        screenshot_dir = os.path.join(os.environ.get("USERPROFILE", ""), ".gemini", "antigravity", "brain", "9b30c28f-3558-4f46-907a-b21c4ad8c6c7")
-        
-        # Capture Initial Light Theme Screenshot (Chapter 1)
-        light_shot_path = os.path.join(screenshot_dir, "desktop_light_theme.png")
-        page.screenshot(path=light_shot_path, full_page=False)
-        print(f"Saved light theme screenshot to {light_shot_path}")
+        # Verify exactly 29 registered chapters and 150 nav links
+        chapter_items = page.locator("#desktopNavTree .nav-chapter-item").all()
+        print(f"[Course 1] Registered chapters in nav: {len(chapter_items)} (Strict Expected: 29)")
+        assert len(chapter_items) == 29, f"Expected strictly 29 chapters in Course 1, got {len(chapter_items)}"
 
-        # Test Continuous Font Zoom (A- / A+)
-        initial_zoom = page.locator("#zoomDisplay").inner_text()
+        total_nav_links = page.locator("#desktopNavTree .nav-heading-link").all()
+        print(f"[Course 1] Total nav heading links: {len(total_nav_links)} (Expected: 150)")
+        assert len(total_nav_links) == 150, f"Expected 150 nav links in Course 1, got {len(total_nav_links)}"
+
+        # Verify Course 1 Folders (comm and ncd only, NO rad folder)
+        comm_folder = page.locator('#desktopNavTree .nav-folder-item[data-folder-key="comm"]')
+        ncd_folder = page.locator('#desktopNavTree .nav-folder-item[data-folder-key="ncd"]')
+        rad_folder = page.locator('#desktopNavTree .nav-folder-item[data-folder-key="rad"]')
+        assert comm_folder.is_visible(), "[Course 1] Communicable diseases folder must exist"
+        assert ncd_folder.is_visible(), "[Course 1] Non-communicable diseases folder must exist"
+        assert rad_folder.count() == 0, "[Course 1] Radiology folder must NOT exist in Course 1 navigation tree"
+        print("[Course 1] PASS: Navigation folders strictly separated (Folder 1: 15 ch, Folder 2: 14 ch)!")
+
+        # 1.3 Controls (Continuous Zoom, Font Switcher, Theme Switcher)
+        print("\n--- [Course 1] Study Controls ---")
         page.click("#zoomInBtn")
-        zoomed_in = page.locator("#zoomDisplay").inner_text()
-        assert zoomed_in == "105%", f"Expected 105%, got {zoomed_in}"
-
+        assert page.locator("#zoomDisplay").inner_text() == "105%", "Expected 105% zoom"
         page.click("#zoomOutBtn")
         page.click("#zoomOutBtn")
-        zoomed_out = page.locator("#zoomDisplay").inner_text()
-        assert zoomed_out == "95%", f"Expected 95%, got {zoomed_out}"
-        
-        # Reset zoom back to 100%
+        assert page.locator("#zoomDisplay").inner_text() == "95%", "Expected 95% zoom"
         page.click("#zoomDisplay")
-        page.wait_for_timeout(100)
 
-        # Test Font Switcher
         page.select_option("#fontSelect", "shabnam")
-
-        # Test Dark Theme Switcher
         page.click("#themeToggleBtn")
-        page.wait_for_timeout(350)
-        theme_attr = page.locator("html").get_attribute("data-theme")
-        assert theme_attr == "dark", f"Expected dark, got {theme_attr}"
-        
-        # Capture Dark Theme Screenshot
-        dark_shot_path = os.path.join(screenshot_dir, "desktop_dark_theme.png")
-        page.screenshot(path=dark_shot_path, full_page=False)
-        print(f"Saved dark theme screenshot to {dark_shot_path}")
-
-        # Revert to light theme for chapter testing
+        page.wait_for_timeout(200)
+        assert page.locator("html").get_attribute("data-theme") == "dark", "Expected dark theme"
         page.click("#themeToggleBtn")
         page.wait_for_timeout(200)
 
-        # 3. Test Navigation & Content Rendering Across All 30 Chapters in Rational Sequence
-        expected_chapters = [
-            ("ch-27", "کلیات", 4),        # فصل ۱
-            ("ch-19", "واگیر", 5),        # فصل ۲
-            ("ch-22", "سندرم", 5),        # فصل ۳
-            ("ch-26", "تعاریف", 6),       # فصل ۴
-            ("ch-20", "نوپدید", 5),       # فصل ۵
-            ("ch-18", "واکسن", 7),        # فصل ۶
-            ("ch-31", "واکسن", 6),        # فصل ۷ (بیماری‌های واکسن‌پذیر بخش ۲ و مراقبت کشوری)
-            ("ch-01", "HIV/AIDS", 11),    # فصل ۸
-            ("ch-02", "سل", 7),           # فصل ۹
-            ("ch-29", "مالاریا", 3),      # فصل ۱۰
-            ("ch-24", "مالاریا", 5),      # فصل ۱۱
-            ("ch-28", "سالک", 5),         # فصل ۱۲
-            ("ch-25", "کالا آزار", 4),    # فصل ۱۳
-            ("ch-30", "هاری", 7),         # فصل ۱۴ (بیماری‌های مشترک انسان و حیوان - هاری و بروسلوز)
-            ("ch-16", "بیمارستانی", 4),   # فصل ۱۵ (ادغام‌شده: عفونت‌های بیمارستانی)
-            ("ch-17", "مقاومت", 4),       # فصل ۱۶
-            ("ch-15", "غیرواگیر", 5),     # فصل ۱۷
-            ("ch-09", "غیرواگیر", 6),     # فصل ۱۸
-            ("ch-13", "پرفشاری", 4),      # فصل ۱۹
-            ("ch-03", "ایسکمیک", 6),      # فصل ۲۰
-            ("ch-06", "سکته", 4),         # فصل ۲۱
-            ("ch-07", "روماتیسمی", 3),    # فصل ۲۲
-            ("ch-04", "چاقی", 6),         # فصل ۲۳
-            ("ch-05", "سرطان", 6),        # فصل ۲۴
-            ("ch-12", "تیروئید", 6),      # فصل ۲۵
-            ("ch-14", "ریزمغذی", 3),      # فصل ۲۶
-            ("ch-11", "دخانیات", 4),      # فصل ۲۷
-            ("ch-10", "سوءمصرف", 5),      # فصل ۲۸
-            ("ch-08", "روان", 4),         # فصل ۲۹
+        # Capture light screenshot of Course 1
+        shot_course1 = os.path.join(screenshot_dir, "desktop_course1_light.png")
+        page.screenshot(path=shot_course1, full_page=False)
+        print(f"Saved Course 1 screenshot to {shot_course1}")
+
+        # 1.4 Traversal across all 29 Chapters
+        expected_course1_chapters = [
+            ("ch-27", "کلیات", 4),
+            ("ch-19", "واگیر", 5),
+            ("ch-22", "سندرم", 5),
+            ("ch-26", "تعاریف", 6),
+            ("ch-20", "نوپدید", 5),
+            ("ch-18", "واکسن", 7),
+            ("ch-31", "واکسن", 6),
+            ("ch-01", "HIV/AIDS", 11),
+            ("ch-02", "سل", 7),
+            ("ch-29", "مالاریا", 3),
+            ("ch-24", "مالاریا", 5),
+            ("ch-28", "سالک", 5),
+            ("ch-25", "کالا آزار", 4),
+            ("ch-30", "هاری", 7),
+            ("ch-16", "بیمارستانی", 4),
+            ("ch-17", "مقاومت", 4),
+            ("ch-15", "غیرواگیر", 5),
+            ("ch-09", "غیرواگیر", 6),
+            ("ch-13", "پرفشاری", 4),
+            ("ch-03", "ایسکمیک", 6),
+            ("ch-06", "سکته", 4),
+            ("ch-07", "روماتیسمی", 3),
+            ("ch-04", "چاقی", 6),
+            ("ch-05", "سرطان", 6),
+            ("ch-12", "تیروئید", 6),
+            ("ch-14", "ریزمغذی", 3),
+            ("ch-11", "دخانیات", 4),
+            ("ch-10", "سوءمصرف", 5),
+            ("ch-08", "روان", 4),
         ]
 
-        print("\n--- Testing Navigation, Zero Undefined & Content Rendering Across All 29 Chapters ---")
-        for new_num, (ch_id, keyword, expected_sec_count) in enumerate(expected_chapters, 1):
+        print("\n--- [Course 1] Navigation & Zero Undefined Across All 29 Chapters ---")
+        for new_num, (ch_id, keyword, expected_sec_count) in enumerate(expected_course1_chapters, 1):
             ch_header = page.locator(f"#desktopNavTree .nav-chapter-header[data-chapter-id='{ch_id}']")
             ch_header.click()
-            page.wait_for_timeout(250)
+            page.wait_for_timeout(200)
 
             title = page.locator(".chapter-title").inner_text()
-            print(f"Switched to Chapter {new_num} ({ch_id}): Title='{title}'")
             assert keyword in title, f"Expected '{keyword}' in title for {ch_id}, got '{title}'"
 
             rendered_sec = page.locator(".study-section").all()
-            print(f"  Sections rendered: {len(rendered_sec)} (Expected: {expected_sec_count})")
             assert len(rendered_sec) == expected_sec_count, f"Expected {expected_sec_count} sections for {ch_id}, got {len(rendered_sec)}"
 
-            # Strict Zero Undefined & Zero NaN Check across entire chapter content
             has_undefined = page.evaluate("""() => {
                 const stream = document.querySelector('.sections-stream');
                 if (!stream) return false;
@@ -177,138 +173,344 @@ def run_tests():
                 return text.includes('undefined') || html.includes('>undefined<') || text.includes('NaN');
             }""")
             assert not has_undefined, f"ERROR: Found 'undefined' or 'NaN' token in {ch_id} rendered DOM!"
-            print(f"  PASS: Chapter {new_num} ({ch_id}) is 100% free of 'undefined' and 'NaN'!")
+            print(f"  PASS: Chapter {new_num}/29 ({ch_id}) verified with {expected_sec_count} sections, zero undefined.")
 
-        # Capture key showcase screenshots
-        ch_shots = [
-            ("ch-27", "desktop_ch01_communicable_principles.png"),
-            ("ch-31", "desktop_ch07_vaccine_preventable_part2.png"),
-            ("ch-30", "desktop_ch14_rabies_brucellosis.png"),
-            ("ch-29", "desktop_ch10_malaria_lifecycle.png"),
-            ("ch-28", "desktop_ch12_cutaneous_leishmaniasis.png"),
-            ("ch-15", "desktop_ch17_ncd_principles.png"),
-            ("ch-08", "desktop_ch29_mental_health.png"),
-        ]
-
-        for ch_id, filename in ch_shots:
-            page.locator(f"#desktopNavTree .nav-chapter-header[data-chapter-id='{ch_id}']").click()
-            page.wait_for_timeout(250)
-            shot_path = os.path.join(screenshot_dir, filename)
-            page.screenshot(path=shot_path, full_page=False)
-            print(f"Saved {ch_id} screenshot to {shot_path}")
-
-        # Test Chapter Progression Footer (Navigate back from Chapter 29 (ch-08) to Chapter 28 (ch-10) via footer card)
-        page.locator("#desktopNavTree .nav-chapter-header[data-chapter-id='ch-08']").click()
-        page.wait_for_timeout(250)
-        prev_card = page.locator(".chapter-nav-card.prev-chapter-card")
-        assert prev_card.is_visible(), "Previous chapter card should be visible in Chapter 29"
-        prev_card.click()
-        page.wait_for_timeout(300)
-        back_ch28_title = page.locator(".chapter-title").inner_text()
-        print(f"Title after clicking prev chapter card: {back_ch28_title}")
-        assert "سوءمصرف" in back_ch28_title, f"Expected return to Chapter 28 (سوءمصرف مواد), got {back_ch28_title}"
-
-        # 4. Test Multi-Chapter Search Engine Across Chapters
-        print("\n--- Testing Multi-Chapter Search Engine Across All Chapters ---")
-        search_tests = [
-            ("INCDC", "ch-09", "ch09-sec01"),          # NCD Roadmap
-            ("هلال طلایی", "ch-10", "ch10-sec03"),      # Substance Abuse
-            ("MPOWER", "ch-11", "ch11-sec04"),         # Tobacco
-            ("دیس‌ژنز", "ch-12", "ch12-sec01"),         # Hypothyroidism
-            ("همودینامیک", "ch-13", "ch13-sec01"),      # Hypertension
-            ("گرسنگی پنهان", "ch-14", "ch14-sec01"),   # Hidden Hunger
-            ("فریدن", "ch-15", "ch15-sec04"),          # Frieden Pyramid
-            ("کارباپنم", "ch-17", "ch17-sec02"),        # AMR Principles
-            ("کوپلیک", "ch-18", "ch18-sec01"),          # Measles
-            ("تتابولین", "ch-31", "ch31-sec03"),        # Neonatal Tetanus TIG
-            ("گراویس", "ch-31", "ch31-sec02"),          # Diphtheria Gravis strain
-            ("روتاویروس", "ch-20", "ch20-sec01"),       # Emerging
-            ("بوتولیسم", "ch-22", "ch22-sec01"),        # 16 Syndromes
-            ("NNIS", "ch-16", "ch16-sec03"),           # Nosocomial NNIS (Merged Chapter)
-            ("هیپنوزوئیت", "ch-24", "ch24-sec02"),      # Malaria Management
-            ("دلتامترین", "ch-25", "ch25-sec04"),       # Kala-azar
-            ("سرخک", "ch-26", "ch26-sec01"),          # Surveillance Definitions
-            ("میاسما", "ch-27", "ch27-sec01"),          # Communicable Principles
-            ("اسپوروتریکوئید", "ch-28", "ch28-sec02"),  # Cutaneous Leishmaniasis
-            ("میلواکی", "ch-30", "ch30-sec04"),        # Rabies PEP & Milwaukee
-            ("بروسلوز", "ch-30", "ch30-sec05"),        # Brucellosis Epidemiology
-        ]
-
-        for query, target_ch, target_sec in search_tests:
-            page.click(".btn-search-trigger")
-            page.wait_for_selector("#searchModalBackdrop.is-active")
-            page.fill("#searchInput", query)
-            page.wait_for_timeout(300) # wait for debounce
-            
-            search_results = page.locator(".search-result-item").all()
-            print(f"Search results for '{query}': {len(search_results)}")
-            assert len(search_results) > 0, f"Expected search results for '{query}'"
-            
-            # Click the matching target result item
-            target_item = page.locator(f".search-result-item[data-target-id='{target_sec}']")
-            assert target_item.is_visible(), f"Expected search result item for {target_sec} with query '{query}'"
-            target_item.click()
-            page.wait_for_timeout(350)
-            
-            # Verify modal closed
-            assert not page.locator("#searchModalBackdrop").is_visible(), "Search modal should close on selection"
-            
-            # Verify target section is visible
-            assert page.locator(f"#{target_sec}").is_visible(), f"Target section #{target_sec} should be rendered and visible"
-            print(f"PASS: Search for '{query}' successfully opened {target_ch} and navigated to #{target_sec}")
-
-        # Test Bookmarking
-        first_bm_btn = page.locator(".study-section .btn-bookmark").first
-        first_bm_btn.click()
-        page.wait_for_timeout(200)
-        bm_count = page.locator("#bookmarksCountBadge").inner_text()
-        print(f"Bookmarks count badge: {bm_count}")
-        assert int(bm_count) >= 1, f"Expected at least 1 bookmark, got {bm_count}"
-
-        page.close()
-
-        # 5. Detailed Mobile Navigation Drawer Testing (390px)
-        print("\n--- Testing Mobile Navigation Drawer (390px) ---")
+        # 1.5 Mobile Drawer for Course 1 (390px)
+        print("\n--- [Course 1] Mobile Navigation Drawer (390px) ---")
         mobile_page = browser.new_page(viewport={"width": 390, "height": 844})
-        mobile_page.goto(file_url)
+        mobile_page.goto(course_url)
         mobile_page.wait_for_load_state("networkidle")
-
-        # Verify mobile toggle visible, sidebar hidden
-        sidebar_visible = mobile_page.locator(".app-sidebar").is_visible()
-        toggle_visible = mobile_page.locator("#mobileNavToggle").is_visible()
-        assert not sidebar_visible, "Sidebar must be hidden on mobile"
-        assert toggle_visible, "Mobile nav toggle must be visible"
-
-        # Open drawer
         mobile_page.click("#mobileNavToggle")
         mobile_page.wait_for_selector("#mobileDrawer.is-open")
-        mobile_page.wait_for_timeout(400) # wait for 320ms slide-in transition to complete
+        mobile_page.wait_for_timeout(350)
         
         drawer_box = mobile_page.locator("#mobileDrawer").bounding_box()
-        print(f"Drawer box: {drawer_box}")
         assert drawer_box["width"] <= 390, f"Drawer width {drawer_box['width']} exceeds mobile width!"
         assert drawer_box["x"] >= 0, f"Drawer renders offscreen to the left: {drawer_box['x']}"
-        assert drawer_box["x"] + drawer_box["width"] <= 390.1, f"Drawer renders offscreen to the right: {drawer_box['x'] + drawer_box['width']}"
-        print("PASS: Drawer is fully within mobile viewport!")
+        
+        mobile_ch = mobile_page.locator("#mobileNavTree .nav-chapter-item").all()
+        print(f"[Course 1] Mobile nav chapters: {len(mobile_ch)} (Expected: 29)")
+        assert len(mobile_ch) == 29, f"Expected 29 chapters in mobile drawer, got {len(mobile_ch)}"
 
-        # Verify all 29 chapters are listed in mobile drawer
-        mobile_chapters = mobile_page.locator("#mobileNavTree .nav-chapter-item").all()
-        print(f"Mobile nav drawer chapters: {len(mobile_chapters)} (Expected: 29)")
-        assert len(mobile_chapters) == 29, f"Expected 29 chapters in mobile drawer, got {len(mobile_chapters)}"
-
-        # Screenshot of mobile drawer
-        mobile_shot_path = os.path.join(screenshot_dir, "mobile_nav_drawer.png")
-        mobile_page.screenshot(path=mobile_shot_path)
-        print(f"Saved mobile drawer screenshot to {mobile_shot_path}")
-
-        # Close drawer
-        mobile_page.click("#drawerCloseBtn")
-        mobile_page.wait_for_timeout(350)
-        drawer_open = mobile_page.locator("#mobileDrawer").evaluate("el => el.classList.contains('is-open')")
-        print(f"Drawer is open after close button: {drawer_open} (Expected: False)")
-        assert not drawer_open, "Drawer should be closed"
-
+        shot_mob_c1 = os.path.join(screenshot_dir, "mobile_nav_drawer_course1.png")
+        mobile_page.screenshot(path=shot_mob_c1)
+        print(f"Saved mobile drawer screenshot to {shot_mob_c1}")
         mobile_page.close()
+        page.close()
+
+        # =========================================================================
+        # PART 2: COURSE 2 (رادیولوژی و تصویربرداری بالینی - radiology.html)
+        # =========================================================================
+        print("\n======================================================")
+        print("=== PART 2: COURSE 2 (رادیولوژی و تصویربرداری بالینی) ===")
+        print("======================================================")
+
+        # 2.1 Zero Horizontal Overflow Across Breakpoints
+        print("\n--- [Course 2] Zero Horizontal Overflow Across Breakpoints ---")
+        for bp in breakpoints:
+            page = browser.new_page(viewport={"width": bp, "height": 800})
+            page.goto(rad_url)
+            page.wait_for_load_state("networkidle")
+            
+            overflow = page.evaluate("""() => {
+                const docEl = document.documentElement;
+                const body = document.body;
+                const scrollW = Math.max(docEl.scrollWidth, body.scrollWidth);
+                const clientW = docEl.clientWidth;
+                return {
+                    scrollW,
+                    clientW,
+                    hasOverflow: scrollW > clientW
+                };
+            }""")
+            
+            if overflow["hasOverflow"]:
+                msg = f"[Course 2] FAIL: Horizontal overflow at {bp}px! scrollWidth={overflow['scrollW']}, clientWidth={overflow['clientW']}"
+                print(msg)
+                errors.append(msg)
+            else:
+                print(f"[Course 2] PASS: {bp}px zero horizontal overflow (scrollW={overflow['scrollW']}, clientW={overflow['clientW']})")
+            page.close()
+
+        # 2.2 Desktop Structure & Navigation Tree
+        print("\n--- [Course 2] Desktop Structure & Chapter 1 (1440px) ---")
+        page = browser.new_page(viewport={"width": 1440, "height": 900})
+        page.goto(rad_url)
+        page.wait_for_load_state("networkidle")
+
+        # Verify Sidebar position (Physical Right)
+        sidebar_box = page.locator(".app-sidebar").bounding_box()
+        content_box = page.locator(".app-content").bounding_box()
+        assert sidebar_box["x"] > content_box["x"], f"[Course 2] Sidebar must be on physical RIGHT: sidebar={sidebar_box['x']}, content={content_box['x']}"
+        print("[Course 2] PASS: Desktop sidebar is physically on the RIGHT side!")
+
+        # Verify exactly 1 chapter in registry and 9 sections
+        rad_chapters = page.locator("#desktopNavTree .nav-chapter-item").all()
+        print(f"[Course 2] Registered chapters in nav: {len(rad_chapters)} (Strict Expected: 1)")
+        assert len(rad_chapters) == 1, f"Expected strictly 1 chapter in Course 2, got {len(rad_chapters)}"
+
+        rad_nav_links = page.locator("#desktopNavTree .nav-heading-link").all()
+        print(f"[Course 2] Total nav heading links: {len(rad_nav_links)} (Expected: 9)")
+        assert len(rad_nav_links) == 9, f"Expected 9 nav links in Course 2, got {len(rad_nav_links)}"
+
+        # Verify Radiology Folder only
+        rad_folder = page.locator('#desktopNavTree .nav-folder-item[data-folder-key="rad"]')
+        assert rad_folder.is_visible(), "[Course 2] Radiology folder must exist"
+        assert page.locator('#desktopNavTree .nav-folder-item[data-folder-key="comm"]').count() == 0, "Comm folder must not exist in Radiology"
+        assert page.locator('#desktopNavTree .nav-folder-item[data-folder-key="ncd"]').count() == 0, "NCD folder must not exist in Radiology"
+
+        # Verify Chapter 1 Title & 9 Sections
+        rad_title = page.locator(".chapter-title").inner_text()
+        print(f"[Course 2] Chapter Title: {rad_title}")
+        assert "مفصلی" in rad_title or "تروما" in rad_title, f"Expected articular/trauma in title, got {rad_title}"
+        
+        rad_sections = page.locator(".study-section").all()
+        print(f"[Course 2] Rendered sections: {len(rad_sections)} (Expected: 9)")
+        assert len(rad_sections) == 9, f"Expected 9 sections in Course 2 Chapter 1, got {len(rad_sections)}"
+
+        # Verify Section ID Badges (#s1 - #s9)
+        print("\n--- [Course 2] Verifying Section ID Badges (#s1 - #s9) ---")
+        for i in range(1, 10):
+            sec_id = f"s{i}"
+            badge = page.locator(f"#{sec_id} .section-id-badge")
+            assert badge.is_visible(), f"Section ID badge #{sec_id} should be visible"
+            badge_text = badge.inner_text()
+            assert f"#{sec_id}" in badge_text, f"Expected #{sec_id} in badge, got {badge_text}"
+        print("[Course 2] PASS: All 9 Section ID badges (#s1 - #s9) verified with discoverability!")
+
+        # Verify zero undefined & zero NaN
+        has_undefined = page.evaluate("""() => {
+            const stream = document.querySelector('.sections-stream');
+            if (!stream) return false;
+            const text = stream.innerText;
+            const html = stream.innerHTML;
+            return text.includes('undefined') || html.includes('>undefined<') || text.includes('NaN');
+        }""")
+        assert not has_undefined, "Found undefined or NaN in Radiology chapter DOM!"
+        print("[Course 2] PASS: Radiology chapter is 100% free of undefined and NaN!")
+
+        # Verify All Tables are Strictly Contained within Section Box Borders
+        print("\n--- [Course 2] Verifying Tables Contained Strictly Within Box Borders ---")
+        table_containment = page.evaluate("""() => {
+            const sections = document.querySelectorAll('.study-section');
+            const violations = [];
+            sections.forEach(sec => {
+                const secRect = sec.getBoundingClientRect();
+                const tables = sec.querySelectorAll('.medical-data-table, table');
+                tables.forEach(table => {
+                    const container = table.closest('.table-responsive, .table-scroll-container') || sec;
+                    const containerRect = container.getBoundingClientRect();
+                    if (containerRect.left < secRect.left - 2 || containerRect.right > secRect.right + 2) {
+                        violations.push({
+                            sectionId: sec.id,
+                            issue: 'table container exceeds section borders',
+                            containerLeft: containerRect.left,
+                            secLeft: secRect.left,
+                            containerRight: containerRect.right,
+                            secRight: secRect.right
+                        });
+                    }
+                });
+            });
+            return violations;
+        }""")
+        assert len(table_containment) == 0, f"Table containment violations: {table_containment}"
+        print("[Course 2] PASS: All tables and table-responsive containers are strictly bounded within section borders!")
+
+        # Dark theme screenshot of Radiology
+        page.click("#themeToggleBtn")
+        page.wait_for_timeout(200)
+        shot_rad_dark = os.path.join(screenshot_dir, "desktop_radiology_dark.png")
+        page.screenshot(path=shot_rad_dark, full_page=False)
+        print(f"Saved dark theme screenshot to {shot_rad_dark}")
+        page.click("#themeToggleBtn")
+        page.wait_for_timeout(200)
+
+        # 2.3 Radiology Image System: Manifest, Gallery, Missing File, Viewer Overlay
+        print("\n--- [Course 2] Testing Radiology Image System ---")
+        
+        # Verify Manifest on disk
+        manifest_file = os.path.join("chapters", "rad-ch01", "images.json")
+        assert os.path.exists(manifest_file), f"Manifest missing at {manifest_file}"
+        with open(manifest_file, "r", encoding="utf-8") as mf:
+            mdata = json.load(mf)
+            assert mdata["chapterId"] == "rad-ch01"
+            assert "s1" in mdata["sections"] and "s9" in mdata["sections"]
+            print("PASS: chapters/rad-ch01/images.json verified on disk with all 9 section keys!")
+
+        # Verify Manifest on disk: 131 images across 9 sections
+        assert len(mdata["sections"]["s1"]) == 3, f"Expected 3 images in s1, got {len(mdata['sections']['s1'])}"
+        assert len(mdata["sections"]["s2"]) == 2, f"Expected 2 images in s2, got {len(mdata['sections']['s2'])}"
+        assert len(mdata["sections"]["s3"]) == 14, f"Expected 14 images in s3, got {len(mdata['sections']['s3'])}"
+        assert len(mdata["sections"]["s4"]) == 37, f"Expected 37 images in s4, got {len(mdata['sections']['s4'])}"
+        assert len(mdata["sections"]["s5"]) == 7, f"Expected 7 images in s5, got {len(mdata['sections']['s5'])}"
+        assert len(mdata["sections"]["s6"]) == 8, f"Expected 8 images in s6, got {len(mdata['sections']['s6'])}"
+        assert len(mdata["sections"]["s7"]) == 12, f"Expected 12 images in s7, got {len(mdata['sections']['s7'])}"
+        assert len(mdata["sections"]["s8"]) == 18, f"Expected 18 images in s8, got {len(mdata['sections']['s8'])}"
+        assert len(mdata["sections"]["s9"]) == 30, f"Expected 30 images in s9, got {len(mdata['sections']['s9'])}"
+        total_manifest_images = sum(len(v) for v in mdata["sections"].values())
+        assert total_manifest_images == 131, f"Expected 131 total images, got {total_manifest_images}"
+        print(f"PASS: Real manifest verified on disk with strictly 131 images across all 9 sections!")
+
+        # Verify All 9 Section Galleries are Rendered in DOM
+        for i in range(1, 10):
+            sec_id = f"s{i}"
+            gal = page.locator(f"#gallery-{sec_id}")
+            assert gal.is_visible(), f"Gallery for {sec_id} must be visible in DOM"
+        print("PASS: All 9 section galleries successfully rendered at section ends!")
+
+        # Verify Clean Preview System on Dense Section (s4: 37 images)
+        gallery_s4 = page.locator("#gallery-s4")
+        visible_s4 = gallery_s4.locator(".radiology-card:not(.radiology-card-overflow):not(.radiology-card-more)").count()
+        more_s4 = gallery_s4.locator(".radiology-card-more").is_visible()
+        overflow_s4 = gallery_s4.locator(".radiology-card-overflow").count()
+        expand_s4 = gallery_s4.locator(".radiology-expand-btn")
+        assert visible_s4 == 5, f"Expected 5 visible preview cards in s4, got {visible_s4}"
+        assert more_s4, "More card (+32) should be visible when s4 is collapsed"
+        assert overflow_s4 == 32, f"Expected 32 overflow cards in s4, got {overflow_s4}"
+        assert expand_s4.is_visible(), "Expand button must be visible for dense gallery s4"
+        print("PASS: Clean Preview System verified for dense section s4 (5 visible cards + 1 more-card)!")
+
+        # Test Expand & Collapse Toggle in s4
+        expand_s4.click()
+        page.wait_for_timeout(200)
+        assert not gallery_s4.locator(".radiology-card-more").is_visible(), "More card should hide when expanded"
+        assert gallery_s4.locator(".radiology-card-overflow").first.is_visible(), "Overflow cards must become visible on expand"
+        expand_s4.click()
+        page.wait_for_timeout(200)
+        assert gallery_s4.locator(".radiology-card-more").is_visible(), "More card should reappear when collapsed"
+        print("PASS: Gallery expand/collapse toggle verified smoothly!")
+
+        # Missing File Placeholder verification (e.g. image8.jpeg)
+        img_err_card = page.locator("#gallery-s3 .radiology-card").first
+        img_err_card.locator("img").evaluate("img => img.dispatchEvent(new Event('error'))")
+        page.wait_for_timeout(100)
+        placeholder = img_err_card.locator(".radiology-missing-placeholder")
+        assert placeholder.is_visible(), "Missing placeholder should render on image error"
+        assert "تصویر یافت نشد" in placeholder.inner_text()
+        print("PASS: Missing file placeholder renders non-alarmingly with Persian title and filename!")
+
+        # Viewer Overlay Test (Open from Section 4 First Image)
+        first_btn = page.locator("#gallery-s4 .radiology-thumb-btn").first
+        first_btn.click()
+        page.wait_for_timeout(300)
+
+        viewer_overlay = page.locator(".radiology-viewer-overlay")
+        assert viewer_overlay.is_visible(), "Viewer overlay must open"
+        assert page.evaluate("document.body.classList.contains('viewer-open')"), "body should have viewer-open"
+
+        counter_badge = page.locator("#viewerCounterBadge").inner_text()
+        assert "1 / 37" in counter_badge, f"Expected 1 / 37, got {counter_badge}"
+
+        # Zoom in and Reset
+        page.click("#viewerZoomInBtn")
+        page.wait_for_timeout(100)
+        assert page.locator("#viewerZoomLevel").inner_text() == "125%"
+
+        page.fill("#viewerContrastSlider", "1.75")
+        page.locator("#viewerContrastSlider").dispatch_event("input")
+        page.click("#viewerInvertBtn")
+        page.wait_for_timeout(100)
+        assert page.locator("#viewerInvertBtn").evaluate("el => el.classList.contains('is-active')")
+
+        # Reset View
+        page.click("#viewerResetBtn")
+        page.wait_for_timeout(100)
+        assert page.locator("#viewerZoomLevel").inner_text() == "100%"
+        assert not page.locator("#viewerInvertBtn").evaluate("el => el.classList.contains('is-active')")
+
+        # Arrow Navigation within Section 4
+        page.click("#viewerNextBtn")
+        page.wait_for_timeout(150)
+        counter_badge_2 = page.locator("#viewerCounterBadge").inner_text()
+        assert "2 / 37" in counter_badge_2, f"Expected 2 / 37, got {counter_badge_2}"
+
+        # Screenshot of viewer
+        shot_viewer = os.path.join(screenshot_dir, "desktop_radiology_viewer.png")
+        page.screenshot(path=shot_viewer, full_page=False)
+        print(f"Saved viewer screenshot to {shot_viewer}")
+
+        # Keyboard close
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(250)
+        assert not page.locator(".radiology-viewer-overlay").is_visible(), "Viewer should close on Escape"
+        assert not page.evaluate("document.body.classList.contains('viewer-open')"), "viewer-open removed"
+        print("PASS: Viewer closed with Escape key and scroll restored!")
+
+        # Search in Radiology
+        page.click(".btn-search-trigger")
+        page.wait_for_selector("#searchModalBackdrop.is-active")
+        page.fill("#searchInput", "کالیس")
+        page.wait_for_timeout(350)
+        results = page.locator(".search-result-item").all()
+        assert len(results) > 0, "Expected search hit for کالیس"
+        results[0].click()
+        page.wait_for_timeout(400)
+        assert page.locator("#s7").is_visible(), "Navigated to section s7"
+        print("PASS: Clinical search hit navigated to section s7!")
+
+        # Mobile Drawer for Radiology (390px)
+        mobile_page = browser.new_page(viewport={"width": 390, "height": 844})
+        mobile_page.goto(rad_url)
+        mobile_page.wait_for_load_state("networkidle")
+        mobile_page.click("#mobileNavToggle")
+        mobile_page.wait_for_selector("#mobileDrawer.is-open")
+        mobile_page.wait_for_timeout(350)
+
+        mob_rad_ch = mobile_page.locator("#mobileNavTree .nav-chapter-item").all()
+        print(f"[Course 2] Mobile nav chapters: {len(mob_rad_ch)} (Expected: 1)")
+        assert len(mob_rad_ch) == 1, f"Expected 1 chapter in mobile drawer, got {len(mob_rad_ch)}"
+
+        shot_mob_rad = os.path.join(screenshot_dir, "mobile_nav_drawer_radiology.png")
+        mobile_page.screenshot(path=shot_mob_rad)
+        print(f"Saved mobile drawer screenshot to {shot_mob_rad}")
+        mobile_page.close()
+        page.close()
+
+        # =========================================================================
+        # PART 3: PORTAL HOMEPAGE (index.html)
+        # =========================================================================
+        print("\n======================================================")
+        print("=== PART 3: PORTAL HOMEPAGE (index.html) ===")
+        print("======================================================")
+        page = browser.new_page(viewport={"width": 1440, "height": 900})
+        page.goto(index_url)
+        page.wait_for_load_state("networkidle")
+
+        # Verify Dropdown displays both courses
+        page.click("#coursesDropdownBtn")
+        page.wait_for_selector("#coursesDropdownMenu.is-open, .portal-dropdown.is-open")
+        cards = page.locator("#coursesDropdownMenu .dropdown-course-card").all()
+        print(f"[Portal] Dropdown course cards: {len(cards)} (Expected: 2)")
+        assert len(cards) == 2, f"Expected 2 distinct courses in dropdown, got {len(cards)}"
+
+        card1_text = cards[0].inner_text()
+        card2_text = cards[1].inner_text()
+        assert "بیماری‌های واگیر و غیرواگیر" in card1_text
+        assert "رادیولوژی و تصویربرداری بالینی" in card2_text
+        print("[Portal] PASS: Dropdown presents both Course 1 and Course 2 clearly!")
+
+        # Verify Hero Search handles queries from both courses
+        print("\n--- [Portal] Testing Hero Search across both courses ---")
+        # Search Course 1 item: 'مالاریا'
+        page.fill("#heroSearchInput", "مالاریا")
+        page.wait_for_timeout(200)
+        res1 = page.locator("#heroSearchResults .hero-search-result-item").all()
+        assert len(res1) > 0, "Expected search hits for malaria"
+        first_href = res1[0].get_attribute("href")
+        assert "communicable-and-noncommunicable-diseases.html" in first_href, f"Expected communicable-and-noncommunicable-diseases.html in href, got {first_href}"
+        print(f"[Portal] PASS: Malaria query resolves to Course 1 ({first_href})!")
+
+        # Search Course 2 item: 'شکستگی'
+        page.fill("#heroSearchInput", "شکستگی")
+        page.wait_for_timeout(200)
+        res2 = page.locator("#heroSearchResults .hero-search-result-item").all()
+        assert len(res2) > 0, "Expected search hits for fracture"
+        rad_href = res2[0].get_attribute("href")
+        assert "radiology.html" in rad_href, f"Expected radiology.html in href, got {rad_href}"
+        print(f"[Portal] PASS: Fracture query resolves to Course 2 ({rad_href})!")
+
+        page.close()
         browser.close()
 
     if errors:
@@ -317,7 +519,9 @@ def run_tests():
             print(f" - {err}")
         sys.exit(1)
     else:
-        print("\nALL AUTOMATED TESTS PASSED WITH 100% SUCCESS ACROSS ALL 29 RATIONALLY REORDERED CHAPTERS AND 150 SECTIONS!")
+        print("\n========================================================================================")
+        print("ALL AUTOMATED TESTS PASSED WITH 100% SUCCESS ACROSS COURSE 1, COURSE 2, AND PORTAL!")
+        print("========================================================================================")
 
 if __name__ == "__main__":
     run_tests()

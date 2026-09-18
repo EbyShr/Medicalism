@@ -125,7 +125,7 @@ window.AppSearch = {
 
     const terms = normQuery.split(' ').filter(t => t.length > 0);
     const results = [];
-    const chapters = window.CHAPTERS_REGISTRY || [];
+    const chapters = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
 
     chapters.forEach(ch => {
       ch.sections.forEach(sec => {
@@ -142,7 +142,26 @@ window.AppSearch = {
         } else {
           rawBody = this.extractAllText(sec);
         }
-        const bodyNorm = this.normalize(rawBody + ' ' + (sec.summary || ''));
+
+        // Include radiology image captions in search index
+        let matchedImageCaption = '';
+        let matchedImageIndex = -1;
+        let captionsText = '';
+        if (window.RadiologyModule && typeof window.RadiologyModule.getSectionImages === 'function') {
+          const imgs = window.RadiologyModule.getSectionImages(ch.id, sec.id);
+          imgs.forEach((img, imgIdx) => {
+            if (img.caption && img.caption.trim()) {
+              captionsText += ' ' + img.caption;
+              const capNorm = this.normalize(img.caption);
+              if (terms.some(t => capNorm.includes(t)) && !matchedImageCaption) {
+                matchedImageCaption = img.caption;
+                matchedImageIndex = imgIdx;
+              }
+            }
+          });
+        }
+
+        const bodyNorm = this.normalize(rawBody + ' ' + (sec.summary || '') + captionsText);
 
         // Match scoring
         let matchesAll = true;
@@ -162,6 +181,9 @@ window.AppSearch = {
             break;
           }
         }
+        if (matchedImageCaption) {
+          score += 12; // Extra relevance for caption hit
+        }
 
         if (matchesAll) {
           results.push({
@@ -170,7 +192,9 @@ window.AppSearch = {
             sectionId: sec.id,
             title: sec.title,
             latinTitle: sec.latinTitle,
-            rawBody: rawBody || sec.summary || '',
+            rawBody: (matchedImageCaption ? `[کلیشه تصویربرداری شماره ${matchedImageIndex + 1}: ${matchedImageCaption}] ` : '') + (rawBody || sec.summary || ''),
+            isImageHit: Boolean(matchedImageCaption),
+            matchedImageIndex,
             score
           });
         }
@@ -191,9 +215,10 @@ window.AppSearch = {
     const html = results.map(r => {
       const snippet = this.createSnippet(r.rawBody, terms);
       return `
-        <div class="search-result-item" data-target-id="${r.sectionId}">
+        <div class="search-result-item" data-target-id="${r.sectionId}" data-chapter-id="${r.chapterId}" data-image-index="${r.isImageHit ? r.matchedImageIndex : ''}">
           <div class="search-result-meta">
             <span class="search-result-chapter-badge">فصل ${r.chapterNumber}</span>
+            ${r.isImageHit ? `<span class="search-result-chapter-badge" style="background: rgba(14, 165, 233, 0.15); color: #0284c7; border-color: rgba(2, 132, 199, 0.3);">📷 کلیشه تصویربرداری</span>` : ''}
             <span class="search-result-title">${r.title}</span>
           </div>
           <div class="search-result-snippet">${snippet}</div>
@@ -207,9 +232,21 @@ window.AppSearch = {
     this.resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
       item.addEventListener('click', () => {
         const targetId = item.getAttribute('data-target-id');
+        const imgIdxStr = item.getAttribute('data-image-index');
         if (targetId && window.AppNavigation) {
           this.close();
           window.AppNavigation.scrollToSection(targetId);
+          if (imgIdxStr !== null && imgIdxStr !== '') {
+            setTimeout(() => {
+              const idx = parseInt(imgIdxStr, 10);
+              const card = document.querySelector(`.radiology-card[data-index="${idx}"]`);
+              if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                card.style.outline = '3px solid var(--accent-primary)';
+                setTimeout(() => { card.style.outline = ''; }, 3000);
+              }
+            }, 400);
+          }
         }
       });
     });

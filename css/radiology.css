@@ -1,0 +1,831 @@
+/**
+ * ANTI-GRAVITY RADIOLOGY IMAGE SYSTEM & VIEWER STYLES
+ * Professional DICOM/Radiology inspection UI, responsive gallery grid,
+ * continuous pointer zoom, physical panning, and live CSS filter controls.
+ */
+
+/* ==========================================================================
+   1. SECTION ID DISCOVERABILITY BADGE
+   ========================================================================== */
+.section-id-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background-color: var(--accent-primary-subtle);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+  margin-inline-start: var(--space-2);
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.section-id-badge:hover {
+  background-color: var(--accent-primary);
+  color: #ffffff;
+  border-color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+.section-id-badge:active {
+  transform: translateY(0);
+}
+
+.section-id-badge svg {
+  opacity: 0.7;
+}
+
+/* ==========================================================================
+   2. INLINE GALLERY AT SECTION END
+   ========================================================================== */
+.radiology-gallery-wrapper {
+  margin-block-start: var(--space-6);
+  margin-block-end: var(--space-4);
+  padding-block-start: var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.radiology-gallery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: var(--space-4);
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.radiology-gallery-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.radiology-gallery-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  background: var(--accent-primary-subtle);
+  color: var(--accent-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.radiology-gallery-label {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.radiology-gallery-count-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: var(--accent-primary-subtle);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-subtle);
+}
+
+.radiology-gallery-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.radiology-launch-viewer-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border-radius: var(--radius-full);
+  background: var(--accent-primary-subtle);
+  color: var(--accent-primary);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.radiology-launch-viewer-btn:hover {
+  background: var(--accent-primary);
+  color: #ffffff;
+  border-color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+.radiology-launch-viewer-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Responsive Grid - Compact, ratio-stable preview */
+.radiology-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: var(--space-3);
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .radiology-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--space-2);
+  }
+}
+
+.radiology-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.radiology-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-md);
+}
+
+/* Clean Preview System: Collapsing dense galleries beyond 5 items */
+.radiology-card-overflow {
+  display: none !important;
+}
+
+.radiology-gallery-wrapper.is-expanded .radiology-card-overflow {
+  display: flex !important;
+}
+
+/* More Card (+N) Quick-access affordance */
+.radiology-card-more {
+  display: flex;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(2, 132, 199, 0.16) 100%);
+  border: 1.5px dashed var(--accent-primary);
+  align-items: center;
+  justify-content: center;
+}
+
+.radiology-gallery-wrapper.is-expanded .radiology-card-more {
+  display: none !important;
+}
+
+.radiology-more-btn {
+  appearance: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  height: 100%;
+  min-height: 98px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  color: var(--accent-primary);
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.radiology-more-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: -2px;
+}
+
+.radiology-more-btn:hover {
+  background: rgba(14, 165, 233, 0.14);
+}
+
+.radiology-more-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.radiology-more-count {
+  font-family: var(--font-mono, monospace);
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--accent-primary);
+}
+
+.radiology-more-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.radiology-more-sub {
+  font-size: 0.68rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--accent-primary);
+  margin-top: 2px;
+}
+
+/* Expand / Collapse Footer Toggle */
+.radiology-gallery-footer {
+  margin-block-start: var(--space-3);
+  display: flex;
+  justify-content: center;
+}
+
+.radiology-expand-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 18px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--bg-surface-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.radiology-expand-btn:hover {
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+  background: var(--bg-surface);
+  transform: translateY(-1px);
+}
+
+.radiology-expand-btn:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+.radiology-expand-btn .expand-label-opened {
+  display: none;
+}
+
+.radiology-expand-btn .expand-label-closed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.radiology-gallery-wrapper.is-expanded .radiology-expand-btn .expand-label-closed {
+  display: none;
+}
+
+.radiology-gallery-wrapper.is-expanded .radiology-expand-btn .expand-label-opened {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Thumbnail Button Semantics */
+.radiology-thumb-btn {
+  appearance: none;
+  background: #080c14;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  position: relative;
+  text-align: center;
+}
+
+.radiology-thumb-btn:focus-visible {
+  outline: 3px solid var(--accent-primary);
+  outline-offset: -3px;
+  z-index: 2;
+}
+
+.radiology-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  transition: transform var(--transition-fast);
+}
+
+.radiology-thumb-btn:hover .radiology-thumb-img {
+  transform: scale(1.03);
+}
+
+.radiology-thumb-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 40%);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: var(--space-2);
+}
+
+.radiology-thumb-btn:hover .radiology-thumb-overlay,
+.radiology-thumb-btn:focus-visible .radiology-thumb-overlay {
+  opacity: 1;
+}
+
+.radiology-inspect-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Captions below image */
+.radiology-card-caption {
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  direction: rtl;
+  text-align: right;
+  border-top: 1px solid var(--border-subtle);
+  background-color: var(--bg-surface);
+}
+
+.radiology-card-caption .latin-term {
+  direction: ltr;
+  display: inline-block;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* ==========================================================================
+   3. MISSING FILE & DIAGNOSTIC STATES
+   ========================================================================== */
+.radiology-missing-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(245, 158, 11, 0.05),
+    rgba(245, 158, 11, 0.05) 12px,
+    rgba(245, 158, 11, 0.1) 12px,
+    rgba(245, 158, 11, 0.1) 24px
+  );
+  border: 1.5px dashed var(--state-warning, #f59e0b);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  text-align: center;
+}
+
+.radiology-missing-icon {
+  color: var(--state-warning, #f59e0b);
+  width: 32px;
+  height: 32px;
+}
+
+.radiology-missing-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.radiology-missing-filename {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  direction: ltr;
+  background: var(--bg-surface);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  word-break: break-all;
+}
+
+/* Specific Malformed Manifest Diagnostic Banner */
+.radiology-diagnostic-banner {
+  margin-block: var(--space-4);
+  padding: var(--space-4);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1.5px solid var(--state-danger, #ef4444);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+}
+
+.radiology-diagnostic-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--state-danger, #ef4444);
+  margin-block-end: var(--space-2);
+}
+
+.radiology-diagnostic-body {
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+
+.radiology-diagnostic-code {
+  display: block;
+  direction: ltr;
+  text-align: left;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  background: var(--bg-surface);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  margin-block-start: var(--space-2);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ==========================================================================
+   4. FULL-SCREEN RADIOLOGY STUDY VIEWER OVERLAY
+   ========================================================================== */
+body.viewer-open {
+  overflow: hidden !important;
+}
+
+body.viewer-open .ambient-bg {
+  display: none !important;
+}
+
+.radiology-viewer-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh; /* Mobile browser chrome support */
+  background: rgba(8, 12, 20, 0.97);
+  backdrop-filter: blur(16px);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  direction: rtl;
+  padding-top: max(8px, env(safe-area-inset-top));
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+  padding-left: max(8px, env(safe-area-inset-left));
+  padding-right: max(8px, env(safe-area-inset-right));
+}
+
+/* Top Toolbar */
+.viewer-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: rgba(15, 23, 42, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  flex-shrink: 0;
+  z-index: 10;
+  gap: var(--space-3);
+}
+
+.viewer-info-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.viewer-section-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 450px;
+}
+
+.viewer-counter-badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.viewer-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.viewer-btn {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-md);
+  color: #ffffff;
+  height: 38px;
+  min-width: 38px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: all var(--transition-fast);
+}
+
+.viewer-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.viewer-btn:focus-visible {
+  outline: 2px solid var(--accent-primary, #0284c7);
+  outline-offset: 2px;
+}
+
+.viewer-btn:active {
+  transform: scale(0.96);
+}
+
+.viewer-btn-close {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.viewer-btn-close:hover {
+  background: rgba(239, 68, 68, 0.4);
+  color: #ffffff;
+}
+
+/* Viewport Area (Inspectable Pixel Surface) */
+.viewer-viewport {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  touch-action: none; /* CRITICAL: Prevent browser pinch/scroll */
+}
+
+.viewer-viewport.is-dragging {
+  cursor: grabbing;
+}
+
+.viewer-image-surface {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform, filter;
+  pointer-events: none;
+  user-select: none;
+}
+
+.viewer-main-img {
+  display: block;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Floating Navigation Arrows (Logical RTL-aware) */
+.viewer-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all var(--transition-fast);
+}
+
+.viewer-nav-btn:hover:not(:disabled) {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: var(--accent-primary, #0284c7);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.viewer-nav-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* RTL positioning: Next is on physical left (leading forward in RTL), Prev is on physical right */
+.viewer-nav-btn-next {
+  left: 16px;
+}
+
+.viewer-nav-btn-prev {
+  right: 16px;
+}
+
+@media (max-width: 640px) {
+  .viewer-nav-btn {
+    width: 40px;
+    height: 40px;
+  }
+  .viewer-nav-btn-next {
+    left: 8px;
+  }
+  .viewer-nav-btn-prev {
+    right: 8px;
+  }
+}
+
+/* Live Adjustments & Zoom Bottom Toolbar */
+.viewer-bottom-bar {
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 10px 16px;
+  color: #ffffff;
+  flex-shrink: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.viewer-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.viewer-slider-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.viewer-slider-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.viewer-slider {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.2);
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  width: 90px;
+  cursor: pointer;
+}
+
+.viewer-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent-primary, #0284c7);
+  border: 2px solid #ffffff;
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.viewer-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.viewer-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent-primary, #0284c7);
+  border: 2px solid #ffffff;
+  cursor: pointer;
+}
+
+.viewer-toggle-btn.is-active {
+  background: var(--accent-primary, #0284c7);
+  border-color: var(--accent-primary, #0284c7);
+  color: #ffffff;
+}
+
+/* Floating Caption Box in Viewer */
+.viewer-caption-box {
+  position: absolute;
+  bottom: 85px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(720px, 92vw);
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  color: #f1f5f9;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  direction: rtl;
+  text-align: right;
+  z-index: 15;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.viewer-caption-box.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(12px);
+}
+
+.viewer-caption-text {
+  flex: 1;
+}
+
+.viewer-caption-close {
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  padding: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+}
+
+.viewer-caption-close:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Sidebar Navigation Indicator Badge */
+.nav-has-images-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: var(--accent-primary-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 1px 5px;
+  margin-inline-start: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .radiology-thumb-img,
+  .radiology-card,
+  .viewer-image-surface,
+  .viewer-caption-box {
+    transition: none !important;
+  }
+}

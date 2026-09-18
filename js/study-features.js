@@ -156,7 +156,7 @@ window.StudyFeatures = {
     const renderBookmarksList = () => {
       if (!listContainer) return;
       const bms = window.appState.bookmarks;
-      const chapters = window.CHAPTERS_REGISTRY || [];
+      const chapters = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
 
       if (bms.length === 0) {
         listContainer.innerHTML = `

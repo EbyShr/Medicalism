@@ -18,8 +18,9 @@ class AppState {
     this.fontScale = (!isNaN(savedScale) && savedScale >= 0.8 && savedScale <= 1.4) ? savedScale : 1.0;
     
     // Chapter & Section Navigation
-    this.activeChapterId = 'ch-27';
-    this.activeSectionId = 'ch27-sec01';
+    const initialReg = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
+    this.activeChapterId = (initialReg[0] && initialReg[0].id) ? initialReg[0].id : 'ch-27';
+    this.activeSectionId = (initialReg[0] && initialReg[0].sections && initialReg[0].sections[0]) ? initialReg[0].sections[0].id : 'ch27-sec01';
     
     // Bookmarks Array
     try {

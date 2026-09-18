@@ -105,7 +105,7 @@
   display: flex;
   flex-direction: row;
   width: 100%;
-  max-width: 1440px;
+  max-width: 1480px;
   margin-inline: auto;
   padding-inline: clamp(var(--space-3), 2.5vw, var(--space-8));
   gap: var(--space-8);
@@ -285,7 +285,7 @@ body.focus-mode-active .app-sidebar {
 }
 
 body.focus-mode-active .app-content {
-  max-width: 960px;
+  max-width: 1080px;
 }
 
 /* Zero Horizontal Overflow Wrapper for Tables */

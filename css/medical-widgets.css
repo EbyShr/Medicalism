@@ -559,30 +559,58 @@
 /* ==========================================================================
    HIGH-CONTRAST MEDICAL TABLES & CONTAINERS
    ========================================================================== */
+.table-responsive,
 .table-responsive-container,
 .table-scroll-container {
   width: 100%;
+  max-width: 100%;
   overflow-x: auto;
-  margin-block: var(--space-5);
+  overflow-y: hidden;
+  margin-block: var(--space-4);
   background-color: var(--bg-surface);
   border: 1.5px solid var(--border-default);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-xs);
   -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
 }
 
+.table-responsive::-webkit-scrollbar,
+.table-scroll-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb,
+.table-scroll-container::-webkit-scrollbar-thumb {
+  background-color: var(--border-default);
+  border-radius: var(--radius-full);
+}
+
+.table-responsive::-webkit-scrollbar-track,
+.table-scroll-container::-webkit-scrollbar-track {
+  background-color: var(--bg-surface-secondary);
+}
+
+.table-responsive > table,
+.table-responsive-container > table,
+.table-scroll-container > table,
 .data-table,
 .medical-table,
+.medical-data-table,
 .study-section table {
   width: 100%;
+  max-width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   text-align: right;
   font-size: var(--font-size-sm);
+  margin: 0;
+  table-layout: auto;
 }
 
 .data-table th,
 .medical-table th,
+.medical-data-table th,
 .study-section table th {
   background-color: var(--color-surface-subtle);
   color: var(--text-primary);
@@ -590,11 +618,14 @@
   padding: 12px 16px;
   border-block-end: 2px solid var(--border-strong);
   border-inline-end: 1px solid var(--border-subtle);
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .data-table td,
 .medical-table td,
+.medical-data-table td,
 .study-section table td {
   padding: 12px 16px;
   border-block-end: 1px solid var(--border-subtle);
@@ -602,37 +633,44 @@
   color: var(--text-secondary);
   vertical-align: top;
   line-height: var(--line-height-normal);
+  overflow-wrap: break-word;
 }
 
 .data-table th:last-child,
 .medical-table th:last-child,
+.medical-data-table th:last-child,
 .study-section table th:last-child,
 .data-table td:last-child,
 .medical-table td:last-child,
+.medical-data-table td:last-child,
 .study-section table td:last-child {
   border-inline-end: none;
 }
 
 .data-table tr:last-child td,
 .medical-table tr:last-child td,
+.medical-data-table tr:last-child td,
 .study-section table tr:last-child td {
   border-block-end: none;
 }
 
 .data-table tr:nth-child(even) td,
 .medical-table tr:nth-child(even) td,
+.medical-data-table tr:nth-child(even) td,
 .study-section table tr:nth-child(even) td {
   background-color: var(--color-surface-subtle);
 }
 
 .data-table tr:nth-child(odd) td,
 .medical-table tr:nth-child(odd) td,
+.medical-data-table tr:nth-child(odd) td,
 .study-section table tr:nth-child(odd) td {
   background-color: var(--bg-surface);
 }
 
 .data-table tr:hover td,
 .medical-table tr:hover td,
+.medical-data-table tr:hover td,
 .study-section table tr:hover td {
   background-color: var(--color-primary-light) !important;
 }
