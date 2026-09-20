@@ -173,6 +173,14 @@ window.AppSearch = {
           });
         }
 
+        // Include exam questions, options, and explanations in search
+        if (ch.id === 'rad-exam' && window.ExamModule && typeof window.ExamModule.getQuestions === 'function') {
+          const qs = window.ExamModule.getQuestions();
+          qs.forEach(q => {
+            captionsText += ' ' + q.prompt + ' ' + (q.explanation || '') + ' ' + (q.options || []).map(o => o.text).join(' ');
+          });
+        }
+
         const bodyNorm = this.normalize(rawBody + ' ' + (sec.summary || '') + captionsText);
 
         // Match scoring

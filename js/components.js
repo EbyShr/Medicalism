@@ -17,11 +17,19 @@ window.ComponentRenderer = {
         <!-- Chapter Hero Banner -->
         <header class="chapter-hero">
           <div class="chapter-meta-tag">
-            <span>فصل ${chapter.number}</span>
-            <span>•</span>
-            <span>${chapter.totalSections} بخش بالینی و اپیدمیولوژیک</span>
-            <span>•</span>
-            <span>${chapter.estimatedReadTime}</span>
+            ${chapter.isExam ? `
+              <span style="background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); color: #ffffff; padding: 2px 10px; border-radius: var(--radius-full); font-weight: 800; box-shadow: 0 0 12px rgba(236, 72, 153, 0.45);">بخش ویژه کوئیز</span>
+              <span>•</span>
+              <span>کیس‌های تصویری و شبیه‌ساز بالینی</span>
+              <span>•</span>
+              <span>${chapter.estimatedReadTime}</span>
+            ` : `
+              <span>فصل ${chapter.number}</span>
+              <span>•</span>
+              <span>${chapter.totalSections} بخش بالینی و اپیدمیولوژیک</span>
+              <span>•</span>
+              <span>${chapter.estimatedReadTime}</span>
+            `}
           </div>
           <h1 class="chapter-title">${chapter.title}</h1>
           <div class="chapter-attribution">
@@ -90,6 +98,9 @@ window.ComponentRenderer = {
     this.bindSectionActions(container);
     if (window.RadiologyModule && typeof window.RadiologyModule.bindContainerEvents === 'function') {
       window.RadiologyModule.bindContainerEvents(container);
+    }
+    if (window.ExamModule && typeof window.ExamModule.bindContainerEvents === 'function') {
+      window.ExamModule.bindContainerEvents(container);
     }
   },
 
@@ -169,6 +180,13 @@ window.ComponentRenderer = {
       sectionBody = this.renderChapterBrainCTSection(section, chapterId);
     } else if (chapterId === 'rad-ch04') {
       sectionBody = this.renderChapterUrinaryContrastSection(section, chapterId);
+    } else if (chapterId === 'rad-exam') {
+      sectionBody = window.ExamModule ? window.ExamModule.renderExamSection(section, chapterId) : `<p>${section.summary || ''}</p>`;
+      return `
+        <div class="study-section exam-study-section-clean" id="${section.id}" data-chapter-id="${chapterId}" style="background: transparent; border: none; padding: 0; box-shadow: none;">
+          ${sectionBody}
+        </div>
+      `;
     } else {
       sectionBody = `<p>${section.summary || ''}</p>`;
     }

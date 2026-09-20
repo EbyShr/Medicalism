@@ -1753,6 +1753,30 @@ window.RADIOLOGY_REGISTRY = [
     }
   ],
   "prevChapterId": "rad-ch03",
+  "nextChapterId": "rad-exam",
+  "courseId": "radiology",
+  "courseTitle": "رادیولوژی و تصویربرداری بالینی"
+},
+{
+  "id": "rad-exam",
+  "slug": "special-exam-quiz",
+  "number": 5,
+  "title": "بخش ویژه آزمون: کیس‌های تصویری و شبیه‌ساز بالینی",
+  "shortTitle": "بخش ویژه کوئیز",
+  "author": "گروه رادیولوژی بالینی و ارزشیابی مهارت‌های تشخیصی",
+  "authorAffiliation": "دانشگاه علوم پزشکی البرز (ABZUMS)",
+  "totalSections": 1,
+  "estimatedReadTime": "آزمون تعاملی و کیس‌های تصویری",
+  "isExam": true,
+  "sections": [
+    {
+      "id": "exam-all",
+      "number": 1,
+      "title": "سوالات چهارگزینه‌ای همراه با تحلیل تصویری و کلید تشریحی",
+      "summary": "مجموعه سوالات استاندارد آزمون رادیولوژی به همراه کلیشه‌های تشخیصی، امکان شبیه‌ساز کوئیز و تطبیق یافته‌ها با هوش مصنوعی."
+    }
+  ],
+  "prevChapterId": "rad-ch04",
   "nextChapterId": null,
   "courseId": "radiology",
   "courseTitle": "رادیولوژی و تصویربرداری بالینی"

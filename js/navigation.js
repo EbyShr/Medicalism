@@ -104,7 +104,9 @@ window.AppNavigation = {
 
     const commChapters = isRadiology ? [] : chapters.filter(ch => ch.number <= 15);
     const ncdChapters = isRadiology ? [] : chapters.filter(ch => ch.number > 15 && ch.number <= 29);
-    const radChapters = isRadiology ? chapters : [];
+    const radChapters = isRadiology
+      ? [...chapters.filter(ch => ch.isExam), ...chapters.filter(ch => !ch.isExam)]
+      : [];
 
     // Ensure the folder containing active chapter is open
     const activeCh = chapters.find(ch => ch.id === activeChapterId);
@@ -122,20 +124,27 @@ window.AppNavigation = {
       const isCurrentChapter = ch.id === activeChapterId;
       const isExpanded = isCurrentChapter; // Current chapter starts expanded
 
+      const isExam = ch.isExam === true;
       const headingsHtml = ch.sections.map(sec => {
         const isActive = sec.id === activeSectionId;
         const isBookmarked = window.appState ? window.appState.isBookmarked(sec.id) : false;
 
-        const imageCount = (window.RadiologyModule && ch.id) ? window.RadiologyModule.getSectionImages(ch.id, sec.id).length : 0;
+        const count = isExam 
+          ? (window.ExamModule ? window.ExamModule.getQuestionsCount() : 1)
+          : ((window.RadiologyModule && ch.id) ? window.RadiologyModule.getSectionImages(ch.id, sec.id).length : 0);
 
         return `
           <li class="nav-heading-item">
             <a href="#${sec.id}" class="nav-heading-link ${isActive ? 'is-active' : ''}" data-target-id="${sec.id}">
               <span class="nav-heading-text">${sec.title}</span>
-              ${imageCount > 0 ? `
-                <span class="nav-has-images-badge" title="${imageCount} کلیشه تصویربرداری">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                  <span>${imageCount}</span>
+              ${count > 0 ? `
+                <span class="nav-has-images-badge ${isExam ? 'nav-exam-q-badge' : ''}" title="${isExam ? `${count} کیس آزمون` : `${count} کلیشه تصویربرداری`}">
+                  ${isExam ? `
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  ` : `
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                  `}
+                  <span>${count}</span>
                 </span>
               ` : ''}
               ${isBookmarked ? `
@@ -150,7 +159,37 @@ window.AppNavigation = {
         `;
       }).join('');
 
-      const numPadded = ch.number.toString().padStart(2, '۰');
+      if (isExam) {
+        return `
+          <li class="nav-chapter-item nav-chapter-item-exam ${isCurrentChapter ? 'is-active' : ''}" data-nav-chapter="${ch.id}">
+            <div class="nav-chapter-header nav-exam-header" data-chapter-id="${ch.id}" role="button" tabindex="0" title="${ch.title}">
+              <div class="nav-chapter-title-group">
+                <div class="nav-exam-pulse-icon" aria-hidden="true">
+                  <span class="nav-exam-glow-ring"></span>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                </div>
+                <span class="nav-chapter-badge nav-chapter-badge-exam">آزمون</span>
+                <span class="nav-chapter-label nav-exam-title-text" title="${ch.title}">بخش ویژه کوئیز</span>
+              </div>
+              <div class="nav-exam-header-meta">
+                <span class="nav-exam-live-pill">
+                  <span class="nav-exam-live-dot"></span>
+                  <span>کوئیز</span>
+                </span>
+              </div>
+            </div>
+          </li>
+          <li class="nav-exam-divider-item" aria-hidden="true">
+            <div class="nav-exam-divider-line">
+              <span>سرفصل‌ها و مباحث آموزشی</span>
+            </div>
+          </li>
+        `;
+      }
+
+      const numPadded = ch.number ? ch.number.toString().padStart(2, '۰') : '۰۱';
 
       return `
         <li class="nav-chapter-item ${isCurrentChapter ? 'is-active' : ''} ${isExpanded ? 'is-expanded' : ''}" data-nav-chapter="${ch.id}">
