@@ -102,8 +102,8 @@ window.AppNavigation = {
 
     const isRadiology = chapters.some(ch => ch.id.startsWith('rad-') || ch.courseId === 'radiology');
 
-    const commChapters = isRadiology ? [] : chapters.filter(ch => ch.number <= 15);
-    const ncdChapters = isRadiology ? [] : chapters.filter(ch => ch.number > 15 && ch.number <= 29);
+    const commChapters = isRadiology ? [] : chapters.filter(ch => ch.number <= 16);
+    const ncdChapters = isRadiology ? [] : chapters.filter(ch => ch.number > 16 && ch.number <= 30);
     const radChapters = isRadiology
       ? [...chapters.filter(ch => ch.isExam), ...chapters.filter(ch => !ch.isExam)]
       : [];
@@ -113,7 +113,7 @@ window.AppNavigation = {
     if (activeCh) {
       if (isRadiology) {
         this.expandedFolders.rad = true;
-      } else if (activeCh.number <= 15) {
+      } else if (activeCh.number <= 16) {
         this.expandedFolders.comm = true;
       } else {
         this.expandedFolders.ncd = true;
@@ -230,7 +230,7 @@ window.AppNavigation = {
               <span class="nav-folder-title">بیماری‌های واگیر</span>
             </div>
             <div class="nav-folder-meta">
-              <span class="nav-folder-badge badge-comm">۱۵ فصل</span>
+              <span class="nav-folder-badge badge-comm">۱۶ فصل</span>
               <svg class="nav-folder-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="9 18 15 12 9 6"></polyline>
               </svg>

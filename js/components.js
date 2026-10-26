@@ -172,6 +172,8 @@ window.ComponentRenderer = {
       sectionBody = this.renderChapter30Section(section);
     } else if (chapterId === 'ch-31') {
       sectionBody = this.renderChapter31Section(section);
+    } else if (chapterId === 'ch-36') {
+      sectionBody = this.renderChapter36Section(section);
     } else if (chapterId === 'ch-32' || chapterId === 'rad-ch01') {
       sectionBody = this.renderChapter32Section(section, chapterId);
     } else if (chapterId === 'rad-ch02') {
@@ -9861,6 +9863,298 @@ window.ComponentRenderer = {
     }
 
     return contentHtml;
+  },
+
+
+  /* =========================================================================
+     CHAPTER 36 RENDERERS (FROM CELL TO SYSTEM: CANCER CONTROL IN IRAN)
+     ========================================================================= */
+  renderChapter36Section(sec) {
+    if (!sec) return '';
+
+    if (sec.id === 'ch36-sec01') {
+      const carc = sec.carcinogenesis || {};
+      const cascade = sec.clonalCascade || [];
+
+      const cascadeCards = cascade.map(c => `
+        <div class="clinical-card" style="border-inline-start: 4px solid var(--color-primary);">
+          <div class="card-header bg-light d-flex align-center gap-2" style="padding: var(--space-3) var(--space-4);">
+            <span class="badge badge-primary" style="font-weight: 800;">مرحله ${c.step}</span>
+            <strong style="font-size: 0.98rem;">${c.title || ''}</strong>
+          </div>
+          <div class="card-body" style="padding: var(--space-3) var(--space-4);">
+            <p style="margin: 0; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">${c.desc || ''}</p>
+          </div>
+        </div>
+      `).join('');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon">🧬</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="grid-4" style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-block-end: var(--space-6);">
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-danger);">
+            <div class="stat-value" style="color: var(--state-danger); font-size: 1.55rem; font-weight: 800;">۱ سلول منفرد</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">آغاز کارسینوژنز با جهش اولیه DNA</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-warning);">
+            <div class="stat-value" style="color: var(--state-warning); font-size: 1.55rem; font-weight: 800;">شکست آپوپتوز</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">مهار مرگ برنامه‌ریزی‌شده سلولی</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--color-primary);">
+            <div class="stat-value" style="color: var(--color-primary); font-size: 1.55rem; font-weight: 800;">۲.۵ تا ۵ سال</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">دوره نهفتگی بالینی در سرطان پستان</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-success);">
+            <div class="stat-value" style="color: var(--state-success); font-size: 1.55rem; font-weight: 800;">۵۰۰ میلیون سلول</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">آستانه تشخیص تومور (5 × 10⁸ cells)</div>
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-6);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">مبانی کارسینوژنز و سینتیک رشد تومور</h3>
+          <div class="clinical-card">
+            <div class="card-body">
+              <ul class="styled-list">
+                <li><strong>جهش ژنتیکی آغازگر:</strong> ${carc.initiation || ''}</li>
+                <li><strong>فرار از آپوپتوز و تکثیر بی‌رویه:</strong> ${carc.apoptosisFailure || ''}</li>
+                <li><strong>سینتیک تقسیمات متوالی:</strong> ${carc.growthKinetics || ''}</li>
+                <li><strong>شاخص نهفتگی بالینی سرطان پستان:</strong> ${carc.breastCancerBenchmark || ''}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">آبشار تکوین کلونال و پیشرفت توده بدخیم</h3>
+          <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
+            ${cascadeCards}
+          </div>
+        </div>
+      `;
+    }
+
+    if (sec.id === 'ch36-sec02') {
+      const triggers = sec.environmentalTriggers || [];
+      const matrix = sec.riskFactorMatrix || [];
+
+      const triggerCards = triggers.map(t => `
+        <div class="clinical-card" style="border-top: 4px solid var(--state-danger);">
+          <div class="card-header" style="font-weight: 700; color: var(--state-danger);">${t.name || ''}</div>
+          <div class="card-body">
+            <p style="margin: 0; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">${t.detail || ''}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const matrixRows = matrix.map(m => `
+        <tr>
+          <td><strong>${m.riskFactor || ''}</strong></td>
+          <td><span class="badge ${m.pathogenicRole.includes('تفنگ') ? 'badge-warning' : 'badge-danger'}">${m.pathogenicRole || ''}</span></td>
+          <td>${m.epidemiologicalBurden || ''}</td>
+        </tr>
+      `).join('');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon">🎯</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="grid-4" style="grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-block-end: var(--space-6);">
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-danger);">
+            <div class="stat-value" style="color: var(--state-danger); font-size: 1.55rem; font-weight: 800;">۲.۴ میلیون</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">مرگ سرطانی سالانه ناشی از دخانیات</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-warning);">
+            <div class="stat-value" style="color: var(--state-warning); font-size: 1.55rem; font-weight: 800;">۲۰ نوع سرطان</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">مرتبط با مصرف دخانیات (رتبه اول)</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--color-primary);">
+            <div class="stat-value" style="color: var(--color-primary); font-size: 1.55rem; font-weight: 800;">۱۵ تا ۲۰٪</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">سهم عوامل عفونی در بروز کل سرطان‌ها</div>
+          </div>
+          <div class="stat-card" style="border-inline-start: 4px solid var(--state-info);">
+            <div class="stat-value" style="color: var(--state-info); font-size: 1.55rem; font-weight: 800;">Synergism</div>
+            <div class="stat-label" style="font-size: var(--font-size-xs); color: var(--text-secondary); margin-block-start: 4px;">اثر هم‌افزایی مستقیم الکل و دخانیات</div>
+          </div>
+        </div>
+
+        <div class="medical-callout callout-warning" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon">🔫</div>
+          <div class="callout-content">
+            <strong>الگوی «تفنگ پر شده و ماشه» (Loaded Gun & Trigger Model):</strong><br>
+            ${sec.gunAndTriggerModel || ''}
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-6);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">عوامل خطر محیطی و رفتاری آغازگر</h3>
+          <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
+            ${triggerCards}
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">ماتریس اپیدمیولوژیک عوامل خطر و نقش پاتوژنیک در بروز سرطان</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>عامل خطر (Risk Factor)</th>
+                  <th>نقش در مدل کارسینوژنز (Pathogenic Role)</th>
+                  <th>بار اپیدمیولوژیک و ویژگی بالینی (Epidemiological Burden)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${matrixRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    if (sec.id === 'ch36-sec03') {
+      const ov = sec.overview || {};
+      const pillars = sec.primaryPillars || [];
+      const modalities = sec.screeningModalities || [];
+
+      const pillarCards = pillars.map(p => `
+        <div class="clinical-card" style="border-inline-start: 4px solid var(--state-success);">
+          <div class="card-header bg-success text-white" style="font-weight: 700;">🛡️ ${p.pillar || ''}</div>
+          <div class="card-body">
+            <p style="margin: 0; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">${p.action || ''}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const modalityRows = modalities.map(m => `
+        <tr>
+          <td><strong>${m.cancer || ''}</strong></td>
+          <td><span class="badge badge-primary">${m.modality || ''}</span></td>
+          <td>${m.goal || ''}</td>
+        </tr>
+      `).join('');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon">🩺</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-6);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">محورهای دفاعی پیشگیری سطح اول و دوم</h3>
+          <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4); margin-block-end: var(--space-4);">
+            <div class="clinical-card">
+              <div class="card-header bg-primary text-white" style="font-weight: 700;">۱. پیشگیری سطح اول (Primary Prevention)</div>
+              <div class="card-body"><p style="margin: 0; line-height: var(--line-height-relaxed);">${ov.primaryPrevention || ''}</p></div>
+            </div>
+            <div class="clinical-card">
+              <div class="card-header bg-info text-white" style="font-weight: 700;">۲. پیشگیری سطح دوم / غربالگری (Screening)</div>
+              <div class="card-body"><p style="margin: 0; line-height: var(--line-height-relaxed);">${ov.secondaryPrevention || ''}</p></div>
+            </div>
+          </div>
+
+          <h4 style="margin-block: var(--space-4) var(--space-3); font-weight: 700;">ارکان عملیاتی پیشگیری سطح اول در محیط کار و زندگی</h4>
+          <div class="grid-2" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
+            ${pillarCards}
+          </div>
+        </div>
+
+        <div class="content-block">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">روش‌های استاندارد غربالگری و تشخیص زودهنگام (Early Curable Stages)</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>نوع بدخیمی هدف</th>
+                  <th>روش استاندارد غربالگری (Screening Modality)</th>
+                  <th>هدف بالینی در جمعیت بدون علامت</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${modalityRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    if (sec.id === 'ch36-sec04') {
+      const milestones = sec.historicalMilestones || [];
+      const pipeline = sec.dataPipeline || [];
+      const priorities = sec.reformPriorities || [];
+
+      const milestoneCards = milestones.map(m => `
+        <div class="clinical-card" style="border-top: 4px solid var(--color-primary);">
+          <div class="card-header" style="font-weight: 800; color: var(--color-primary);">${m.year || ''} — ${m.title || ''}</div>
+          <div class="card-body">
+            <p style="margin: 0; font-size: var(--font-size-sm); line-height: var(--line-height-relaxed);">${m.desc || ''}</p>
+          </div>
+        </div>
+      `).join('');
+
+      const pipelineCards = pipeline.map(p => `
+        <div class="clinical-card" style="margin-block-end: var(--space-3); border-inline-start: 4px solid var(--state-info);">
+          <div class="card-body" style="padding: var(--space-3) var(--space-4); display: flex; align-items: flex-start; gap: var(--space-3);">
+            <span class="badge badge-info" style="font-weight: 800; flex-shrink: 0;">گام ${p.step}</span>
+            <div>
+              <strong style="display: block; margin-block-end: 4px;">${p.stage || ''}</strong>
+              <span style="font-size: var(--font-size-sm); color: var(--text-secondary);">${p.detail || ''}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      const priorityRows = priorities.map(pr => `
+        <tr>
+          <td><strong>${pr.priority || ''}</strong></td>
+          <td>${pr.operationalAction || ''}</td>
+        </tr>
+      `).join('');
+
+      return `
+        <div class="medical-callout callout-info" style="margin-block-end: var(--space-6);">
+          <div class="callout-icon">🏛️</div>
+          <div class="callout-content"><p>${sec.summary || ''}</p></div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-6);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">پیشینه تاریخی و استانداردهای ثبت سرطان در ایران</h3>
+          <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-4);">
+            ${milestoneCards}
+          </div>
+        </div>
+
+        <div class="content-block" style="margin-block-end: var(--space-6);">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">زنجیره ۵ مرحله‌ای انتقال و پردازش داده در نظام ثبت سرطان ایران</h3>
+          ${pipelineCards}
+        </div>
+
+        <div class="content-block">
+          <h3 class="block-title" style="margin-block-end: var(--space-3);">ماتریس اولویت‌های اصلاحی برای ارتقای برنامه ثبت سرطان</h3>
+          <div class="table-responsive">
+            <table class="medical-data-table">
+              <thead>
+                <tr>
+                  <th>اولویت‌های اصلاحی (Reform Priorities)</th>
+                  <th>شرح اقدام عملیاتی (Operational Action)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${priorityRows}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    return `<p>${sec.summary || ''}</p>`;
   },
 
 };

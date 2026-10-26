@@ -70,7 +70,7 @@ def run_tests():
             page.close()
 
         # 1.2 Desktop Architecture & Navigation Tree (1440px)
-        print("\n--- [Course 1] Desktop Structure & Strictly 29 Chapters (1440px) ---")
+        print("\n--- [Course 1] Desktop Structure & Strictly 30 Chapters (1440px) ---")
         page = browser.new_page(viewport={"width": 1440, "height": 900})
         page.goto(course_url)
         page.wait_for_load_state("networkidle")
@@ -83,12 +83,12 @@ def run_tests():
 
         # Verify exactly 29 registered chapters and 150 nav links
         chapter_items = page.locator("#desktopNavTree .nav-chapter-item").all()
-        print(f"[Course 1] Registered chapters in nav: {len(chapter_items)} (Strict Expected: 29)")
-        assert len(chapter_items) == 29, f"Expected strictly 29 chapters in Course 1, got {len(chapter_items)}"
+        print(f"[Course 1] Registered chapters in nav: {len(chapter_items)} (Strict Expected: 30)")
+        assert len(chapter_items) == 30, f"Expected strictly 30 chapters in Course 1, got {len(chapter_items)}"
 
         total_nav_links = page.locator("#desktopNavTree .nav-heading-link").all()
-        print(f"[Course 1] Total nav heading links: {len(total_nav_links)} (Expected: 150)")
-        assert len(total_nav_links) == 150, f"Expected 150 nav links in Course 1, got {len(total_nav_links)}"
+        print(f"[Course 1] Total nav heading links: {len(total_nav_links)} (Expected: 154)")
+        assert len(total_nav_links) == 154, f"Expected 154 nav links in Course 1, got {len(total_nav_links)}"
 
         # Verify Course 1 Folders (comm and ncd only, NO rad folder)
         comm_folder = page.locator('#desktopNavTree .nav-folder-item[data-folder-key="comm"]')
@@ -97,7 +97,7 @@ def run_tests():
         assert comm_folder.is_visible(), "[Course 1] Communicable diseases folder must exist"
         assert ncd_folder.is_visible(), "[Course 1] Non-communicable diseases folder must exist"
         assert rad_folder.count() == 0, "[Course 1] Radiology folder must NOT exist in Course 1 navigation tree"
-        print("[Course 1] PASS: Navigation folders strictly separated (Folder 1: 15 ch, Folder 2: 14 ch)!")
+        print("[Course 1] PASS: Navigation folders strictly separated (Folder 1: 16 ch, Folder 2: 14 ch)!")
 
         # 1.3 Controls (Continuous Zoom, Font Switcher, Theme Switcher)
         print("\n--- [Course 1] Study Controls ---")
@@ -120,7 +120,7 @@ def run_tests():
         page.screenshot(path=shot_course1, full_page=False)
         print(f"Saved Course 1 screenshot to {shot_course1}")
 
-        # 1.4 Traversal across all 29 Chapters
+        # 1.4 Traversal across all 30 Chapters
         expected_course1_chapters = [
             ("ch-27", "کلیات", 4),
             ("ch-19", "واگیر", 5),
@@ -146,6 +146,7 @@ def run_tests():
             ("ch-07", "روماتیسمی", 3),
             ("ch-04", "چاقی", 6),
             ("ch-05", "سرطان", 6),
+            ("ch-36", "سرطان", 4),
             ("ch-12", "تیروئید", 6),
             ("ch-14", "ریزمغذی", 3),
             ("ch-11", "دخانیات", 4),
@@ -153,7 +154,7 @@ def run_tests():
             ("ch-08", "روان", 4),
         ]
 
-        print("\n--- [Course 1] Navigation & Zero Undefined Across All 29 Chapters ---")
+        print("\n--- [Course 1] Navigation & Zero Undefined Across All 30 Chapters ---")
         for new_num, (ch_id, keyword, expected_sec_count) in enumerate(expected_course1_chapters, 1):
             ch_header = page.locator(f"#desktopNavTree .nav-chapter-header[data-chapter-id='{ch_id}']")
             ch_header.click()
@@ -173,7 +174,7 @@ def run_tests():
                 return text.includes('undefined') || html.includes('>undefined<') || text.includes('NaN');
             }""")
             assert not has_undefined, f"ERROR: Found 'undefined' or 'NaN' token in {ch_id} rendered DOM!"
-            print(f"  PASS: Chapter {new_num}/29 ({ch_id}) verified with {expected_sec_count} sections, zero undefined.")
+            print(f"  PASS: Chapter {new_num}/30 ({ch_id}) verified with {expected_sec_count} sections, zero undefined.")
 
         # 1.5 Mobile Drawer for Course 1 (390px)
         print("\n--- [Course 1] Mobile Navigation Drawer (390px) ---")
@@ -204,8 +205,8 @@ def run_tests():
         mobile_page.wait_for_timeout(250)
 
         mobile_ch = mobile_page.locator("#mobileNavTree .nav-chapter-item").all()
-        print(f"[Course 1] Mobile nav chapters: {len(mobile_ch)} (Expected: 29)")
-        assert len(mobile_ch) == 29, f"Expected 29 chapters in mobile drawer, got {len(mobile_ch)}"
+        print(f"[Course 1] Mobile nav chapters: {len(mobile_ch)} (Expected: 30)")
+        assert len(mobile_ch) == 30, f"Expected 30 chapters in mobile drawer, got {len(mobile_ch)}"
 
         shot_mob_c1 = os.path.join(screenshot_dir, "mobile_nav_drawer_course1.png")
         mobile_page.screenshot(path=shot_mob_c1)

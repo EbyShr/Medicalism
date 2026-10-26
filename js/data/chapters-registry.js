@@ -1,6 +1,6 @@
 /**
  * MEDICAL STUDY WEBAPP - PERSISTENT CHAPTERS REGISTRY
- * Rationally reordered curriculum: Chapters 1 to 29
+ * Rationally reordered curriculum: Chapters 1 to 30 (16 Communicable + 14 Non-Communicable)
  */
 window.CHAPTERS_REGISTRY = [
   {
@@ -6390,12 +6390,222 @@ window.CHAPTERS_REGISTRY = [
       }
     ],
     "prevChapterId": "ch-04",
+    "nextChapterId": "ch-36"
+  },
+  {
+    "id": "ch-36",
+    "slug": "cancer-control-narrative-from-cell-to-system-iran",
+    "number": 25,
+    "title": "از سلول تا سامانه: روایت مبارزه با سرطان در ایران",
+    "shortTitle": "از سلول تا سامانه ثبت سرطان",
+    "author": "اداره ثبت و کنترل سرطان، مرکز مدیریت بیماری‌های غیرواگیر",
+    "authorAffiliation": "معاونت بهداشت وزارت بهداشت، درمان و آموزش پزشکی",
+    "totalSections": 4,
+    "estimatedReadTime": "۱۸ دقیقه مطالعه تخصصی",
+    "sections": [
+      {
+        "id": "ch36-sec01",
+        "number": 1,
+        "title": "۱. پاتوبیولوژی سلولی-مولکولی و سینتیک رشد تومور",
+        "latinTitle": "Cellular Pathobiology & Tumor Growth Kinetics",
+        "summary": "آغاز کارسینوژنز (Carcinogenesis) با وقوع جهش ژنتیکی اولیه (Primary Genetic Mutation) در ساختار DNA یک سلول منفرد؛ شکست مسیر مرگ برنامه‌ریزی‌شده سلولی یا آپوپتوز (Evasion of Apoptosis) و تکثیر کلونال بی‌رویه (Uncontrolled Proliferation)؛ سینتیک رشد تومور: در سرطان پستان (Breast Cancer) یک دوره نهفتگی بالینی معادل ۲.۵ تا ۵ سال زمان لازم است تا جمعیت سلول‌های نئوپلاستیک به آستانه بحرانی قابل شناسایی بالینی یا پاراکلینیکی یعنی ۵۰۰ میلیون سلول (5 × 10⁸ cells) و تشکیل توده تومورال قابل تشخیص برسد.",
+        "carcinogenesis": {
+          "initiation": "فرآیند کارسینوژنز (Carcinogenesis) در سطح سلولی، با وقوع یک جهش ژنتیکی (Genetic Mutation) در یک سلول منفرد آغاز می‌گردد.",
+          "apoptosisFailure": "این تغییر ژنومی سبب می‌شود که سلول جهش‌یافته برخلاف سلول‌های طبیعی و سالم، مسیر مرگ برنامه‌ریزی‌شده سلولی یا آپوپتوز (Apoptosis) را اجرا نکرده و با شکست این سد کنترلی، به تکثیر و رشد بی‌رویه (Uncontrolled Proliferation) ادامه دهد.",
+          "growthKinetics": "از منظر سینتیک رشد تومور، سال‌ها زمان لازم است تا یک سلول منفرد دارای جهش اولیه (Primary Mutation) از طریق تقسیمات متوالی به یک توده تومورال قابل تشخیص بالینی یا پاراکلینیکی تبدیل شود.",
+          "breastCancerBenchmark": "در بدخیمی‌هایی نظیر سرطان پستان (Breast Cancer)، یک دوره نهفتگی بالینی معادل ۲.۵ تا ۵ سال زمان نیاز است تا جمعیت سلول‌های نئوپلاستیک به آستانه قابل شناسایی یعنی ۵۰۰ میلیون سلول (5 × 10⁸ cells) برسد."
+        },
+        "clonalCascade": [
+          {
+            "step": 1,
+            "title": "القای جهش ژنتیکی اولیه (Initial Genetic Mutation)",
+            "desc": "رخداد جهش ژنتیکی اولیه در ساختار اسید دئوکسی‌ریبونوکلئیک (DNA) یک سلول واحد."
+          },
+          {
+            "step": 2,
+            "title": "مهار و شکست آپوپتوز (Evasion of Apoptosis)",
+            "desc": "مهار و شکست فرآیند مرگ برنامه‌ریزی‌شده سلولی در سلول ترانسفورم‌شده."
+          },
+          {
+            "step": 3,
+            "title": "تقسیم و تکثیر کلونال بی‌رویه (Uncontrolled Clonal Proliferation)",
+            "desc": "تقسیم و تکثیر کلونال بی‌رویه در طول یک دوره نهفتگی چندساله (معادل ۲.۵ تا ۵ سال در کارسینوم پستان)."
+          },
+          {
+            "step": 4,
+            "title": "تشکیل توده تومورال قابل تشخیص (Detectable Tumor Mass)",
+            "desc": "تجمع جمعیت سلولی به آستانه بحرانی ۵۰۰ میلیون سلول (5 × 10⁸ cells) و تشکیل توده تومورال قابل تشخیص بالینی یا پاراکلینیکی."
+          }
+        ]
+      },
+      {
+        "id": "ch36-sec02",
+        "number": 2,
+        "title": "۲. اتیولوژی و اپیدمیولوژی عوامل خطر",
+        "latinTitle": "Etiology & Risk Factor Epidemiology",
+        "summary": "الگوی «تفنگ پر شده و ماشه» (Loaded Gun & Trigger): عوامل ژنتیکی (Genetic Factors) به عنوان تفنگ پر شده بستر مستعدکننده پایه را می‌سازند و عوامل محیطی (Environmental Factors) با کشیدن ماشه موجب بروز بالینی می‌شوند؛ دخانیات (Tobacco): رتبه اول مرگ سرطانی با ۲.۴ میلیون مرگ سالانه و دخیل در ۲۰ نوع سرطان؛ عوامل عفونی (Infectious Agents): مسئول ۱۵ تا ۲۰ درصد کل سرطان‌ها؛ الکل (Alcohol): کارسینوژن مستقل و دارای اثر هم‌افزایی (Synergistic Effect) با دخانیات؛ پرتوها (Radiation): اشعه فرابنفش (UV Radiation) به عنوان ماشه‌چکان آسیب ژنومی.",
+        "gunAndTriggerModel": "در مدل سبب‌شناسی بدخیمی‌ها، تعامل میان استعداد ژنتیکی و مواجهات محیطی از الگوی «تفنگ پر شده و ماشه» تبعیت می‌کند؛ به‌گونه‌ای که عوامل ژنتیکی (Genetic Factors) همانند یک تفنگ پر شده بستر مستعدکننده اولیه را فراهم می‌سازند، اما این عوامل محیطی (Environmental Factors) نظیر دخانیات و پرتوها هستند که با کشیدن ماشه، منجر به بروز بالینی بیماری می‌گردند.",
+        "environmentalTriggers": [
+          {
+            "name": "مصرف دخانیات (Tobacco Use)",
+            "detail": "رتبه نخست علل مرگ ناشی از بدخیمی را به خود اختصاص داده و سالانه مسبب ۲.۴ میلیون مرگ و عامل اتیولوژیک در بروز ۲۰ نوع سرطان مختلف به شمار می‌رود."
+          },
+          {
+            "name": "عوامل عفونی (Infectious Agents)",
+            "detail": "عفونت‌های انکوژنیک مسئول بروز ۱۵ تا ۲۰ درصد از کل موارد سرطان‌ها هستند."
+          },
+          {
+            "name": "مصرف الکل (Alcohol Consumption)",
+            "detail": "به عنوان یک کارسینوژن مستقل عمل کرده و در ترکیب با مصرف دخانیات، دارای اثر هم‌افزایی (Synergistic Effect) در تشدید ریسک ابتلا به بدخیمی است."
+          },
+          {
+            "name": "پرتوها (Radiation)",
+            "detail": "مواجهه با پرتوهای محیطی به‌ویژه اشعه فرابنفش (Ultraviolet - UV Radiation) به عنوان عامل ماشه‌چکان آسیب ژنومی عمل می‌کند."
+          }
+        ],
+        "riskFactorMatrix": [
+          {
+            "riskFactor": "عوامل ژنتیکی (Genetic Factors)",
+            "pathogenicRole": "زمینه مستعدکننده پایه (تفنگ پر شده)",
+            "epidemiologicalBurden": "ایجاد استعداد ارثی و آسیب‌پذیری اولیه ژنوم"
+          },
+          {
+            "riskFactor": "دخانیات (Tobacco)",
+            "pathogenicRole": "عامل محیطی ماشه‌چکان (Environmental Trigger)",
+            "epidemiologicalBurden": "عامل اول مرگ سرطانی؛ ۲.۴ میلیون مرگ؛ دخیل در ۲۰ نوع سرطان"
+          },
+          {
+            "riskFactor": "عفونت‌ها (Infections)",
+            "pathogenicRole": "عامل محیطی ماشه‌چکان (Environmental Trigger)",
+            "epidemiologicalBurden": "عامل اتیولوژیک در ۱۵ تا ۲۰ درصد از کل سرطان‌ها"
+          },
+          {
+            "riskFactor": "الکل (Alcohol)",
+            "pathogenicRole": "عامل محیطی ماشه‌چکان (Environmental Trigger)",
+            "epidemiologicalBurden": "دارای اثر هم‌افزایی (Synergism) مستقیم با مصرف دخانیات"
+          },
+          {
+            "riskFactor": "پرتوها (Radiation)",
+            "pathogenicRole": "عامل محیطی ماشه‌چکان (Environmental Trigger)",
+            "epidemiologicalBurden": "آسیب ناشی از مواجهه با اشعه فرابنفش (UV Radiation)"
+          }
+        ]
+      },
+      {
+        "id": "ch36-sec03",
+        "number": 3,
+        "title": "۳. استراتژی‌های پیشگیری و غربالگری",
+        "latinTitle": "Prevention & Screening Protocols",
+        "summary": "سد دفاعی در برابر بدخیمی‌ها بر دو محور پیشگیری در محیط کار و زندگی (پیشگیری سطح اول) و بیماریابی زودهنگام (پیشگیری سطح دوم / غربالگری) استوار است؛ ارکان پیشگیری سطح اول: حفاظت فیزیکی در برابر اشعه فرابنفش (UV Protection) و بهداشت حرفه‌ای با حذف مواجهه‌های شغلی کارسینوژن به‌ویژه آزبست (Asbestos Exposure Elimination)؛ روش‌های استاندارد غربالگری در مراحل اولیه و قابل درمان (Early Curable Stages) در جمعیت‌های بدون علامت: ماموگرافی برای سرطان پستان، آزمایش سیتولوژی پاپ‌اسمیر برای سرطان دهانه رحم، و کولونوسکوپی برای سرطان روده بزرگ.",
+        "overview": {
+          "primaryPrevention": "سد دفاعی در برابر بدخیمی‌ها بر دو محور اصلی پیشگیری در محیط کار و زندگی و بیماریابی زودهنگام استوار است. اقدامات معطوف به بهسازی محیط کار و زندگی، ارکان اصلی پیشگیری سطح اول (Primary Prevention) محسوب می‌شوند که شامل حفاظت فیزیکی در برابر اشعه فرابنفش (UV Protection) و حذف مواجهه‌های شغلی کارسینوژن به‌ویژه آزبست (Asbestos Exposure Elimination) می‌گردند.",
+          "secondaryPrevention": "در سطح پیشگیری ثانویه، غربالگری (Screening) شامل به‌کارگیری روش‌های تشخیصی استاندارد جهت شناسایی بیماری در مراحل اولیه و قابل درمان (Early Curable Stages) در جمعیت‌های بدون علامت است."
+        },
+        "primaryPillars": [
+          {
+            "pillar": "ایمنی در برابر پرتوهای محیطی (Ultraviolet Radiation Protection)",
+            "action": "حفاظت فیزیکی و محیطی در برابر اشعه فرابنفش خورشیدی و منابع مصنوعی."
+          },
+          {
+            "pillar": "بهداشت حرفه‌ای (Occupational Health)",
+            "action": "حذف مواجهه‌های شغلی خطرناک و کارسینوژن با تمرکز ویژه بر حذف آزبست (Asbestos)."
+          }
+        ],
+        "screeningModalities": [
+          {
+            "cancer": "سرطان پستان (Breast Cancer)",
+            "modality": "انجام ماموگرافی (Mammography)",
+            "goal": "تشخیص زودهنگام توده‌های پستانی در مراحل اولیه و قابل درمان در زنان بدون علامت."
+          },
+          {
+            "cancer": "سرطان دهانه رحم (Cervical Cancer)",
+            "modality": "آزمایش سیتولوژی پاپ‌اسمیر (Pap Smear)",
+            "goal": "شناسایی تغییرات پیش‌بدخیمی و سلول‌های دیسپلاستیک سرویکس پیش از تهاجم."
+          },
+          {
+            "cancer": "سرطان روده بزرگ (Colorectal Cancer)",
+            "modality": "ارزیابی آندوسکوپیک از طریق کولونوسکوپی (Colonoscopy)",
+            "goal": "پایش مخاط کولون و رکتوم جهت شناسایی و برداشت پولیپ‌های آدنوماتوز و ضایعات اولیه."
+          }
+        ]
+      },
+      {
+        "id": "ch36-sec04",
+        "number": 4,
+        "title": "۴. نظام ثبت سرطان در ایران و اولویت‌های اصلاحی",
+        "latinTitle": "Cancer Registry Architecture & Reform Priorities in Iran",
+        "summary": "پیشینه تاریخی ثبت سرطان در ایران: آغاز در سال ۱۳۴۶ خورشیدی با تأسیس اولین مرکز ثبت سرطان در شهرستان بابل (Babol) و شکل‌گیری قانونی و سراسری در سال ۱۳۶۳ خورشیدی با تصویب قانون ثبت و گزارش اجباری (Mandatory Reporting Law)؛ زنجیره ۵ مرحله‌ای انتقال و پردازش داده: ۱) تشخیص بافت‌شناختی در آزمایشگاه‌ها و مراکز پاتولوژی، ۲) کدگذاری بین‌المللی تومور بر اساس ICD-O، ۳) پالایش و رفع تکرار داده‌ها (Data Cleaning & Deduplication)، ۴) تجمیع منطقه‌ای در معاونت بهداشتی استان‌ها، ۵) ارسال و ذخیره‌سازی متمرکز در مرکز مدیریت بیماری‌ها (CDC)؛ چهار اولویت اصلاحی: جمع‌آوری داده‌های معتبر، تعیین اولویت‌های مداخله‌ای، جلوگیری از موازی‌کاری، و انتشار گزارش‌های منظم سالانه و استانی.",
+        "historicalMilestones": [
+          {
+            "year": "۱۳۴۶ خورشیدی",
+            "title": "تأسیس اولین مرکز ثبت سرطان در بابل (Babol)",
+            "desc": "آغاز پیشینه تاریخی نظام ثبت سرطان در ایران با راه‌اندازی نخستین ایستگاه ثبت در شهرستان بابل."
+          },
+          {
+            "year": "۱۳۶۳ خورشیدی",
+            "title": "تصویب قانون ثبت و گزارش اجباری (Mandatory Reporting Law)",
+            "desc": "الزامی و سراسری شدن گزارش‌دهی و ثبت موارد بدخیمی در سراسر کشور بر پایه مصوبه قانونی."
+          },
+          {
+            "year": "استاندارد ICD-O",
+            "title": "سیستم کدگذاری بین‌المللی بیماری‌های انکولوژی",
+            "desc": "ثبت یکپارچه اطلاعات تومور در سطح ملی بر مبنای استاندارد International Classification of Diseases for Oncology."
+          }
+        ],
+        "dataPipeline": [
+          {
+            "step": 1,
+            "stage": "تشخیص بافت‌شناختی و تولید داده اولیه",
+            "detail": "استخراج داده‌های تشخیصی اولیه در آزمایشگاه‌ها، مراکز پاتولوژی و مراکز تشخیص بیماری‌ها."
+          },
+          {
+            "step": 2,
+            "stage": "استانداردسازی و کدگذاری بین‌المللی (ICD-O)",
+            "detail": "ثبت و یکسان‌سازی اطلاعات تومور بر مبنای سیستم کدگذاری بین‌المللی بیماری‌های انکولوژی (ICD-O)."
+          },
+          {
+            "step": 3,
+            "stage": "پالایش اطلاعات و رفع تکرار (Data Cleaning & Deduplication)",
+            "detail": "پالایش داده‌های کدگذاری‌شده از طریق عملیات پاکسازی و حذف رکوردهای تکراری."
+          },
+          {
+            "step": 4,
+            "stage": "تجمیع منطقه‌ای در سطح معاونت بهداشتی استان‌ها",
+            "detail": "ارسال داده‌های پالایش‌شده به معاونت‌های بهداشتی استان‌ها (Provincial Health Deputies) و تجمیع استانی."
+          },
+          {
+            "step": 5,
+            "stage": "ذخیره‌سازی متمرکز در مرکز مدیریت بیماری‌ها (CDC)",
+            "detail": "ارسال نهایی و تجمیع متمرکز کشوری در پایگاه داده مرکز مدیریت بیماری‌ها (Center for Disease Control)."
+          }
+        ],
+        "reformPriorities": [
+          {
+            "priority": "جمع‌آوری داده‌های معتبر (Valid Data Collection)",
+            "operationalAction": "اطمینان از کامل بودن منابع اطلاعاتی در هنگام ثبت (Completeness of Data Sources)"
+          },
+          {
+            "priority": "تعیین اولویت‌های مداخله‌ای (Intervention Prioritization)",
+            "operationalAction": "تمرکز بر سرطان‌های شایع و قابل پیشگیری در سطح ملی (Common & Preventable Cancers)"
+          },
+          {
+            "priority": "جلوگیری از موازی‌کاری (Prevention of Duplication)",
+            "operationalAction": "تمرکز مدیریت داده‌ها (Centralized Data Management) برای کاهش هزینه‌ها و خطا"
+          },
+          {
+            "priority": "انتشار گزارش‌های منظم (Regular Reporting)",
+            "operationalAction": "فراهم کردن دسترسی محققان به داده‌های سالانه و استانی (Annual & Provincial Data Access)"
+          }
+        ]
+      }
+    ],
+    "prevChapterId": "ch-05",
     "nextChapterId": "ch-12"
   },
   {
     "id": "ch-12",
     "slug": "congenital-hypothyroidism-screening-management",
-    "number": 25,
+    "number": 26,
     "title": "غربالگری و مدیریت کم‌کاری تیروئید نوزادان (Congenital Hypothyroidism)",
     "shortTitle": "کم‌کاری تیروئید نوزادان",
     "author": "اداره غدد و متابولیک وزارت بهداشت و شبکه کشوری غربالگری نوزادان",
@@ -6645,13 +6855,13 @@ window.CHAPTERS_REGISTRY = [
         ]
       }
     ],
-    "prevChapterId": "ch-05",
+    "prevChapterId": "ch-36",
     "nextChapterId": "ch-14"
   },
   {
     "id": "ch-14",
     "slug": "micronutrient-deficiencies-idd",
-    "number": 26,
+    "number": 27,
     "title": "کمبود ریزمغذی‌ها و اختلالات ناشی از کمبود ید (Hidden Hunger)",
     "shortTitle": "کمبود ریزمغذی‌ها و ید",
     "author": "متخصصین تغذیه جامعه و سلامت عمومی",
@@ -6820,7 +7030,7 @@ window.CHAPTERS_REGISTRY = [
   {
     "id": "ch-11",
     "slug": "tobacco-epidemiology-control-policies",
-    "number": 27,
+    "number": 28,
     "title": "اپیدمیولوژی و کنترل دخانیات: از بحران جهانی تا سیاست‌های پیشگیری در ایران",
     "shortTitle": "اپیدمیولوژی و کنترل دخانیات",
     "author": "دبیرخانه ستاد کشوری کنترل و مبارزه با دخانیات و مرکز تحقیقات کنترل دخانیات",
@@ -7048,7 +7258,7 @@ window.CHAPTERS_REGISTRY = [
   {
     "id": "ch-10",
     "slug": "substance-abuse-epidemiology-prevention",
-    "number": 28,
+    "number": 29,
     "title": "اپیدمیولوژی و پیشگیری از سوءمصرف مواد: از الگوهای جهانی تا شواهد بومی",
     "shortTitle": "سوءمصرف مواد و اعتیاد",
     "author": "پژوهشگران مرکز ملی مطالعات اعتیاد (INCAS) و شبکه ملی پژوهش در اعتیاد",
@@ -7341,7 +7551,7 @@ window.CHAPTERS_REGISTRY = [
   {
     "id": "ch-08",
     "slug": "mental-health-epidemiology-suicide-prevention",
-    "number": 29,
+    "number": 30,
     "title": "اپیدمیولوژی سلامت روان در ایران: بار بیماری، اختلالات شایع و استراتژی‌های پیشگیری",
     "shortTitle": "سلامت روان و خودکشی",
     "author": "پژوهشگران پیمایش ملی سلامت روان (IranMHS) و مرکز تحقیقات روان‌پزشکی",
