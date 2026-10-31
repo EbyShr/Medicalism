@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>آزمون و بانک سوالات بالینی | مدیکالیسم البرز</title>
+  <meta name="description" content="سامانه هوشمند آزمون و بانک سوالات پزشکی و بالینی مدیکالیسم البرز، دارای حالت آموزشی، شبیه‌ساز آزمون، کارنامه و پاسخنامه تشریحی با تحلیل گزینه‌ها.">
+  <meta name="theme-color" content="#0284c7">
+
+  <!-- Fonts: Vazirmatn & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Webfonts for Shabnam & Sahel -->
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/shabnam-font@v5.0.1/dist/font-face.css" rel="stylesheet" type="text/css">
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" type="text/css">
+
+  <!-- Core App Styles -->
+  <link rel="stylesheet" href="./css/tokens.css">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/medical-widgets.css">
+  <link rel="stylesheet" href="./css/dark-theme.css">
+  <link rel="stylesheet" href="./css/portal.css">
+  <link rel="stylesheet" href="./css/quiz.css">
+</head>
+<body class="portal-page quiz-page">
+
+  <!-- Ambient Animated Background -->
+  <div class="ambient-bg" aria-hidden="true">
+    <div class="ambient-orb ambient-orb-1" style="background: radial-gradient(circle, rgba(2, 132, 199, 0.22) 0%, transparent 70%);"></div>
+    <div class="ambient-orb ambient-orb-2" style="background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, transparent 70%);"></div>
+    <div class="ambient-orb ambient-orb-3"></div>
+  </div>
+
+  <!-- Sticky Top Navigation Bar -->
+  <header class="portal-header">
+    <div class="portal-container portal-header-inner">
+      <a href="./index.html" class="portal-brand" aria-label="مدیکالیسم البرز صفحه اصلی">
+        <div class="portal-brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+          </svg>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 4px;">
+          <span class="portal-brand-title">مدیکالیسم</span>
+          <span class="quiz-brand-badge">آزمون و بانک سوال</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="portal-nav-links" aria-label="ناوبری اصلی پورتال">
+        <!-- Courses Dropdown -->
+        <div class="portal-dropdown" id="coursesDropdown">
+          <button class="portal-dropdown-trigger" type="button" id="coursesDropdownBtn" aria-expanded="false" aria-haspopup="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <span class="portal-dropdown-text-desktop">سرفصل‌ها و دوره‌های آموزشی</span>
+            <span class="portal-dropdown-text-mobile">دوره‌ها</span>
+            <svg class="portal-dropdown-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          <div class="portal-dropdown-menu" id="coursesDropdownMenu" role="menu">
+            <div class="dropdown-section-label">دوره‌های آموزشی فعال البرز</div>
+            
+            <!-- Course 1 -->
+            <a href="./communicable-and-noncommunicable-diseases.html" class="dropdown-course-card" style="display: block; text-decoration: none; color: inherit;">
+              <div class="dropdown-course-header" style="margin-block-end: 0;">
+                <div class="dropdown-course-icon-active">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </div>
+                <div style="flex: 1;">
+                  <div class="dropdown-course-title" style="display: flex; align-items: center; justify-content: space-between;">
+                    <span>بیماری‌های واگیر و غیرواگیر</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                  </div>
+                  <div class="dropdown-course-meta">۳۰ فصل جامع • آماده مطالعه</div>
+                </div>
+              </div>
+            </a>
+
+            <!-- Course 2 -->
+            <a href="./radiology.html" class="dropdown-course-card" style="margin-block-end: 0; border-color: rgba(14, 165, 233, 0.3); display: block; text-decoration: none; color: inherit;">
+              <div class="dropdown-course-header" style="margin-block-end: 0;">
+                <div class="dropdown-course-icon-active" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                </div>
+                <div style="flex: 1;">
+                  <div class="dropdown-course-title" style="display: flex; align-items: center; justify-content: space-between;">
+                    <span>رادیولوژی و تصویربرداری بالینی</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                  </div>
+                  <div class="dropdown-course-meta">۴ فصل جامع • آماده مطالعه</div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <a href="./index.html" class="quiz-header-nav-link" title="صفحه اصلی پورتال">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          </svg>
+          <span>صفحه اصلی</span>
+        </a>
+      </nav>
+
+      <!-- Action Buttons (Font, Theme) -->
+      <div class="portal-header-actions">
+        <!-- Font Selector -->
+        <select class="font-select" id="portalFontSelect" title="تغییر قلم مطالعه" style="font-size: 12px; padding: 5px 8px;">
+          <option value="vazirmatn">وزیرمتن</option>
+          <option value="shabnam">شبنم</option>
+          <option value="sahel">ساحل</option>
+        </select>
+
+        <!-- Dark/Light Theme Toggle -->
+        <button class="btn-icon" id="portalThemeToggleBtn" title="تغییر حالت تم (روشن / تاریک)" aria-label="تغییر تم">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Quiz Container -->
+  <main class="quiz-container">
+
+    <!-- ======================================================================
+         VIEW 1: TOPIC & QUIZ SELECTION HUB (صفحه انتخاب مبحث و فیلترها)
+         ====================================================================== -->
+    <div id="quizHubView" class="quiz-hub-view">
+      <div class="quiz-hub-hero">
+        <span class="quiz-hub-hero-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span>سامانه هوشمند خودارزیابی بالینی مدیکالیسم</span>
+        </span>
+        <h1 class="quiz-hub-title">بانک جامع آزمون، تست و سوالات تحلیلی پزشکی</h1>
+        <p class="quiz-hub-subtitle">
+          سامانه تخصصی آزمون و ارزشیابی بالینی دانشگاه علوم پزشکی البرز؛ با دو حالت مطالعه آموزشی (پاسخ آنی همراه با تشریح گزینه‌ها و دام‌های تستی) و شبیه‌ساز رسمی آزمون (همراه با کارنامه درصدی و نشانک‌گذاری).
+        </p>
+      </div>
+      <!-- Quizzes List Grid -->
+      <div class="quiz-cards-grid" id="quizzesGrid">
+        <!-- Rendered dynamically by QuizEngine -->
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         VIEW 2: COURSE TOPICS VIEW (صفحه اختصاصی مباحث درس)
+         ====================================================================== -->
+    <div id="quizCourseView" class="quiz-course-view" style="display: none;">
+      
+      <!-- Course Header & Back Bar -->
+      <div class="course-view-header">
+        <button type="button" class="btn-back-hub" onclick="window.medicalQuiz.returnToHub()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+          <span>بازگشت به فهرست دروس</span>
+        </button>
+        <div class="course-view-meta-badges">
+          <span class="quiz-card-category" id="courseCategoryBadge">بیماری‌های غیرواگیر</span>
+          <span class="quiz-card-badge" id="courseTotalBadge">۲۹۵ سوال در ۱۲ مبحث</span>
+        </div>
+      </div>
+
+      <!-- Course Hero & Dedicated Top Filter Bar -->
+      <div class="course-hero-card">
+        <h2 class="course-hero-title" id="courseTitle">بانک جامع سوالات بیماری‌های غیرواگیر (NCDs)</h2>
+        <p class="course-hero-desc" id="courseDesc">
+          مجموعه سوالات تحلیلی و استاندارد بر اساس راهنماهای کشوری، سند ملی افق ۱۴۰۴ و بسته خدمت Ira-PEN. مبحث مورد نظر خود را انتخاب کنید یا به صورت جامع آزمون دهید.
+        </p>
+
+        <!-- Dedicated Filter & Controls Bar -->
+        <div class="course-controls-bar">
+          <div class="controls-bar-row">
+            <!-- Mode Toggle -->
+            <div class="controls-group">
+              <span class="controls-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                <span>حالت مطالعه و ارزیابی:</span>
+              </span>
+              <div class="mode-toggle-group">
+                <button type="button" class="btn-mode-toggle is-active-study" id="courseModeStudy" onclick="window.medicalQuiz.setCourseMode('study')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                  </svg>
+                  <span>آموزشی (دسته‌های ۵ تایی رندوم)</span>
+                </button>
+                <button type="button" class="btn-mode-toggle" id="courseModeExam" onclick="window.medicalQuiz.setCourseMode('exam')">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                  <span>شبیه‌ساز آزمون رسمی</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Topic Filter Dropdown (Searchable) -->
+            <div class="controls-group">
+              <span class="controls-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                </svg>
+                <span>فیلتر مبحث هدف:</span>
+              </span>
+              
+              <div class="course-topic-dropdown" id="courseTopicDropdown">
+                <button type="button" class="course-dropdown-trigger" id="courseDropdownTrigger" onclick="window.medicalQuiz.toggleCourseDropdown()" aria-expanded="false">
+                  <span id="courseDropdownSelectedText">همه مباحث (آزمون جامع - ۹۱ سوال)</span>
+                  <svg class="select-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+
+                <div class="course-dropdown-menu" id="courseDropdownMenu" style="display: none;">
+                  <div class="course-dropdown-search">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="courseTopicSearchInput" placeholder="جستجوی عنوان فصل، مبحث..." oninput="window.medicalQuiz.filterCourseDropdown(this.value)" autocomplete="off">
+                  </div>
+                  <div class="course-dropdown-actions">
+                    <span style="color: var(--text-muted); font-weight: 600;">انتخاب یک یا چند مبحث:</span>
+                    <div style="display: flex; gap: 8px;">
+                      <button type="button" class="btn-dropdown-action" onclick="window.medicalQuiz.selectAllCourseTopics(event)">انتخاب همه</button>
+                      <button type="button" class="btn-dropdown-action" onclick="window.medicalQuiz.clearAllCourseTopics(event)">لغو همه</button>
+                    </div>
+                  </div>
+                  <div class="course-dropdown-list" id="courseDropdownList">
+                    <!-- Injected dynamically -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Button to start with selected settings -->
+          <div class="course-controls-action">
+            <button type="button" class="btn-start-configured-quiz" id="btnStartConfiguredQuiz" onclick="window.medicalQuiz.startConfiguredCourseQuiz()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <span id="btnStartConfiguredText">شروع حالت آموزشی (دسته‌های ۵ سوالی رندوم)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Title for Individual Chapters -->
+      <div class="chapters-grid-header">
+        <h3 class="chapters-grid-title">فصول و مباحث آموزشی این درس</h3>
+        <span class="chapters-grid-subtitle">می‌توانید مستقیماً روی هر مبحث کلیک کنید:</span>
+      </div>
+
+      <!-- Chapters Cards Grid -->
+      <div class="chapters-cards-grid" id="courseChaptersGrid">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         VIEW 2: ACTIVE QUIZ WORKSPACE (محیط آزمون فعال)
+         ====================================================================== -->
+    <div id="quizActiveView" class="quiz-active-view" style="display: none;">
+      
+      <!-- Top Sticky Control Bar -->
+      <div class="quiz-top-bar">
+        <div class="quiz-top-left">
+          <button type="button" class="btn-back-hub" id="btnBackToHub" onclick="window.medicalQuiz.returnToCourseView()" title="بازگشت به فهرست مباحث این درس">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <span>فهرست مباحث</span>
+          </button>
+
+          <!-- Mode Switcher -->
+          <div class="mode-toggle-group">
+            <button type="button" class="btn-mode-toggle is-active-study" id="btnModeStudy" onclick="window.medicalQuiz.switchMode('study')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              </svg>
+              <span>آموزشی (۵تایی)</span>
+            </button>
+            <button type="button" class="btn-mode-toggle" id="btnModeExam" onclick="window.medicalQuiz.switchMode('exam')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              <span>شبیه‌ساز آزمون</span>
+            </button>
+          </div>
+          <!-- Current Quiz / Chapter Title -->
+          <div class="active-chapter-indicator" id="activeQuizTitle"></div>
+        </div>
+
+        <div class="quiz-top-right">
+          <!-- Batch Indicator in Study Mode -->
+          <div class="batch-indicator-badge" id="batchIndicatorBadge" style="display: none;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            <span id="batchIndicatorText">ترتیب تصادفی سوالات</span>
+          </div>
+
+          <!-- Shuffle Order Button in Study Mode -->
+          <button type="button" class="btn-shuffle-order" id="btnShuffleOrder" onclick="window.medicalQuiz.shuffleCurrentQuestions()" style="display: none;" title="بُرزدن مجدد و تصادفی‌سازی چیدمان سوالات">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="16 3 21 3 21 8"></polyline>
+              <line x1="4" y1="20" x2="21" y2="3"></line>
+              <polyline points="21 16 21 21 16 21"></polyline>
+              <line x1="15" y1="15" x2="21" y2="21"></line>
+              <line x1="4" y1="4" x2="9" y2="9"></line>
+            </svg>
+            <span>بُرزدن ترتیب</span>
+          </button>
+
+          <!-- Timer (Exam Mode) -->
+          <div class="quiz-timer-badge" id="quizTimerWrapper" style="display: none;" title="زمان سپری شده از شروع آزمون">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span id="quizTimerDisplay">00:00</span>
+          </div>
+
+          <!-- Flag Question Button -->
+          <button type="button" class="btn-flag-question" id="btnFlagQuestion" title="علامت‌گذاری سوال شک‌دار برای بازبینی (کلید میانبر F)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span>نشان‌کردن سوال</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Progress Track -->
+      <div class="quiz-progress-track" aria-hidden="true">
+        <div class="quiz-progress-fill" id="quizProgressFill" style="width: 0%;"></div>
+      </div>
+
+      <!-- Question Card -->
+      <div class="quiz-question-card" id="quizQuestionCard">
+        <div class="question-header">
+          <span class="question-number-badge" id="questionCounter">سوال ۱</span>
+          <span class="question-topic-tag" id="questionTopicTag" style="display: none;"></span>
+        </div>
+
+        <!-- Stem -->
+        <div class="quiz-stem" id="questionStem">
+          <!-- Question text -->
+        </div>
+
+        <!-- Options -->
+        <div class="quiz-options-list" id="optionsList">
+          <!-- Options rendered dynamically -->
+        </div>
+
+        <!-- Explanation Card (Study Mode / Exam Review) -->
+        <div class="quiz-explanation-card" id="explanationCard" style="display: none;">
+          <div class="explanation-main-header">
+            <div class="explanation-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <span>پاسخ تشریحی، مستندات علمی و دام‌های تستی</span>
+            </div>
+            <span class="explanation-correct-badge">پاسخنامه مستند</span>
+          </div>
+
+          <!-- Section 1: Rationale -->
+          <div class="rationale-container">
+            <div class="rationale-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>تحلیل گزینه صحیح و مبانی بالینی:</span>
+            </div>
+            <p class="rationale-text" id="rationaleText"></p>
+          </div>
+
+          <!-- Section 2: Distractors Correction -->
+          <div class="distractors-container">
+            <div class="distractors-label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span>دام‌های تستی و علت رد سایر گزینه‌ها (Distractors Correction):</span>
+            </div>
+            <div id="distractorsList">
+              <!-- Injected dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Controls Bar -->
+      <div class="quiz-bottom-bar">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" class="btn-nav-question" id="btnPrevQuestion" title="سوال قبلی (کلید راست کیبورد)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <span>سوال قبلی</span>
+          </button>
+          
+          <button type="button" class="btn-open-matrix" id="btnOpenMatrix" title="مشاهده جدول و پالت سوالات">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"></rect>
+              <rect x="14" y="3" width="7" height="7"></rect>
+              <rect x="14" y="14" width="7" height="7"></rect>
+              <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>پالت سوالات</span>
+          </button>
+
+          <button type="button" class="btn-nav-question" id="btnNextQuestion" title="سوال بعدی (کلید چپ کیبورد)">
+            <span>سوال بعدی</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          <!-- 5 Next Random Questions Button (Study Mode) -->
+          <button type="button" class="btn-next-batch" id="btnNextBatch" onclick="window.medicalQuiz.loadNextRandomBatch()" style="display: none;" title="دریافت ۵ سوال تصادفی جدید از مباحث انتخابی">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            <span>۵ سوال رندوم بعدی</span>
+          </button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" class="btn-submit-exam" id="btnSubmitExam" style="display: none;" title="ثبت نهایی پاسخ‌ها و صدور کارنامه آزمون">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>ثبت و پایان آزمون</span>
+          </button>
+
+          <button type="button" class="btn-reset-quiz" id="btnResetQuiz" title="شروع مجدد آزمون و پاک کردن پاسخ‌های ذخیره شده">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+            </svg>
+            <span>شروع مجدد</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================================
+         VIEW 3: SCORECARD & RESULTS (کارنامه آزمون)
+         ====================================================================== -->
+    <div id="quizScorecardView" class="quiz-scorecard-view" style="display: none;">
+      <!-- Generated dynamically by QuizEngine -->
+    </div>
+
+  </main>
+
+  <!-- Question Matrix Modal Dialog -->
+  <div class="matrix-modal-backdrop" id="matrixModal" role="dialog" aria-modal="true" aria-label="پالت دسترسی سریع به سوالات">
+    <div class="matrix-modal">
+      <div class="matrix-modal-header">
+        <div class="matrix-modal-title">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>پالت دسترسی سریع به سوالات</span>
+        </div>
+        <button class="matrix-close-btn" id="matrixCloseBtn" aria-label="بستن پنجره">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="matrix-grid" id="matrixGrid">
+        <!-- Buttons 1 to N -->
+      </div>
+
+      <div class="matrix-legend">
+        <div class="matrix-legend-item">
+          <span class="legend-dot" style="background: rgba(2, 132, 199, 0.4);"></span>
+          <span>پاسخ داده‌شده</span>
+        </div>
+        <div class="matrix-legend-item">
+          <span class="legend-dot" style="background: #d97706;"></span>
+          <span>نشان‌شده (شک‌دار)</span>
+        </div>
+        <div class="matrix-legend-item">
+          <span class="legend-dot" style="background: var(--bg-body-secondary); border: 1px solid var(--border-default);"></span>
+          <span>پاسخ نداده</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="./data/quizzes/ncd_student_exam_part1_data.js"></script>
+  <script src="./data/quizzes/ncd_student_exam_part2_data.js"></script>
+  <script src="./data/quizzes/ncd_ihd_irapen_data.js"></script>
+  <script src="./data/quizzes/ncd_obesity_data.js"></script>
+  <script src="./data/quizzes/ncd_cancer_data.js"></script>
+  <script src="./data/quizzes/ncd_stroke_data.js"></script>
+  <script src="./data/quizzes/ncd_mental_health_data.js"></script>
+  <script src="./data/quizzes/ncd_diabetes_data.js"></script>
+  <script src="./data/quizzes/ncd_substance_abuse_data.js"></script>
+  <script src="./data/quizzes/ncd_cancer_pathobiology_data.js"></script>
+  <script src="./data/quizzes/ncd_hypertension_data.js"></script>
+  <script src="./data/quizzes/ncd_tobacco_control_data.js"></script>
+  <script src="./js/data/quiz-registry.js"></script>
+  <script src="./js/quiz-engine.js"></script>
+
+  <script>
+    // Header & Theme Synchronization
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Dropdown Toggle
+      const coursesDropdown = document.getElementById('coursesDropdown');
+      const coursesDropdownBtn = document.getElementById('coursesDropdownBtn');
+
+      if (coursesDropdown && coursesDropdownBtn) {
+        coursesDropdownBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = coursesDropdown.classList.contains('is-open');
+          coursesDropdown.classList.toggle('is-open', !isOpen);
+          coursesDropdownBtn.setAttribute('aria-expanded', !isOpen);
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!coursesDropdown.contains(e.target)) {
+            coursesDropdown.classList.remove('is-open');
+            coursesDropdownBtn.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
+
+      // 2. Theme Toggle
+      const themeToggleBtn = document.getElementById('portalThemeToggleBtn');
+      const sunIcon = themeToggleBtn ? themeToggleBtn.querySelector('.icon-sun') : null;
+      const moonIcon = themeToggleBtn ? themeToggleBtn.querySelector('.icon-moon') : null;
+
+      function updateThemeIcons(theme) {
+        if (!sunIcon || !moonIcon) return;
+        if (theme === 'dark') {
+          sunIcon.style.display = 'block';
+          moonIcon.style.display = 'none';
+        } else {
+          sunIcon.style.display = 'none';
+          moonIcon.style.display = 'block';
+        }
+      }
+
+      const savedTheme = localStorage.getItem('med_theme') || 
+        (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeIcons(savedTheme);
+
+      if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+          const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+          const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', nextTheme);
+          localStorage.setItem('med_theme', nextTheme);
+          updateThemeIcons(nextTheme);
+        });
+      }
+
+      // 3. Font Family Selector
+      const fontSelect = document.getElementById('portalFontSelect');
+      const savedFont = localStorage.getItem('med_font_family') || 'vazirmatn';
+      if (fontSelect) {
+        fontSelect.value = savedFont;
+        applyFont(savedFont);
+
+        fontSelect.addEventListener('change', (e) => {
+          const newFont = e.target.value;
+          localStorage.setItem('med_font_family', newFont);
+          applyFont(newFont);
+        });
+      }
+
+      function applyFont(font) {
+        const root = document.documentElement;
+        if (font === 'shabnam') {
+          root.style.setProperty('--font-current', 'var(--font-shabnam)');
+        } else if (font === 'sahel') {
+          root.style.setProperty('--font-current', 'var(--font-sahel)');
+        } else {
+          root.style.setProperty('--font-current', 'var(--font-vazirmatn)');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
