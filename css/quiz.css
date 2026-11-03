@@ -509,6 +509,7 @@
   flex-direction: column;
   gap: var(--space-6);
   width: 100%;
+  padding-block-end: 90px;
   animation: quizFadeIn 250ms ease-out;
 }
 
@@ -924,6 +925,7 @@
   justify-content: space-between;
   transition: all var(--transition-normal);
   position: relative;
+  overflow: hidden;
 }
 
 .chapter-card:hover {
@@ -2536,4 +2538,351 @@
 
 .quiz-card-radiology:hover {
   border-color: #0ea5e9;
+}
+
+/* ==========================================================================
+   ADVANCED MEDICAL QUESTION BANK (UWorld / Amboss Features)
+   ========================================================================== */
+
+/* 1. Option Strike-Through */
+.quiz-option.strikethrough {
+  opacity: 0.45 !important;
+  background: var(--bg-body-secondary) !important;
+}
+
+.quiz-option.strikethrough .quiz-option-text {
+  text-decoration: line-through !important;
+  text-decoration-color: #ef4444 !important;
+  text-decoration-thickness: 1.8px !important;
+}
+
+.quiz-option.strikethrough .quiz-option-key {
+  opacity: 0.55;
+  text-decoration: line-through;
+}
+
+.btn-option-strikethrough {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-inline-start: auto;
+  flex-shrink: 0;
+  opacity: 0.45;
+}
+
+.quiz-option:hover .btn-option-strikethrough {
+  opacity: 0.85;
+}
+
+.btn-option-strikethrough:hover {
+  background: rgba(220, 38, 38, 0.12);
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.25);
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+.btn-option-strikethrough.is-active-strike {
+  opacity: 1;
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.12);
+  border-color: rgba(220, 38, 38, 0.25);
+}
+
+/* 2. Keyboard Shortcuts Hint Bar */
+.question-keyboard-hint-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding: 10px 16px;
+  margin-block-start: var(--space-4);
+  background: var(--bg-body-secondary);
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-lg);
+  font-size: 11.5px;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.question-keyboard-hint-bar .hint-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.question-keyboard-hint-bar .hint-sep {
+  color: var(--border-default);
+  font-weight: bold;
+}
+
+.question-keyboard-hint-bar .hint-subtext {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.question-keyboard-hint-bar kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-family: inherit;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .question-keyboard-hint-bar kbd {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+}
+
+@media (max-width: 768px) {
+  .question-keyboard-hint-bar {
+    display: none;
+  }
+}
+
+/* 3. Per-Question Pacing Timer */
+.question-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.question-pacing-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--bg-body-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.question-pacing-timer.is-slow {
+  color: #d97706;
+  border-color: rgba(217, 119, 6, 0.35);
+  background: rgba(217, 119, 6, 0.08);
+}
+
+.question-pacing-timer.is-frozen {
+  opacity: 0.85;
+}
+
+/* 4. Topic Mastery Progress Track & Badges */
+.chapter-mastery-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.chapter-mastery-pill.is-unstarted {
+  color: var(--text-muted);
+  background: var(--bg-body-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.topic-mastery-progress-track {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  height: 4px;
+  background: var(--border-subtle);
+  width: 100%;
+  overflow: hidden;
+}
+
+.topic-mastery-progress-fill {
+  height: 100%;
+  transition: width 0.35s ease;
+}
+
+/* 5. Sticky Floating Bottom Action Bar */
+.course-floating-action-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(920px, calc(100vw - 32px));
+  z-index: 1000;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-default);
+  box-shadow: 0 16px 36px -4px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(16px);
+  padding: 12px 18px;
+  animation: floatSlideUp 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .course-floating-action-bar {
+  background: rgba(30, 41, 59, 0.94);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 40px -4px rgba(0, 0, 0, 0.55);
+}
+
+@keyframes floatSlideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.floating-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.floating-bar-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.floating-bar-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: rgba(2, 132, 199, 0.15);
+  color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.floating-bar-title {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.floating-bar-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.floating-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-floating-study {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-floating-study:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+}
+
+.btn-floating-exam {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #4f46e5, #4338ca);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-floating-exam:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+}
+
+.btn-floating-cancel {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--bg-body-secondary);
+  color: var(--text-muted);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-floating-cancel:hover {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.25);
+}
+
+@media (max-width: 640px) {
+  .course-floating-action-bar {
+    bottom: 12px;
+    padding: 10px 12px;
+  }
+  .floating-bar-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .floating-bar-actions {
+    justify-content: stretch;
+  }
+  .floating-bar-actions button {
+    flex: 1 1 auto;
+    justify-content: center;
+    font-size: 12px;
+    padding: 8px 10px;
+  }
 }

@@ -55,6 +55,79 @@ window.ComponentRenderer = {
         </div>
     `;
 
+    // Chapter Completion Status Button
+    const isCompleted = window.StudyFeatures && typeof window.StudyFeatures.isChapterCompleted === 'function'
+      ? window.StudyFeatures.isChapterCompleted(chapter.id)
+      : false;
+
+    html += `
+      <div class="chapter-completion-action-bar">
+        <button type="button" class="btn-toggle-chapter-completed ${isCompleted ? 'is-completed' : ''}" data-chapter-id="${chapter.id}" onclick="window.StudyFeatures && window.StudyFeatures.toggleChapterCompletion('${chapter.id}')" aria-label="نشان کردن وضعیت مطالعه فصل">
+          <span class="completion-checkbox-box">${isCompleted ? '✓' : ''}</span>
+          <span class="completion-text">${isCompleted ? 'مطالعه‌شده (ثبت‌شده در کارنامه)' : 'نشان کردن این فصل به عنوان مطالعه‌شده'}</span>
+        </button>
+      </div>
+    `;
+
+    // End-of-Chapter Quiz Cross-Link
+    const QUIZ_CHAPTER_MAP = {
+      'ch-13': { quiz: 'ncd-ihd-irapen', title: 'بیماری‌های ایسکمیک قلب (IHD) و برنامه ایراپن', desc: 'سنجش دانش بالینی و پروتکل‌های کشوری IHD، فاکتورهای خطر قلبی‌عروقی و ارزیابی ۱۰ ساله سکته‌ها' },
+      'ch-06': { quiz: 'ncd-obesity', title: 'چاقی و اضافه وزن', desc: 'تست‌های تشخیصی، معیارهای BMI، شاخص‌های دور کمر و پروتکل‌های مداخله تغذیه‌ای و درمانی' },
+      'ch-36': { quiz: 'ncd-cancer', title: 'اصول کلی غربالگری و اپیدمیولوژی سرطان‌ها', desc: 'برنامه‌های ملی غربالگری سرطان‌های روده بزرگ، پستان و دهانه رحم و عوامل خطر اپیدمیولوژیک' },
+      'ch-09': { quiz: 'ncd-stroke', title: 'سکته‌های مغزی و بیماری‌های عروق مغز', desc: 'علائم هشداردهنده FAST، زمان طلایی درمان، مدیریت حاد ایسکمی و پروتکل‌های توانبخشی' },
+      'ch-12': { quiz: 'ncd-mental-health', title: 'سلامت روان و اختلالات شایع روانپزشکی', desc: 'غربالگری افسردگی، اضطراب، پیشگیری از خودکشی و راهنماهای بالینی ادغام در شبکه بهداشتی' },
+      'ch-03': { quiz: 'ncd-diabetes', title: 'دیابت و اختلالات متابولیک', desc: 'معیارهای تشخیصی ADA و کشوری، تارگت‌های قند خون، رژیم درمانی و عوارض ماکرو و میکروواسکولار' },
+      'ch-05': { quiz: 'ncd-substance-abuse', title: 'پیشگیری و مدیریت سوءمصرف مواد', desc: 'روش‌های مداخله مختصر، مواد روان‌گردان، اوپیوییدها و استراتژی‌های کاهش آسیب' },
+      'ch-14': { quiz: 'ncd-cancer-pathobiology', title: 'پاتوبیولوژی و بیولوژی مولکولی سرطان', desc: 'مسیرهای انکوژنز، ژن‌های سرکوب‌گر تومور، مارکرهای مولکولی و درمان‌های هدفمند' },
+      'ch-07': { quiz: 'ncd-hypertension', title: 'پرفشاری خون (هیپرتانسیون) و مدیریت آن', desc: 'طبقه‌بندی فشار خون، تارگت‌های درمانی، خط اول داروها و بحران‌های فشار خون' },
+      'ch-04': { quiz: 'ncd-tobacco-control', title: 'دخانیات و برنامه‌های کنترل مصرف تنباکو', desc: 'راهکارهای MPOWER سازمان جهانی بهداشت، نیکوتین‌تراپی و مشاوره‌های ترک دخانیات' },
+      'ch-11': { quiz: 'ncd-student-exam-1', title: 'مجموعه آزمون جامع بالینی ۱', desc: 'سوالات تالیفی کلاسی، تحلیل سناریوهای کیس‌محور و ارزیابی جامع NCD' },
+      'ch-15': { quiz: 'ncd-student-exam-2', title: 'مجموعه آزمون جامع بالینی ۲', desc: 'سوالات تحلیلی چندگزینه‌ای، پروتکل‌های پیشگیری و ارتقای سلامت' }
+    };
+
+    let quizUrl = './quiz.html';
+    let quizTitle = 'بانک جامع سوالات و آزمون‌های تحلیلی';
+    let quizDesc = 'شبیه‌ساز آزمون‌های پزشکی، تحلیل سناریوهای بالینی کشوری و کارنامه هوشمند عملکرد';
+
+    if (QUIZ_CHAPTER_MAP[chapter.id]) {
+      const qInfo = QUIZ_CHAPTER_MAP[chapter.id];
+      quizUrl = `./quiz.html?quiz=${qInfo.quiz}&mode=study`;
+      quizTitle = qInfo.title;
+      quizDesc = qInfo.desc;
+    } else if (chapter.id.startsWith('rad-') || chapter.courseId === 'radiology') {
+      quizUrl = './radiology.html#rad-exam-special';
+      quizTitle = 'آزمون تعاملی کیس‌های بالینی رادیولوژی';
+      quizDesc = '۲۰ سناریوی تشخیصی تصویری با کادربندی پاتولوژی و ارزیابی مهارت خواندن کلیشه‌ها';
+    }
+
+    html += `
+      <section class="chapter-quiz-crosslink-card" aria-label="سنجش یادگیری در بانک سوالات">
+        <div class="quiz-crosslink-header">
+          <div class="quiz-crosslink-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+          </div>
+          <div class="quiz-crosslink-info">
+            <span class="quiz-crosslink-badge">سنجش یادگیری این فصل در بانک سوالات</span>
+            <h4 class="quiz-crosslink-title">${quizTitle}</h4>
+            <p class="quiz-crosslink-desc">${quizDesc}</p>
+          </div>
+        </div>
+        <div class="quiz-crosslink-action">
+          <a href="${quizUrl}" class="btn-quiz-crosslink">
+            <span>ورود به آزمون و سنجش یادگیری</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(180deg);">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </div>
+      </section>
+    `;
+
     // Chapter Navigation Footer (Progression between chapters)
     const chapters = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
     const currentIndex = chapters.findIndex(c => c.id === chapter.id);

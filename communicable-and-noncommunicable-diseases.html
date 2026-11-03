@@ -165,6 +165,18 @@
           </div>
           <span style="font-size: 11px; color: var(--text-muted);">۳۰ سرفصل</span>
         </div>
+
+        <!-- Compact Study Progress Widget -->
+        <div class="sidebar-study-progress-widget" id="sidebarStudyProgressWidget" aria-label="پیشرفت مطالعه دوره">
+          <div class="progress-widget-header">
+            <span class="progress-widget-title">پیشرفت مطالعه:</span>
+            <span class="progress-widget-stats" id="studyProgressStats">۰ از ۳۰ فصل (۰٪)</span>
+          </div>
+          <div class="progress-widget-track" title="درصد مطالعه کل سرفصل‌ها">
+            <div class="progress-widget-fill" id="studyProgressFill" style="width: 0%;"></div>
+          </div>
+        </div>
+
         <nav class="sidebar-scroll-container">
           <ul class="nav-tree" id="desktopNavTree">
             <!-- Injected dynamically via AppNavigation -->
@@ -231,6 +243,17 @@
           <span style="font-size: 10.5px; background: #059669; color: #fff; padding: 2px 7px; border-radius: var(--radius-full);">شروع</span>
         </a>
       </div>
+      <!-- Mobile Study Progress Widget -->
+      <div class="sidebar-study-progress-widget mobile-study-progress" id="mobileStudyProgressWidget" aria-label="پیشرفت مطالعه دوره">
+        <div class="progress-widget-header">
+          <span class="progress-widget-title">پیشرفت مطالعه:</span>
+          <span class="progress-widget-stats" id="mobileStudyProgressStats">۰ از ۳۰ فصل (۰٪)</span>
+        </div>
+        <div class="progress-widget-track" title="درصد مطالعه کل سرفصل‌ها">
+          <div class="progress-widget-fill" id="mobileStudyProgressFill" style="width: 0%;"></div>
+        </div>
+      </div>
+
       <ul class="nav-tree" id="mobileNavTree">
         <!-- Injected dynamically via AppNavigation -->
       </ul>

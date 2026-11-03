@@ -32,6 +32,12 @@
       this.timerSeconds = 0;
       this.timerInterval = null;
 
+      // Professional Question Bank Features (UWorld / Amboss)
+      this.strikes = {}; // { [qId]: Set of struck option keys }
+      this.pacingSeconds = 0;
+      this.pacingInterval = null;
+      this.questionPacingMap = {}; // { [qId]: seconds spent }
+
       // DOM Elements
       this.dom = {};
     }
@@ -107,6 +113,12 @@
       this.dom.matrixModal = document.getElementById('matrixModal');
       this.dom.matrixGrid = document.getElementById('matrixGrid');
       this.dom.matrixCloseBtn = document.getElementById('matrixCloseBtn');
+
+      // Pacing Timer & Floating Multi-Select Bar
+      this.dom.questionPacingTimer = document.getElementById('questionPacingTimer');
+      this.dom.questionPacingDisplay = document.getElementById('questionPacingDisplay');
+      this.dom.courseFloatingActionBar = document.getElementById('courseFloatingActionBar');
+      this.dom.floatingSelectedText = document.getElementById('floatingSelectedText');
     }
 
     bindGlobalEvents() {
@@ -358,6 +370,7 @@
         if (this.dom.courseView) this.dom.courseView.style.display = 'none';
         if (this.dom.scorecardView) this.dom.scorecardView.style.display = 'none';
         if (this.dom.activeView) this.dom.activeView.style.display = 'block';
+        if (this.dom.courseFloatingActionBar) this.dom.courseFloatingActionBar.style.display = 'none';
 
         if (this.dom.activeQuizTitle) {
           this.dom.activeQuizTitle.textContent = quizMeta.title;
@@ -578,9 +591,31 @@
       const chapters = course.chapters.filter(c => !c.isAll);
 
       this.dom.courseChaptersGrid.innerHTML = chapters.map((ch, idx) => {
-        const storedAnswers = this.loadStoredAnswers(ch.id);
-        const answeredCount = Object.keys(storedAnswers).length;
-        const hasProgress = answeredCount > 0;
+        const questions = ch.fallbackQuestions || 
+          (window.QuizRegistry && window.QuizRegistry.questionsCache && window.QuizRegistry.questionsCache.get(ch.id)) || [];
+        const totalChQuestions = ch.totalQuestions || questions.length || 0;
+
+        const chAnswers = this.loadStoredAnswers(ch.id);
+        const globalAnswers = this.loadStoredAnswers('ncd');
+        const allAnswers = this.loadStoredAnswers('ncd-all');
+
+        let answeredCount = 0;
+        let correctCount = 0;
+
+        questions.forEach(q => {
+          const ans = chAnswers[q.id] || chAnswers[String(q.id)] ||
+                      globalAnswers[q.id] || globalAnswers[String(q.id)] ||
+                      allAnswers[q.id] || allAnswers[String(q.id)];
+          if (ans !== undefined && ans !== null) {
+            answeredCount++;
+            if (ans === q.correct_answer) {
+              correctCount++;
+            }
+          }
+        });
+
+        const accuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+        const progressPercent = totalChQuestions > 0 ? Math.min(100, Math.round((answeredCount / totalChQuestions) * 100)) : 0;
         const isSelected = this.selectedChapterIds.has(ch.id);
         const isSpecial = !!ch.isSpecialExam;
 
@@ -610,7 +645,12 @@
             <div>
               <div class="chapter-card-meta">
                 <span>⏱️ زمان تخمینی: ${ch.estimatedMinutes || 25} دقیقه</span>
-                ${hasProgress ? `<span style="color: var(--accent-primary); font-weight: 700;">✓ ${answeredCount} پاسخ داده شده</span>` : ''}
+                ${answeredCount > 0 
+                  ? `<span class="chapter-mastery-pill" style="color: ${accuracy >= 70 ? '#059669' : (accuracy >= 40 ? '#0284c7' : '#d97706')}; background: ${accuracy >= 70 ? 'rgba(5, 150, 105, 0.1)' : (accuracy >= 40 ? 'rgba(2, 132, 199, 0.1)' : 'rgba(217, 119, 6, 0.1)')};">
+                       ✓ ${this.toPersianDigits(answeredCount)} از ${this.toPersianDigits(totalChQuestions)} پاسخ داده شده (${this.toPersianDigits(accuracy)}٪ دقت)
+                     </span>`
+                  : `<span class="chapter-mastery-pill is-unstarted">شروع نشده (۰ از ${this.toPersianDigits(totalChQuestions)})</span>`
+                }
               </div>
               <div class="chapter-card-buttons">
                 <button type="button" class="btn-mode-study" onclick="window.medicalQuiz.startSingleChapterQuiz('${ch.id}', 'study')" title="مطالعه آموزشی فقط این مبحث به صورت تصادفی">
@@ -627,6 +667,11 @@
                   <span>شبیه‌ساز آزمون</span>
                 </button>
               </div>
+            </div>
+
+            <!-- Topic Mastery Progress Track -->
+            <div class="topic-mastery-progress-track" title="میزان پیشرفت پاسخ‌دهی به این مبحث: ${progressPercent}٪">
+              <div class="topic-mastery-progress-fill" style="width: ${progressPercent}%; background: ${accuracy >= 70 ? '#059669' : (accuracy >= 40 ? '#0284c7' : '#d97706')};"></div>
             </div>
           </div>
         `;
@@ -783,6 +828,25 @@
           }
         }
       }
+
+      // Sticky Floating Bottom Multi-Select Action Bar
+      const floatingBar = this.dom.courseFloatingActionBar || document.getElementById('courseFloatingActionBar');
+      const floatingText = this.dom.floatingSelectedText || document.getElementById('floatingSelectedText');
+      if (floatingBar) {
+        if (this.dom.courseView && this.dom.courseView.style.display !== 'none' && selectedCount > 0) {
+          floatingBar.style.display = 'block';
+          if (floatingText) {
+            floatingText.textContent = `${this.toPersianDigits(selectedCount)} مبحث انتخاب شده (${this.toPersianDigits(totalSelectedQuestions)} سوال)`;
+          }
+        } else {
+          floatingBar.style.display = 'none';
+        }
+      }
+    }
+
+    startFloatingQuiz(mode = 'study') {
+      this.selectedCourseMode = mode;
+      this.startConfiguredCourseQuiz();
     }
 
     toggleCourseDropdown() {
@@ -941,6 +1005,7 @@
         if (this.dom.courseView) this.dom.courseView.style.display = 'none';
         if (this.dom.scorecardView) this.dom.scorecardView.style.display = 'none';
         if (this.dom.activeView) this.dom.activeView.style.display = 'block';
+        if (this.dom.courseFloatingActionBar) this.dom.courseFloatingActionBar.style.display = 'none';
 
         // Setup UI
         this.updateHeaderMeta();
@@ -1056,13 +1121,26 @@
       // Question Stem
       this.dom.questionStem.textContent = q.stem;
 
+      // Per-Question Pacing Timer Handling
+      if (isAnswered) {
+        this.stopPacingTimer(qId);
+      } else {
+        this.startPacingTimer(qId);
+      }
+
       // Render Options
       const showFeedback = (this.mode === 'study' && isAnswered) || this.isSubmitted;
+      const qStrikes = (this.strikes && this.strikes[qId]) || new Set();
       let optionsHtml = '';
 
       q.options.forEach(opt => {
         const optKey = opt.key;
         let optClasses = ['quiz-option'];
+
+        const isStruck = qStrikes.has(optKey);
+        if (isStruck) {
+          optClasses.push('strikethrough');
+        }
 
         if (this.mode === 'exam' && !this.isSubmitted) {
           if (selectedKey === optKey) {
@@ -1099,23 +1177,63 @@
           }
         }
 
+        const strikeBtnHtml = `
+          <button type="button" class="btn-option-strikethrough ${isStruck ? 'is-active-strike' : ''}" 
+                  data-strike-key="${optKey}" 
+                  title="${isStruck ? 'حذف خط‌خوردگی گزینه' : 'خط زدن این گزینه (رد گزینه)'}" 
+                  aria-label="${isStruck ? 'حذف خط‌خوردگی' : 'خط زدن گزینه'} ${optKey}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        `;
+
         optionsHtml += `
-          <button type="button" class="${optClasses.join(' ')}" data-option-key="${optKey}">
+          <div role="button" tabindex="0" class="${optClasses.join(' ')}" data-option-key="${optKey}">
             <span class="quiz-option-key">${optKey}</span>
             <span class="quiz-option-text">${this.escapeHtml(opt.text)}</span>
+            ${strikeBtnHtml}
             ${statusIconHtml}
-          </button>
+          </div>
         `;
       });
 
       this.dom.optionsList.innerHTML = optionsHtml;
 
-      // Attach option click listeners
-      this.dom.optionsList.querySelectorAll('.quiz-option').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const key = btn.getAttribute('data-option-key');
+      // Attach option listeners (click, contextmenu, strike button, spacebar)
+      this.dom.optionsList.querySelectorAll('.quiz-option').forEach(el => {
+        const key = el.getAttribute('data-option-key');
+
+        // Normal click on option selects it (unless strike button was clicked)
+        el.addEventListener('click', (e) => {
+          if (e.target.closest('.btn-option-strikethrough')) return;
           this.handleOptionSelection(key);
         });
+
+        // Right-click toggles strike-through
+        el.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          this.toggleOptionStrike(qId, key);
+        });
+
+        // Keyboard accessibility (Space on focused option)
+        el.addEventListener('keydown', (e) => {
+          if (e.key === ' ' || e.key === 'Spacebar') {
+            e.preventDefault();
+            this.handleOptionSelection(key);
+          }
+        });
+
+        // Strike button click toggles strike-through without selecting
+        const strikeBtn = el.querySelector('.btn-option-strikethrough');
+        if (strikeBtn) {
+          strikeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            this.toggleOptionStrike(qId, key);
+          });
+        }
       });
 
       // Render Explanation Card (Immediately in Study Mode after answering, or in Exam Review)
@@ -1146,6 +1264,9 @@
         return;
       }
 
+      // Stop pacing timer for this question
+      this.stopPacingTimer(qId);
+
       // Record answer
       this.answers[qId] = optionKey;
       this.saveState();
@@ -1160,6 +1281,84 @@
             this.dom.explanationCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           }
         }, 150);
+      }
+    }
+
+    toggleOptionStrike(qId, optKey) {
+      if (!this.strikes) this.strikes = {};
+      if (!this.strikes[qId]) this.strikes[qId] = new Set();
+      
+      const qStrikes = this.strikes[qId];
+      if (qStrikes.has(optKey)) {
+        qStrikes.delete(optKey);
+      } else {
+        qStrikes.add(optKey);
+      }
+
+      if (this.dom.optionsList) {
+        const optEl = this.dom.optionsList.querySelector(`.quiz-option[data-option-key="${optKey}"]`);
+        if (optEl) {
+          const isStruck = qStrikes.has(optKey);
+          optEl.classList.toggle('strikethrough', isStruck);
+          const btn = optEl.querySelector('.btn-option-strikethrough');
+          if (btn) {
+            btn.classList.toggle('is-active-strike', isStruck);
+            btn.setAttribute('title', isStruck ? 'حذف خط‌خوردگی گزینه' : 'خط زدن این گزینه (رد گزینه)');
+            btn.setAttribute('aria-label', `${isStruck ? 'حذف خط‌خوردگی' : 'خط زدن گزینه'} ${optKey}`);
+          }
+        }
+      }
+    }
+
+    startPacingTimer(qId) {
+      this.clearPacingInterval();
+      this.pacingSeconds = (this.questionPacingMap && this.questionPacingMap[qId]) || 0;
+      this.updatePacingDisplay(false);
+
+      this.pacingInterval = setInterval(() => {
+        this.pacingSeconds++;
+        if (this.questionPacingMap) this.questionPacingMap[qId] = this.pacingSeconds;
+        this.updatePacingDisplay(false);
+      }, 1000);
+    }
+
+    stopPacingTimer(qId) {
+      this.clearPacingInterval();
+      if (qId && this.questionPacingMap) {
+        this.questionPacingMap[qId] = this.pacingSeconds;
+      }
+      this.updatePacingDisplay(true);
+    }
+
+    clearPacingInterval() {
+      if (this.pacingInterval) {
+        clearInterval(this.pacingInterval);
+        this.pacingInterval = null;
+      }
+    }
+
+    updatePacingDisplay(isFrozen = false) {
+      const display = this.dom.questionPacingDisplay || document.getElementById('questionPacingDisplay');
+      const timerBadge = this.dom.questionPacingTimer || document.getElementById('questionPacingTimer');
+      if (!display) return;
+
+      const sec = this.pacingSeconds || 0;
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      const timeFormatted = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      display.textContent = `⏱ ${this.toPersianDigits(timeFormatted)}`;
+
+      if (timerBadge) {
+        if (sec > 90) {
+          timerBadge.classList.add('is-slow');
+        } else {
+          timerBadge.classList.remove('is-slow');
+        }
+        if (isFrozen) {
+          timerBadge.classList.add('is-frozen');
+        } else {
+          timerBadge.classList.remove('is-frozen');
+        }
       }
     }
 
@@ -1656,6 +1855,11 @@
       this.timerSeconds = 0;
       this.currentIndex = 0;
 
+      this.clearPacingInterval();
+      this.pacingSeconds = 0;
+      this.questionPacingMap = {};
+      this.strikes = {};
+
       if (this.timerInterval) {
         clearInterval(this.timerInterval);
         this.timerInterval = null;
@@ -1678,8 +1882,13 @@
         clearInterval(this.timerInterval);
         this.timerInterval = null;
       }
+      this.clearPacingInterval();
       this.saveState();
       
+      if (this.dom.courseFloatingActionBar) {
+        this.dom.courseFloatingActionBar.style.display = 'none';
+      }
+
       this.dom.activeView.style.display = 'none';
       this.dom.scorecardView.style.display = 'none';
       this.dom.hubView.style.display = 'block';
@@ -1745,29 +1954,50 @@
     handleKeyboardShortcuts(e) {
       // Don't intercept when focusing input
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
-      if (this.dom.activeView.style.display !== 'block') return;
+      if (!this.dom.activeView || this.dom.activeView.style.display !== 'block') return;
+
+      // Close modal on Escape
+      if (this.dom.matrixModal && this.dom.matrixModal.classList.contains('is-open')) {
+        if (e.key === 'Escape') {
+          this.closeMatrixModal();
+        }
+        return;
+      }
+
+      const q = this.filteredQuestions && this.filteredQuestions[this.currentIndex];
+      if (!q) return;
 
       if (e.key === 'ArrowLeft') {
         // Next in RTL
+        e.preventDefault();
         this.goToNextQuestion();
+      } else if (e.key === 'Enter') {
+        // Next question only when currently answered
+        if (this.answers.hasOwnProperty(q.id)) {
+          e.preventDefault();
+          this.goToNextQuestion();
+        }
       } else if (e.key === 'ArrowRight') {
         // Prev in RTL
+        e.preventDefault();
         this.goToPrevQuestion();
       } else if (e.key === 'f' || e.key === 'F' || e.key === 'ب') {
+        e.preventDefault();
         this.toggleFlagCurrent();
       } else if (e.key === 'Escape') {
         this.closeCourseDropdown();
         this.closeMatrixModal();
-      } else if (['1', '2', '3', '4'].includes(e.key)) {
-        const num = parseInt(e.key, 10);
-        const q = this.filteredQuestions && this.filteredQuestions[this.currentIndex];
-        if (q && q.options && q.options[num - 1]) {
+      } else if (['1', '2', '3', '4', '۱', '۲', '۳', '۴'].includes(e.key)) {
+        e.preventDefault();
+        const map = { '1': 1, '2': 2, '3': 3, '4': 4, '۱': 1, '۲': 2, '۳': 3, '۴': 4 };
+        const num = map[e.key];
+        if (q.options && q.options[num - 1]) {
           this.handleOptionSelection(q.options[num - 1].key);
         }
       } else if (['a', 'b', 'c', 'd', 'A', 'B', 'C', 'D'].includes(e.key)) {
+        e.preventDefault();
         const letter = e.key.toUpperCase();
-        const q = this.filteredQuestions && this.filteredQuestions[this.currentIndex];
-        if (q && q.options) {
+        if (q.options) {
           const found = q.options.find(opt => opt.key.toUpperCase() === letter);
           if (found) {
             this.handleOptionSelection(found.key);

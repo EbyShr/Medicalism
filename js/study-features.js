@@ -10,6 +10,7 @@ window.StudyFeatures = {
     this.initBookmarksModal();
     this.initFocusMode();
     this.initThemeToggle();
+    this.initChapterCompletion();
   },
 
   /**
@@ -118,17 +119,23 @@ window.StudyFeatures = {
     if (!bar) return;
 
     const onScroll = () => {
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPos = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+      const docHeight = Math.max(
+        document.documentElement.scrollHeight - window.innerHeight,
+        document.body.scrollHeight - window.innerHeight,
+        0
+      );
       if (docHeight <= 0) {
         bar.style.width = '0%';
         return;
       }
-      const scrollPos = window.scrollY;
       const progress = Math.min(Math.max((scrollPos / docHeight) * 100, 0), 100);
       bar.style.width = `${progress}%`;
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    this._updateReadingProgress = onScroll;
     onScroll();
   },
 
@@ -270,6 +277,134 @@ window.StudyFeatures = {
       focusBtn.setAttribute('title', enabled ? 'خروج از حالت تمرکز' : 'ورود به حالت تمرکز مطالعه');
       window.showToast(enabled ? 'حالت تمرکز فعال شد (نوارهای جانبی پنهان شدند)' : 'حالت تمرکز غیرفعال شد');
     });
+  },
+
+  /**
+   * Chapter Completion Tracking & Study Progress
+   */
+  STORAGE_KEY_COMPLETED: 'med_completed_chapters',
+
+  toPersianDigits(num) {
+    if (num === null || num === undefined) return '';
+    const id = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    return num.toString().replace(/[0-9]/g, function (w) {
+      return id[+w];
+    });
+  },
+
+  getCompletedChapters() {
+    try {
+      const data = localStorage.getItem(this.STORAGE_KEY_COMPLETED);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      console.warn('Error reading completed chapters:', e);
+      return [];
+    }
+  },
+
+  isChapterCompleted(chapterId) {
+    if (!chapterId) return false;
+    const completed = this.getCompletedChapters();
+    return completed.includes(chapterId);
+  },
+
+  toggleChapterCompletion(chapterId) {
+    if (!chapterId) return false;
+    let completed = this.getCompletedChapters();
+    const index = completed.indexOf(chapterId);
+    let isNowCompleted = false;
+
+    if (index >= 0) {
+      completed.splice(index, 1);
+      isNowCompleted = false;
+    } else {
+      completed.push(chapterId);
+      isNowCompleted = true;
+    }
+
+    try {
+      localStorage.setItem(this.STORAGE_KEY_COMPLETED, JSON.stringify(completed));
+    } catch (e) {
+      console.warn('Error saving completed chapters:', e);
+    }
+
+    // 1. Update button state in active chapter view
+    document.querySelectorAll(`.btn-toggle-chapter-completed[data-chapter-id="${chapterId}"]`).forEach(btn => {
+      btn.classList.toggle('is-completed', isNowCompleted);
+      const box = btn.querySelector('.completion-checkbox-box');
+      if (box) box.textContent = isNowCompleted ? '✓' : '';
+      const text = btn.querySelector('.completion-text');
+      if (text) {
+        text.textContent = isNowCompleted
+          ? 'مطالعه‌شده (ثبت‌شده در کارنامه)'
+          : 'نشان کردن این فصل به عنوان مطالعه‌شده';
+      }
+    });
+
+    // 2. Update indicator badge in sidebar & mobile drawer nav trees
+    document.querySelectorAll(`[data-nav-chapter="${chapterId}"]`).forEach(item => {
+      item.classList.toggle('is-chapter-completed', isNowCompleted);
+      const badge = item.querySelector('.nav-chapter-completed-badge');
+      if (badge) {
+        badge.style.display = isNowCompleted ? 'inline-flex' : 'none';
+      }
+    });
+
+    // 3. Update Study Progress Widget
+    this.updateStudyProgressWidget();
+
+    // 4. Notify user with toast
+    if (typeof window.showToast === 'function') {
+      window.showToast(
+        isNowCompleted
+          ? 'فصل به عنوان مطالعه‌شده در کارنامه ثبت شد ✓'
+          : 'علامت مطالعه این فصل برداشته شد'
+      );
+    }
+
+    return isNowCompleted;
+  },
+
+  updateStudyProgressWidget() {
+    const chapters = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
+    const validChapters = chapters.filter(c => !c.isExam);
+    const totalCount = validChapters.length > 0 ? validChapters.length : 30;
+
+    const completed = this.getCompletedChapters();
+    const completedSet = new Set(completed);
+    const currentCompletedCount = validChapters.filter(c => completedSet.has(c.id)).length;
+
+    const percentage = totalCount > 0 ? Math.round((currentCompletedCount / totalCount) * 100) : 0;
+
+    const statsText = `${this.toPersianDigits(currentCompletedCount)} از ${this.toPersianDigits(totalCount)} فصل (${this.toPersianDigits(percentage)}٪)`;
+
+    // Update desktop widget
+    const statsEl = document.getElementById('studyProgressStats');
+    const fillEl = document.getElementById('studyProgressFill');
+    if (statsEl) statsEl.textContent = statsText;
+    if (fillEl) fillEl.style.width = `${percentage}%`;
+
+    // Update mobile widget
+    const mobStatsEl = document.getElementById('mobileStudyProgressStats');
+    const mobFillEl = document.getElementById('mobileStudyProgressFill');
+    if (mobStatsEl) mobStatsEl.textContent = statsText;
+    if (mobFillEl) mobFillEl.style.width = `${percentage}%`;
+  },
+
+  initChapterCompletion() {
+    this.updateStudyProgressWidget();
+
+    // Also update widget and reading progress bar when chapter changes
+    if (window.appState) {
+      window.appState.subscribe('activeChapterId', () => {
+        this.updateStudyProgressWidget();
+        setTimeout(() => {
+          if (typeof this._updateReadingProgress === 'function') {
+            this._updateReadingProgress();
+          }
+        }, 120);
+      });
+    }
   }
 };
 

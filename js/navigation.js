@@ -190,13 +190,17 @@ window.AppNavigation = {
       }
 
       const numPadded = ch.number ? ch.number.toString().padStart(2, '۰') : '۰۱';
+      const isCompleted = window.StudyFeatures && typeof window.StudyFeatures.isChapterCompleted === 'function'
+        ? window.StudyFeatures.isChapterCompleted(ch.id)
+        : false;
 
       return `
-        <li class="nav-chapter-item ${isCurrentChapter ? 'is-active' : ''} ${isExpanded ? 'is-expanded' : ''}" data-nav-chapter="${ch.id}">
+        <li class="nav-chapter-item ${isCurrentChapter ? 'is-active' : ''} ${isExpanded ? 'is-expanded' : ''} ${isCompleted ? 'is-chapter-completed' : ''}" data-nav-chapter="${ch.id}">
           <div class="nav-chapter-header" data-chapter-id="${ch.id}">
             <div class="nav-chapter-title-group">
               <span class="nav-chapter-badge">فصل ${numPadded}</span>
               <span class="nav-chapter-label" title="${ch.title}">${ch.shortTitle || ch.title}</span>
+              <span class="nav-chapter-completed-badge" style="${isCompleted ? 'display: inline-flex;' : 'display: none;'}" title="مطالعه‌شده">✓</span>
             </div>
             <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="9 18 15 12 9 6"></polyline>

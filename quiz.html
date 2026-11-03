@@ -378,6 +378,46 @@
       <div class="chapters-cards-grid" id="courseChaptersGrid">
         <!-- Rendered dynamically -->
       </div>
+
+      <!-- Sticky Floating Bottom Multi-Select Action Bar -->
+      <div class="course-floating-action-bar" id="courseFloatingActionBar" style="display: none;" aria-live="polite">
+        <div class="floating-bar-inner">
+          <div class="floating-bar-info">
+            <div class="floating-bar-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                <polyline points="9 11 12 14 22 4"></polyline>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+            </div>
+            <div>
+              <div class="floating-bar-title" id="floatingSelectedText">۰ مبحث انتخاب شده (۰ سوال)</div>
+              <div class="floating-bar-sub">آماده ایجاد و اجرای آزمون ترکیبی از مباحث منتخب</div>
+            </div>
+          </div>
+          <div class="floating-bar-actions">
+            <button type="button" class="btn-floating-study" id="btnFloatingStudy" onclick="window.medicalQuiz.startFloatingQuiz('study')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              </svg>
+              <span>شروع حالت آموزشی (تصادفی)</span>
+            </button>
+            <button type="button" class="btn-floating-exam" id="btnFloatingExam" onclick="window.medicalQuiz.startFloatingQuiz('exam')">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              <span>شروع شبیه‌ساز آزمون</span>
+            </button>
+            <button type="button" class="btn-floating-cancel" id="btnFloatingCancel" onclick="window.medicalQuiz.clearAllCourseTopics(event)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              <span>لغو انتخاب</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ======================================================================
@@ -465,8 +505,18 @@
       <!-- Question Card -->
       <div class="quiz-question-card" id="quizQuestionCard">
         <div class="question-header">
-          <span class="question-number-badge" id="questionCounter">سوال ۱</span>
-          <span class="question-topic-tag" id="questionTopicTag" style="display: none;"></span>
+          <div class="question-header-right">
+            <span class="question-number-badge" id="questionCounter">سوال ۱</span>
+            <span class="question-topic-tag" id="questionTopicTag" style="display: none;"></span>
+          </div>
+          <!-- Per-Question Pacing Timer -->
+          <div class="question-pacing-timer" id="questionPacingTimer" title="زمان سپری شده برای این سوال">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span id="questionPacingDisplay">⏱ ۰۰:۰۰</span>
+          </div>
         </div>
 
         <!-- Stem -->
@@ -477,6 +527,37 @@
         <!-- Options -->
         <div class="quiz-options-list" id="optionsList">
           <!-- Options rendered dynamically -->
+        </div>
+
+        <!-- Keyboard Shortcuts Hint Bar (Desktop) -->
+        <div class="question-keyboard-hint-bar" aria-hidden="true">
+          <div class="hint-group">
+            <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd>
+            <span class="hint-subtext">یا</span>
+            <kbd>A</kbd><kbd>B</kbd><kbd>C</kbd><kbd>D</kbd>
+            <span>انتخاب گزینه</span>
+          </div>
+          <div class="hint-sep">•</div>
+          <div class="hint-group">
+            <kbd>راست‌کلیک</kbd>
+            <span class="hint-subtext">یا</span>
+            <kbd>✕</kbd>
+            <span>خط زدن گزینه رد شده</span>
+          </div>
+          <div class="hint-sep">•</div>
+          <div class="hint-group">
+            <kbd>F</kbd>
+            <span>نشان‌کردن</span>
+          </div>
+          <div class="hint-sep">•</div>
+          <div class="hint-group">
+            <kbd>→</kbd>
+            <span>قبلی</span>
+            <kbd>←</kbd>
+            <span class="hint-subtext">یا</span>
+            <kbd>Enter</kbd>
+            <span>بعدی</span>
+          </div>
         </div>
 
         <!-- Explanation Card (Study Mode / Exam Review) -->
