@@ -24,18 +24,14 @@ if hasattr(sys.stdout, 'reconfigure'):
 
 # Regex patterns for stripping conversational AI turn transitions
 CONVERSATIONAL_WRAPPER_PATTERNS = [
-    re.compile(r'^\*{0,2}نقشه\s+درختی\s+و\s+تقسیم‌بندی\s+کالیبره‌شده\s+فصل\s+آماده\s+است.*$', re.IGNORECASE),
-    re.compile(r'^\*{0,2}آیا\s+بخش\s+۱\s+را\s+با\s+تمام\s+جزئیات\s+شروع\s+کنم\?.*$', re.IGNORECASE),
-    re.compile(r'^\*{0,2}بخش\s+[\d\u06F0-\u06F9]+.*به\s+پایان\s+رسید.*آیا\s+بخش.*شروع\s+کنم\?.*$', re.IGNORECASE),
-    re.compile(r'^\*{0,2}بخش\s+[\d\u06F0-\u06F9]+.*به\s+پایان\s+رسید.*آیا\s+مایلید.*$', re.IGNORECASE),
-    re.compile(r'^\*{0,2}در\s+ادامه\s+بخش\s+[\d\u06F0-\u06F9]+.*تقدیم\s+می‌شود.*$', re.IGNORECASE),
-    re.compile(r'^\*{0,2}ادامه\s+فصل\s+۱۰:.*$', re.IGNORECASE),
-    re.compile(r'^\*{0,2}فاز\s+۱:\s*مهندسی\s+ساختار\s+و\s+نقشه\s+درختی.*$', re.IGNORECASE),
-    re.compile(r'^\*{0,2}فاز\s+۲:\s*تولید\s+محتوای\s+فصل.*$', re.IGNORECASE),
-    re.compile(r'^\*{0,2}اکنون\s+آماده\s+تولید\s+بخش.*$', re.IGNORECASE),
-    re.compile(r'^\*{0,2}توضیح:\s*برای\s+حفظ\s+دقت\s+صددرصدی.*$', re.IGNORECASE),
-    re.compile(r'^\*{0,2}دستورات\s+سیستمی.*$', re.IGNORECASE),
-    re.compile(r'^\*{0,2}پایان\s+فصل\s+۱۰\s*\(جدار\s+شکم\s+و\s+فتق‌ها\).*موفق\s+باشید.*$', re.IGNORECASE)
+    re.compile(r'^\*{0,2}بخش\s+[\d\u06F0-\u06F9]+.*به\s+پایان\s+رسید.*', re.IGNORECASE),
+    re.compile(r'^#*\s*ادامه\s+فصل\s+[\d\u06F0-\u06F9]+:.*$', re.IGNORECASE),
+    re.compile(r'^\*{0,2}نقشه\s+درختی.*$', re.IGNORECASE),
+    re.compile(r'^\*{0,2}آیا\s+بخش\s+.*', re.IGNORECASE),
+    re.compile(r'^\*{0,2}در\s+ادامه\s+بخش\s+.*', re.IGNORECASE),
+    re.compile(r'^\*{0,2}فاز\s+[۱-۹\d]:.*', re.IGNORECASE),
+    re.compile(r'^\*{0,2}دستورات\s+سیستمی.*', re.IGNORECASE),
+    re.compile(r'^\*{0,2}پایان\s+فصل\s+۱۰.*', re.IGNORECASE)
 ]
 
 def clean_page_numbers(text):
@@ -48,42 +44,53 @@ def clean_page_numbers(text):
     return t.strip()
 
 def format_math_expr(match):
-    """Formats LaTeX math into clean accessible HTML markup."""
+    """Formats LaTeX math into clean, human-readable medical markup without code boxes."""
     raw = match.group(1).strip()
     s = raw
-    s = s.replace(r'\text{cm}', 'cm').replace(r'\text{ cm}', ' cm')
-    s = s.replace(r'\text{bpm}', 'bpm').replace(r'\text{ bpm}', ' bpm')
-    s = s.replace(r'\text{ kg/m}^2', ' kg/m²').replace(r'\text{kg/m}^2', ' kg/m²')
-    s = s.replace(r'\text{BMI}', 'BMI')
-    s = s.replace(r'^\circ\text{F}', '°F').replace(r'^\circ F', '°F')
-    s = s.replace(r'HbA_{1c}', 'HbA<sub>1c</sub>')
+    # Strip \text{...} wrappers (e.g. \text{ cm}, \text{–}, \text{BMI})
+    s = re.sub(r'\\text\{([^}]+)\}', r'\1', s)
+    # Replace en-dash / hyphens inside dimensions
+    s = s.replace(r'\text{-}', '–').replace(r'\text{–}', '–').replace('-', '–')
+    # Temperature degrees
+    s = re.sub(r'\^\\circ\s*F', '°F', s)
+    # Unit formats
+    s = s.replace(r'kg/m^2', 'kg/m²')
     s = s.replace(r'\%', '%')
-    s = s.replace(r'<', '&lt;').replace(r'>', '&gt;')
-    return f'<span class="medical-math" dir="ltr">{s}</span>'
+    # Protect HbA_{1c} token before escaping comparison operators
+    s = s.replace(r'HbA_{1c}', '###HBA1C###')
+    # Escape < and > for HTML safety
+    s = s.replace('<', '&lt;').replace('>', '&gt;')
+    # Restore styled HbA1c
+    s = s.replace('###HBA1C###', 'HbA<sub>1c</sub>')
+    # Clean redundant whitespace
+    s = re.sub(r'\s+', ' ', s).strip()
+    return f'<span class="med-measure" dir="ltr">{s}</span>'
 
 def transform_inline_elements(text):
     """Transforms inline badges, math, arrows, English medical terms, and decision pills."""
-    # 1. Inline Theory and Trap badges - micro-indicators with tooltip & sr-only metadata to prevent visual clutter
-    text = re.sub(
-        r'`?\[🎯\s*نکته\s*تئوری\]`?',
-        '<span class="badge-theory pearl-micro-badge" data-exam-point="theory" title="نکته تئوری امتحانی"><span class="badge-icon" aria-hidden="true">🎯</span><span class="badge-text sr-only">نکته تئوری</span></span>',
-        text
-    )
-    text = re.sub(
-        r'`?\[⚠️\s*تله\s*امتحانی\]`?',
-        '<span class="badge-trap trap-micro-badge" data-exam-point="trap" title="تله و دام امتحانی"><span class="badge-icon" aria-hidden="true">⚠️</span><span class="trap-label-mini">دام تستی</span><span class="badge-text sr-only">تله امتحانی</span></span>',
-        text
-    )
+    # 1. Inline Theory badge: attach punctuation directly to preceding Persian word to prevent RTL jumping
+    def repl_theory(m):
+        punct = m.group(1) or ''
+        return f'{punct} <span class="badge-theory pearl-micro-badge" data-exam-point="theory" title="نکته تئوری امتحانی"><span class="badge-icon" aria-hidden="true">🎯</span><span class="badge-text sr-only">نکته تئوری</span></span>'
+
+    text = re.sub(r'\s*`?\[🎯\s*نکته\s*تئوری\]`?\s*([\.،؛:!؟\?]?)', repl_theory, text)
+
+    # 2. Inline Trap badge
+    def repl_trap(m):
+        punct = m.group(1) or ''
+        return f'{punct} <span class="badge-trap trap-micro-badge" data-exam-point="trap" title="تله و دام امتحانی"><span class="badge-icon" aria-hidden="true">⚠️</span><span class="trap-label-mini">دام تستی</span><span class="badge-text sr-only">تله امتحانی</span></span>'
+
+    text = re.sub(r'\s*`?\[⚠️\s*تله\s*امتحانی\]`?\s*([\.،؛:!؟\?]?)', repl_trap, text)
     
-    # 2. Inline math expressions ($...$)
+    # 3. Inline math expressions ($...$)
     text = re.sub(r'\$([^\$]+)\$', format_math_expr, text)
 
-    # 3. Directional arrows in diagnostic/treatment algorithms
+    # 4. Directional arrows in diagnostic/treatment algorithms
     text = re.sub(r'([⬅️➡️⬇️⬆️])', r'<span class="stepper-arrow-indicator">\1</span>', text)
     text = re.sub(r'✅', '<span class="badge-decision-yes" title="موفقیت‌آمیز / پایدار">✅</span>', text)
     text = re.sub(r'❌', '<span class="badge-decision-no" title="ناموفق / ناپایدار / خط قرمز">❌</span>', text)
 
-    # 4. Highlight English medical terms in bold (**English Term**) for crisp contrast
+    # 5. Highlight English medical terms in bold (**English Term**) for crisp contrast
     def replace_med_term(match):
         term = match.group(1)
         # If term contains English letters and no Persian characters
@@ -202,6 +209,7 @@ def parse_section_markdown(markdown_text):
             
             # Enforce RTL and clean table wrappers inside stepper
             step_body_html = re.sub(r' align="left"', ' align="right"', step_body_html)
+            step_body_html = re.sub(r'style="text-align:\s*left;?"', 'style="text-align: right;"', step_body_html)
             step_body_html = re.sub(
                 r'<table>',
                 r'<div class="table-container" dir="rtl"><table class="table-medical responsive-table" dir="rtl">',
@@ -247,6 +255,7 @@ def parse_section_markdown(markdown_text):
 
             # Enforce RTL alignment on th and td
             table_html = re.sub(r' align="left"', ' align="right"', table_html)
+            table_html = re.sub(r'style="text-align:\s*left;?"', 'style="text-align: right;"', table_html)
             table_html = re.sub(r' align="center"', ' align="center"', table_html)
 
             # Style cells containing theory pearls and traps

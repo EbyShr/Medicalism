@@ -1715,25 +1715,32 @@
   vertical-align: middle;
 }
 
-.medical-math {
-  font-family: var(--font-mono);
+.medical-math,
+.med-measure {
+  font-family: inherit;
   direction: ltr;
   unicode-bidi: isolate;
-  background: var(--bg-body-secondary);
-  color: var(--accent-primary);
-  padding: 1px 6px;
-  border-radius: var(--radius-xs);
-  border: 1px solid var(--border-subtle);
   font-weight: 700;
-  font-size: 0.9em;
-  display: inline-block;
-  margin-inline: 2px;
+  color: #0284c7;
+  display: inline;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 2px !important;
+  box-shadow: none !important;
 }
 
-[data-theme="dark"] .medical-math {
-  background: #1e293b;
+[data-theme="dark"] .medical-math,
+[data-theme="dark"] .med-measure {
   color: #38bdf8;
-  border-color: #334155;
+}
+
+.med-measure sub,
+.medical-math sub {
+  font-size: 0.78em;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+  bottom: -0.22em;
 }
 
 .step-num-pill {
