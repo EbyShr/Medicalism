@@ -110,6 +110,20 @@
           <span id="bookmarksCountBadge" style="display: none; position: absolute; top: -4px; right: -4px; width: 17px; height: 17px; border-radius: 50%; background-color: var(--accent-primary); color: #fff; font-size: 10px; font-weight: 800; align-items: center; justify-content: center;">0</span>
         </button>
 
+        <!-- Highlights Drawer Trigger -->
+        <button class="btn-icon btn-highlights-toggle" id="highlightsToggleBtn" title="هایلایت‌های من (🖍️ هایلایتها)" aria-label="هایلایت‌های من">
+          <span style="font-size: 15px;">🖍️</span>
+          <span id="highlightsCountBadge" class="header-count-badge" style="display: none;">0</span>
+        </button>
+
+        <!-- Exam Cram Mode Toggle Button -->
+        <button class="btn-exam-cram-toggle" id="examCramToggleBtn" title="⚡ حالت شب امتحان (مرور سریع)" aria-label="حالت شب امتحان (مرور سریع)" aria-pressed="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="cram-bolt-icon">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span class="exam-cram-desktop-label">شب امتحان</span>
+        </button>
+
         <!-- Quiz Module Quick Link Button -->
         <a href="./quiz.html" class="btn-icon" title="آزمون و بانک سوالات" aria-label="آزمون و بانک سوال" style="color: #059669; text-decoration: none;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
@@ -185,7 +199,7 @@
       </aside>
 
       <!-- Central Reading Area (Chapter & Sections) -->
-      <main class="app-content" id="chapterContentArea" tabindex="-1">
+      <main class="app-content chapter-content" id="chapterContentArea" tabindex="-1">
         <!-- Content injected dynamically via ComponentRenderer -->
       </main>
 
@@ -231,6 +245,18 @@
           <option value="shabnam">شبنم (Shabnam)</option>
           <option value="sahel">ساحل (Sahel)</option>
         </select>
+      </div>
+
+      <!-- Mobile Highlights & Exam Cram Quick Actions -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-block-end: var(--space-4);">
+        <button type="button" class="btn-highlight-action" id="mobileHighlightsBtn" style="justify-content: center; padding: 10px 8px; font-size: 12px; font-weight: 800; border-radius: var(--radius-md); background: var(--bg-surface); border: 1px solid var(--border-default);">
+          <span>🖍️ هایلایت‌ها</span>
+          <span id="mobileHighlightsCountBadge" style="display: none; font-size: 10px; background: #f59e0b; color: #fff; padding: 1px 6px; border-radius: var(--radius-full);">۰</span>
+        </button>
+        <button type="button" class="btn-exam-cram-toggle" id="mobileExamCramToggleBtn" style="width: 100%; height: auto; padding: 10px 8px; font-size: 12px; font-weight: 800; justify-content: center; border-radius: var(--radius-md);">
+          <span class="cram-bolt-icon">⚡</span>
+          <span>شب امتحان</span>
+        </button>
       </div>
 
       <!-- Mobile Quiz Link -->
@@ -296,6 +322,38 @@
       </div>
       <div class="search-results-list" id="bookmarksList">
         <!-- Bookmarked items injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Highlights Modal Dialog ("هایلایتهای من") -->
+  <div class="search-modal-backdrop" id="highlightsModalBackdrop" role="dialog" aria-modal="true" aria-label="هایلایت‌های من">
+    <div class="search-dialog highlights-dialog" id="highlightsDialog">
+      <div class="highlights-modal-header">
+        <div class="highlights-modal-title-group">
+          <span style="font-size: 19px;">🖍️</span>
+          <span>هایلایت‌های من</span>
+          <span class="highlights-count-pill" id="highlightsModalCountPill">۰ مورد</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" class="btn-highlight-action" id="printHighlightsBtn" title="پرینت خلاصه هایلایت‌ها">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            <span>پرینت خلاصه</span>
+          </button>
+          <button type="button" class="btn-highlight-action btn-danger-action" id="clearAllHighlightsBtn" title="پاک کردن تمام هایلایت‌ها">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span>پاک کردن همه</span>
+          </button>
+          <button type="button" class="action-mini-btn" id="highlightsCloseBtn" aria-label="بستن پنجره هایلایت‌ها">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="highlights-modal-list" id="highlightsList">
+        <!-- Highlights injected dynamically -->
       </div>
     </div>
   </div>

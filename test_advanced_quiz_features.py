@@ -84,13 +84,13 @@ def test_advanced_quiz_features():
         print("PASS: Key 'f' toggles flag off successfully!")
 
         # Test Option Selection via Keyboard ('1' or 'A')
-        # Q1 correct answer is 'A'
-        page.keyboard.press("1")
+        correct_key = page.evaluate("() => window.medicalQuiz.filteredQuestions[window.medicalQuiz.currentIndex].correct_answer")
+        page.keyboard.press(correct_key)
         page.wait_for_timeout(200)
-        assert page.locator("#explanationCard").is_visible(), "Explanation card should show up after answering Q1 with key '1'"
-        opt_a = page.locator(".quiz-option[data-option-key='A']")
-        assert "is-correct" in (opt_a.get_attribute("class") or ""), "Option A should be marked correct"
-        print("PASS: Key '1' selected Option A successfully!")
+        assert page.locator("#explanationCard").is_visible(), f"Explanation card should show up after answering Q1 with key '{correct_key}'"
+        opt_correct = page.locator(f".quiz-option[data-option-key='{correct_key}']")
+        assert "is-correct" in (opt_correct.get_attribute("class") or ""), f"Option {correct_key} should be marked correct"
+        print(f"PASS: Key '{correct_key}' selected Option {correct_key} successfully!")
 
         # Test Next Question via Enter (since answered)
         q_counter_before = page.locator("#questionCounter").inner_text()
