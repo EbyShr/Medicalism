@@ -1549,63 +1549,143 @@
    GENERAL SURGERY & RICH MEDICAL UI WIDGETS
    ========================================================================== */
 
-/* 1. Inline Exam Badges (.badge-theory & .badge-trap) */
+/* 1. Inline Exam Badges (.badge-theory & .badge-trap) - Micro-indicators without visual clutter */
 .badge-theory {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  background: rgba(14, 165, 233, 0.12);
-  color: #0284c7;
-  border: 1px solid rgba(14, 165, 233, 0.35);
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: rgba(13, 148, 136, 0.15);
+  color: #0d9488;
+  border: 1px solid rgba(13, 148, 136, 0.35);
   border-radius: var(--radius-full);
-  padding: 1px 8px;
   font-size: 0.8rem;
-  font-weight: 800;
   vertical-align: middle;
   margin-inline: 4px;
-  box-shadow: 0 1px 3px rgba(14, 165, 233, 0.1);
+  box-shadow: 0 1px 3px rgba(13, 148, 136, 0.1);
+  cursor: help;
   transition: all var(--transition-fast);
 }
 
 .badge-theory:hover {
-  background: rgba(14, 165, 233, 0.2);
-  border-color: #0284c7;
-  transform: translateY(-1px);
+  background: rgba(13, 148, 136, 0.25);
+  border-color: #0d9488;
+  transform: scale(1.18);
 }
 
 [data-theme="dark"] .badge-theory {
-  background: rgba(14, 165, 233, 0.18);
-  color: #38bdf8;
-  border-color: rgba(56, 189, 248, 0.4);
+  background: rgba(13, 148, 136, 0.24);
+  color: #2dd4bf;
+  border-color: rgba(45, 212, 191, 0.45);
 }
 
 .badge-trap {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  background: rgba(239, 68, 68, 0.12);
-  color: #dc2626;
-  border: 1px solid rgba(239, 68, 68, 0.35);
+  gap: 4px;
+  background: rgba(225, 29, 72, 0.12);
+  color: #e11d48;
+  border: 1px solid rgba(225, 29, 72, 0.35);
   border-radius: var(--radius-full);
   padding: 1px 8px;
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 800;
   vertical-align: middle;
   margin-inline: 4px;
-  box-shadow: 0 1px 3px rgba(239, 68, 68, 0.1);
+  box-shadow: 0 1px 4px rgba(225, 29, 72, 0.12);
+  cursor: help;
   transition: all var(--transition-fast);
 }
 
 .badge-trap:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: #dc2626;
-  transform: translateY(-1px);
+  background: rgba(225, 29, 72, 0.22);
+  border-color: #e11d48;
+  transform: scale(1.06);
+}
+
+.trap-label-mini {
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: -0.2px;
 }
 
 [data-theme="dark"] .badge-trap {
-  background: rgba(239, 68, 68, 0.2);
-  color: #f87171;
-  border-color: rgba(248, 113, 113, 0.45);
+  background: rgba(225, 29, 72, 0.22);
+  color: #fb7185;
+  border-color: rgba(251, 113, 133, 0.45);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Clinical Pearl and Trap styled list items */
+.exam-pearl-item {
+  border-inline-start: 3.5px solid #0d9488 !important;
+  background: rgba(13, 148, 136, 0.04);
+  border-radius: var(--radius-md);
+  padding: 9px 14px !important;
+  margin-block: 8px !important;
+  list-style: none !important;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.exam-pearl-item:hover {
+  background: rgba(13, 148, 136, 0.08);
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.08);
+}
+
+[data-theme="dark"] .exam-pearl-item {
+  background: rgba(13, 148, 136, 0.12);
+  border-inline-start-color: #2dd4bf !important;
+}
+
+.exam-trap-item {
+  border-inline-start: 4px solid #e11d48 !important;
+  background: rgba(225, 29, 72, 0.05);
+  border-radius: var(--radius-md);
+  padding: 10px 14px !important;
+  margin-block: 8px !important;
+  list-style: none !important;
+  color: #9f1239;
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.exam-trap-item:hover {
+  background: rgba(225, 29, 72, 0.09);
+  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.1);
+}
+
+[data-theme="dark"] .exam-trap-item {
+  background: rgba(225, 29, 72, 0.15);
+  color: #fda4af;
+  border-inline-start-color: #fb7185 !important;
+}
+
+/* English Medical Term Highlighting */
+.med-term {
+  color: #0284c7;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline;
+  letter-spacing: 0.2px;
+}
+
+[data-theme="dark"] .med-term {
+  color: #38bdf8;
 }
 
 /* 2. Stepper Arrows, Math & Decision Badges */
@@ -1669,32 +1749,52 @@
   box-shadow: 0 2px 6px rgba(225, 29, 72, 0.25);
 }
 
-/* 3. Clinical Stepper Cards (گام‌های ۱ تا ۵) */
+/* 3. Clinical Stepper Cards (گام‌های ۱ تا ۵) with Rich Thematic Color Palette */
 .clinical-stepper-card {
   background: var(--bg-surface);
   border: 1.5px solid var(--border-subtle);
   border-radius: var(--radius-xl);
-  padding: 20px 24px;
-  margin-block: 22px;
+  padding: 22px 26px;
+  margin-block: 24px;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
   position: relative;
   overflow: hidden;
-  border-inline-start: 5px solid #e11d48;
+  border-inline-start: 5px solid #2563eb;
   transition: all var(--transition-normal);
 }
 
 .clinical-stepper-card:hover {
   border-color: var(--border-default);
-  box-shadow: 0 8px 26px rgba(225, 29, 72, 0.08);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.08);
   transform: translateY(-2px);
 }
 
 [data-theme="dark"] .clinical-stepper-card {
   background: rgba(30, 41, 59, 0.7);
   border-color: rgba(255, 255, 255, 0.08);
-  border-inline-start-color: #f43f5e;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
+
+/* Stepper Thematic Colors */
+.step-theme-indigo { border-inline-start-color: #2563eb !important; }
+.step-theme-indigo:hover { box-shadow: 0 8px 24px rgba(37, 99, 235, 0.14) !important; }
+.step-badge-indigo { background: linear-gradient(135deg, #2563eb, #1d4ed8) !important; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35) !important; }
+
+.step-theme-rose { border-inline-start-color: #e11d48 !important; }
+.step-theme-rose:hover { box-shadow: 0 8px 24px rgba(225, 29, 72, 0.14) !important; }
+.step-badge-rose { background: linear-gradient(135deg, #e11d48, #be123c) !important; box-shadow: 0 2px 8px rgba(225, 29, 72, 0.35) !important; }
+
+.step-theme-amber { border-inline-start-color: #d97706 !important; }
+.step-theme-amber:hover { box-shadow: 0 8px 24px rgba(217, 119, 6, 0.14) !important; }
+.step-badge-amber { background: linear-gradient(135deg, #d97706, #b45309) !important; box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35) !important; }
+
+.step-theme-cyan { border-inline-start-color: #0891b2 !important; }
+.step-theme-cyan:hover { box-shadow: 0 8px 24px rgba(8, 145, 178, 0.14) !important; }
+.step-badge-cyan { background: linear-gradient(135deg, #0891b2, #0e7490) !important; box-shadow: 0 2px 8px rgba(8, 145, 178, 0.35) !important; }
+
+.step-theme-emerald { border-inline-start-color: #059669 !important; }
+.step-theme-emerald:hover { box-shadow: 0 8px 24px rgba(5, 150, 105, 0.14) !important; }
+.step-badge-emerald { background: linear-gradient(135deg, #059669, #047857) !important; box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35) !important; }
 
 .step-card-header {
   display: flex;
@@ -1706,13 +1806,11 @@
 }
 
 .step-badge-pill {
-  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
   color: #ffffff;
   font-size: 0.78rem;
   font-weight: 800;
   padding: 4px 12px;
   border-radius: var(--radius-full);
-  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.3);
   flex-shrink: 0;
 }
 
@@ -2038,34 +2136,80 @@
   margin-block: 4px;
 }
 
-/* 6. Medical Subheadings */
+/* 6. Medical Subheadings & Section Banners */
+.medical-subheading-banner {
+  margin-block: 28px 14px;
+  position: relative;
+}
+
+.level1-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-inline-start: 4px solid var(--accent-primary);
+  border-radius: var(--radius-lg);
+  padding: 12px 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.level1-banner .medical-subheading-level1 {
+  margin: 0;
+  border: none;
+  padding: 0;
+  font-size: 1.18rem;
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
+.level2-banner .medical-subheading-level2 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--accent-primary);
+  margin-block: 16px 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.level2-banner .medical-subheading-level2::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
 .medical-subheading-level1 {
-  font-size: 1.25rem;
+  font-size: 1.22rem;
   font-weight: 900;
   color: var(--text-primary);
   margin-block: 24px 14px;
-  padding-block-end: 8px;
-  border-block-end: 1.5px solid var(--border-subtle);
 }
 
 .medical-subheading-level2 {
-  font-size: 1.08rem;
+  font-size: 1.06rem;
   font-weight: 800;
   color: var(--text-primary);
   margin-block: 18px 10px;
 }
 
-/* 7. Tables Container & Styling */
+/* 7. Tables Container & Strict RTL Matrix Styling */
 .table-container {
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  margin-block: 22px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-default);
-  box-shadow: var(--shadow-xs);
+  margin-block: 24px;
+  border-radius: var(--radius-xl);
+  border: 1.5px solid var(--border-default);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
   background: var(--bg-surface);
+  direction: rtl !important;
+  text-align: right !important;
 }
 
 .table-medical {
@@ -2073,16 +2217,20 @@
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.88rem;
-  line-height: 1.6;
-  text-align: start;
+  line-height: 1.75;
+  direction: rtl !important;
+  text-align: right !important;
 }
 
 .table-medical th {
-  background: var(--bg-body-secondary);
-  color: var(--text-primary);
+  direction: rtl !important;
+  text-align: right !important;
+  background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-body-secondary) 100%);
+  color: var(--accent-primary);
   font-weight: 800;
-  padding: 12px 16px;
-  border-block-end: 2px solid var(--border-default);
+  font-size: 0.92rem;
+  padding: 14px 18px;
+  border-block-end: 2.5px solid var(--accent-primary);
   border-inline-end: 1px solid var(--border-subtle);
   position: sticky;
   top: 0;
@@ -2091,35 +2239,91 @@
 }
 
 .table-medical td {
-  padding: 12px 16px;
+  direction: rtl !important;
+  text-align: right !important;
+  padding: 13px 18px;
   border-block-end: 1px solid var(--border-subtle);
   border-inline-end: 1px solid var(--border-subtle);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   vertical-align: top;
+  line-height: 1.75;
 }
 
-.table-medical tr:last-child td {
-  border-block-end: none;
+.table-medical td:first-child {
+  font-weight: 800;
+  color: #0369a1;
+  background-color: rgba(2, 132, 199, 0.04);
+}
+
+.table-medical tr:nth-child(even) td {
+  background-color: rgba(241, 245, 249, 0.55);
 }
 
 .table-medical tr:hover td {
-  background-color: var(--bg-body-secondary);
+  background-color: rgba(2, 132, 199, 0.07) !important;
 }
 
 .table-medical td:last-child, .table-medical th:last-child {
   border-inline-end: none;
 }
 
+.table-cell-pearl {
+  background-color: rgba(13, 148, 136, 0.06) !important;
+  border-inline-start: 3.5px solid #0d9488 !important;
+}
+
+.table-cell-trap {
+  background-color: rgba(225, 29, 72, 0.06) !important;
+  border-inline-start: 3.5px solid #e11d48 !important;
+}
+
 [data-theme="dark"] .table-medical th {
   background: #1e293b;
-  border-block-end-color: #334155;
+  color: #38bdf8;
+  border-block-end-color: #0284c7;
   border-inline-end-color: #334155;
 }
 
 [data-theme="dark"] .table-medical td {
   border-color: #334155;
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .table-medical td:first-child {
+  color: #38bdf8;
+  background-color: rgba(56, 189, 248, 0.07);
+}
+
+[data-theme="dark"] .table-medical tr:nth-child(even) td {
+  background-color: rgba(30, 41, 59, 0.45);
 }
 
 [data-theme="dark"] .table-medical tr:hover td {
-  background-color: rgba(51, 65, 85, 0.4);
+  background-color: rgba(56, 189, 248, 0.12) !important;
 }
+
+[data-theme="dark"] .table-cell-pearl {
+  background-color: rgba(13, 148, 136, 0.15) !important;
+  border-inline-start-color: #14b8a6 !important;
+}
+
+[data-theme="dark"] .table-cell-trap {
+  background-color: rgba(225, 29, 72, 0.15) !important;
+  border-inline-start-color: #f43f5e !important;
+}
+
+/* 8. Mind-Map Distinct Branch Themes */
+.mindmap-card-branch[data-branch="1"] { border-inline-start-color: #0284c7; }
+.mindmap-card-branch[data-branch="1"] .branch-badge { background: #0284c7; }
+.mindmap-card-branch[data-branch="2"] { border-inline-start-color: #6366f1; }
+.mindmap-card-branch[data-branch="2"] .branch-badge { background: #6366f1; }
+.mindmap-card-branch[data-branch="3"] { border-inline-start-color: #8b5cf6; }
+.mindmap-card-branch[data-branch="3"] .branch-badge { background: #8b5cf6; }
+.mindmap-card-branch[data-branch="4"] { border-inline-start-color: #e11d48; }
+.mindmap-card-branch[data-branch="4"] .branch-badge { background: #e11d48; }
+.mindmap-card-branch[data-branch="5"] { border-inline-start-color: #d97706; }
+.mindmap-card-branch[data-branch="5"] .branch-badge { background: #d97706; }
+.mindmap-card-branch[data-branch="6"] { border-inline-start-color: #059669; }
+.mindmap-card-branch[data-branch="6"] .branch-badge { background: #059669; }
+.mindmap-card-branch[data-branch="7"] { border-inline-start-color: #0d9488; }
+.mindmap-card-branch[data-branch="7"] .branch-badge { background: #0d9488; }

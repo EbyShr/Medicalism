@@ -1746,6 +1746,11 @@ mark.user-highlight[data-color="blue"] {
   display: inline-flex !important;
 }
 
+.exam-cram-mode .exam-pearl-item,
+.exam-cram-mode .exam-trap-item {
+  display: list-item !important;
+}
+
 .exam-cram-mode table {
   display: table !important;
 }

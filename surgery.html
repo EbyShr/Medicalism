@@ -330,7 +330,7 @@
   <!-- Scripts -->
   <script src="./js/data/surgery-registry.js"></script>
   <script>
-    window.ACTIVE_REGISTRY = window.SURGERY_REGISTRY;
+    window.ACTIVE_REGISTRY = Array.isArray(window.SURGERY_REGISTRY) ? window.SURGERY_REGISTRY : (window.SURGERY_REGISTRY && window.SURGERY_REGISTRY.chapters ? window.SURGERY_REGISTRY.chapters : []);
   </script>
   <script src="./js/state.js"></script>
   <script src="./js/components.js"></script>
