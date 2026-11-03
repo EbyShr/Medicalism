@@ -114,7 +114,7 @@
         </div>
 
         <!-- Direct Nav Link to Quiz Module -->
-        <a href="./quiz.html" class="portal-nav-link" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: #059669; background: rgba(5, 150, 105, 0.08); padding: 5px 12px; border-radius: var(--radius-full); border: 1px solid rgba(5, 150, 105, 0.2);" title="ورود به سامانه آزمون و بانک سوالات">
+        <a href="./quiz.html" class="portal-nav-link" title="ورود به سامانه آزمون و بانک سوالات">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
             <polyline points="9 11 12 14 22 4"></polyline>
             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
@@ -191,8 +191,8 @@
       </div>
 
       <!-- Quick Quiz Module Promo Banner -->
-      <div style="margin-block-start: 24px; display: flex; justify-content: center;">
-        <a href="./quiz.html" style="text-decoration: none; display: inline-flex; align-items: center; gap: 12px; background: linear-gradient(135deg, rgba(5, 150, 105, 0.12), rgba(2, 132, 199, 0.12)); border: 1.5px solid rgba(5, 150, 105, 0.35); border-radius: var(--radius-xl); padding: 12px 20px; transition: all var(--transition-fast); box-shadow: 0 4px 14px rgba(5, 150, 105, 0.15);">
+      <div style="margin-block-start: 24px; display: flex; justify-content: center; width: 100%; box-sizing: border-box;">
+        <a href="./quiz.html" style="text-decoration: none; display: inline-flex; align-items: center; gap: 12px; background: linear-gradient(135deg, rgba(5, 150, 105, 0.12), rgba(2, 132, 199, 0.12)); border: 1.5px solid rgba(5, 150, 105, 0.35); border-radius: var(--radius-xl); padding: 12px 18px; max-width: 100%; box-sizing: border-box; flex-wrap: wrap; justify-content: center; transition: all var(--transition-fast); box-shadow: 0 4px 14px rgba(5, 150, 105, 0.15);">
           <div style="width: 36px; height: 36px; border-radius: var(--radius-lg); background: linear-gradient(135deg, #059669, #0284c7); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
           </div>
@@ -238,6 +238,199 @@
         <span>✓ راهنماهای تشخیصی بر بالین بیمار</span>
         <span>✓ به‌روزرسانی مستمر بر اساس رفرنس‌های مصوب وزارت بهداشت</span>
       </div>
+    </div>
+  </section>
+
+  <!-- Quick Stats Strip (نوار آمار سریع سامانه) -->
+  <section class="portal-container portal-stats-section" aria-label="نوار آمار سریع سامانه">
+    <div class="portal-stats-strip">
+      <div class="stat-pill-item">
+        <div class="stat-pill-icon stat-icon-cyan">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+        </div>
+        <div class="stat-pill-content">
+          <div class="stat-pill-value">۳۰ <span class="stat-pill-unit">فصل آموزشی</span></div>
+          <div class="stat-pill-label">سرفصل‌های مصوب واگیر و غیرواگیر</div>
+        </div>
+      </div>
+
+      <div class="stat-pill-item">
+        <div class="stat-pill-icon stat-icon-sky">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+        </div>
+        <div class="stat-pill-content">
+          <div class="stat-pill-value">۴۷۴ <span class="stat-pill-unit">کلیشه رادیولوژی</span></div>
+          <div class="stat-pill-label">اطلس دیجیتال با زوم و کنتراست پویا</div>
+        </div>
+      </div>
+
+      <div class="stat-pill-item">
+        <div class="stat-pill-icon stat-icon-emerald">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 11 12 14 22 4"></polyline>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+        </div>
+        <div class="stat-pill-content">
+          <div class="stat-pill-value">۲۹۵ <span class="stat-pill-unit">سوال تحلیلی</span></div>
+          <div class="stat-pill-label">بانک تست و شبیه‌ساز با کارنامه رسمی</div>
+        </div>
+      </div>
+
+      <div class="stat-pill-item">
+        <div class="stat-pill-icon stat-icon-indigo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+        </div>
+        <div class="stat-pill-content">
+          <div class="stat-pill-value">۱۰۰٪ <span class="stat-pill-unit">آفلاین و رایگان</span></div>
+          <div class="stat-pill-label">بدون نیاز به اینترنت، دسترسی سریع بالینی</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3-Card Bento Grid ("ماژول‌های اصلی سامانه") -->
+  <section class="portal-container portal-modules-section" id="modules" style="scroll-margin-top: 90px;">
+    <div class="modules-section-header">
+      <div class="modules-section-pill">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        <span>معماری یکپارچه آموزش پزشکی مدیکالیسم</span>
+      </div>
+      <h2 class="modules-section-title">ماژول‌های اصلی سامانه آموزشی البرز</h2>
+      <p class="modules-section-desc">
+        تفکیک استاندارد دوره‌های بالینی، اطلس‌های تصویری و سامانه‌های خودارزیابی؛ دسترسی مستقیم دانشجویان پزشکی به محتوای مصوب.
+      </p>
+    </div>
+
+    <div class="portal-bento-grid">
+      <!-- Bento Card 1: Communicable & Non-Communicable Diseases -->
+      <article class="bento-card bento-card-comm" data-module="diseases">
+        <div>
+          <div class="bento-card-header">
+            <div class="bento-icon-wrapper bento-icon-comm">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+            </div>
+            <span class="bento-badge bento-badge-comm">درسنامه بالینی مصوب</span>
+          </div>
+
+          <div class="bento-card-body">
+            <h3 class="bento-card-title">درسنامه جامع بیماری‌های واگیر و غیرواگیر</h3>
+            <p class="bento-card-text">
+              ۳۰ فصل مصوب، ۱۵۴ مبحث بالینی، جداول و الگوریتم‌های کشوری، بسته خدمت Ira-PEN، پروتکل‌های ملی سل، مالاریا، هاری، ایدز و بیماری‌های مزمن متابولیک و قلبی عروقی.
+            </p>
+
+            <div class="bento-tags-list">
+              <span class="bento-tag">۳۰ فصل مصوب</span>
+              <span class="bento-tag">۱۵۴ مبحث بالینی</span>
+              <span class="bento-tag">جداول و الگوریتم‌های کشوری</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-card-footer">
+          <a href="./communicable-and-noncommunicable-diseases.html" class="bento-cta-btn bento-cta-comm">
+            <span>ورود به درسنامه بیماری‌ها</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Bento Card 2: Radiology & Clinical Imaging -->
+      <article class="bento-card bento-card-rad" data-module="radiology">
+        <div>
+          <div class="bento-card-header">
+            <div class="bento-icon-wrapper bento-icon-rad">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </div>
+            <span class="bento-badge bento-badge-rad">اطلس دیجیتال و کیس‌های واقعی</span>
+          </div>
+
+          <div class="bento-card-body">
+            <h3 class="bento-card-title">اطلس و آموزش رادیولوژی بالینی</h3>
+            <p class="bento-card-text">
+              ۴ سرفصل ماژور، ۴۷۴ کلیشه رادیولوژی با کیفیت بالا، اصول تفسیر گرافی ساده شکم و اسکلتی، CT اسکن مغز و مطالعات حاجب ادراری همراه با نمایشگر پیشرفته با قابلیت زوم و کنتراست و آزمون تصویری.
+            </p>
+
+            <div class="bento-tags-list">
+              <span class="bento-tag">۴ سرفصل ماژور</span>
+              <span class="bento-tag">۴۷۴ کلیشه رادیولوژی</span>
+              <span class="bento-tag">نمایشگر زوم و کنتراست</span>
+              <span class="bento-tag">آزمون تصویری</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-card-footer">
+          <a href="./radiology.html" class="bento-cta-btn bento-cta-rad">
+            <span>ورود به اطلس رادیولوژی</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Bento Card 3: Quiz & Analytical Test Bank -->
+      <article class="bento-card bento-card-quiz" data-module="quiz">
+        <div>
+          <div class="bento-card-header">
+            <div class="bento-icon-wrapper bento-icon-quiz">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 11 12 14 22 4"></polyline>
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+              </svg>
+            </div>
+            <span class="bento-badge bento-badge-quiz">ارزشیابی و خودآزمایی بالینی</span>
+          </div>
+
+          <div class="bento-card-body">
+            <h3 class="bento-card-title">بانک جامع آزمون و سوالات تحلیلی</h3>
+            <p class="bento-card-text">
+              ۲۹۵ سوال طبقه‌بندی‌شده در ۱۲ مبحث تخصصی، سوالات تالیفی کلاسی، حالت مطالعه آموزشی با پاسخ تشریحی آنی و رد گزینه‌ها (Distractors)، شبیه‌ساز رسمی آزمون با کارنامه و مرور هوشمند اشتباهات.
+            </p>
+
+            <div class="bento-tags-list">
+              <span class="bento-tag">۲۹۵ سوال تحلیلی</span>
+              <span class="bento-tag">۱۲ مبحث تخصصی</span>
+              <span class="bento-tag">حالت آموزشی و شبیه‌ساز</span>
+              <span class="bento-tag">پاسخ تشریحی کامل</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-card-footer">
+          <a href="./quiz.html" class="bento-cta-btn bento-cta-quiz">
+            <span>ورود به سامانه آزمون</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </a>
+        </div>
+      </article>
     </div>
   </section>
 

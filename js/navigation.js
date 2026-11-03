@@ -46,7 +46,7 @@ window.AppNavigation = {
       });
 
       // 2. Add active & expanded to the newly active chapter
-      const targetItem = container.querySelector(`.nav-chapter-item[data-nav-chapter="${newChapterId}"]`);
+      const targetItem = container.querySelector(`[data-nav-chapter="${newChapterId}"]`);
       if (targetItem) {
         targetItem.classList.add('is-active', 'is-expanded');
 
@@ -161,7 +161,7 @@ window.AppNavigation = {
 
       if (isExam) {
         return `
-          <li class="nav-chapter-item nav-chapter-item-exam ${isCurrentChapter ? 'is-active' : ''}" data-nav-chapter="${ch.id}">
+          <li class="nav-chapter-item-exam ${isCurrentChapter ? 'is-active' : ''}" data-nav-chapter="${ch.id}">
             <div class="nav-chapter-header nav-exam-header" data-chapter-id="${ch.id}" role="button" tabindex="0" title="${ch.title}">
               <div class="nav-chapter-title-group">
                 <div class="nav-exam-pulse-icon" aria-hidden="true">

@@ -192,6 +192,185 @@
     /* ==========================================================================
        VIEW 1: RENDER HUB (فهرست کلی دروس و پورتال‌های آزمون)
        ========================================================================== */
+    toPersianDigits(num) {
+      if (num === null || num === undefined) return '';
+      const farsiDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+      return num.toString().replace(/\d/g, d => farsiDigits[parseInt(d, 10)]);
+    }
+
+    loadStoredFlags(quizId) {
+      try {
+        const stored = localStorage.getItem(`med_quiz_flags_${quizId}`);
+        return stored ? JSON.parse(stored) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    computeStudentStats() {
+      const course = window.QuizRegistry ? window.QuizRegistry.getQuizById('ncd') : null;
+      const chapters = (course && course.chapters && course.chapters.filter(c => !c.isAll)) || [];
+
+      let totalAnswered = 0;
+      let totalCorrect = 0;
+      let totalIncorrect = 0;
+      const flaggedSet = new Set();
+      const incorrectQuestionsMap = new Map();
+      const flaggedQuestionsMap = new Map();
+      const allUniqueAnsweredQuestions = new Map();
+
+      // Collect from individual chapters
+      chapters.forEach(ch => {
+        const questions = ch.fallbackQuestions || 
+          (window.QuizRegistry && window.QuizRegistry.questionsCache && window.QuizRegistry.questionsCache.get(ch.id)) || [];
+
+        const storedAnswers = this.loadStoredAnswers(ch.id);
+        const storedFlags = this.loadStoredFlags(ch.id);
+
+        questions.forEach(q => {
+          const key = `${ch.id}_${q.id}`;
+
+          // Check flagged
+          if (storedFlags.includes(q.id) || storedFlags.includes(String(q.id))) {
+            flaggedSet.add(key);
+            flaggedQuestionsMap.set(key, { ...q, chapterId: ch.id, chapterTitle: ch.shortTitle || ch.title });
+          }
+
+          // Check answered
+          const userAns = storedAnswers[q.id] || storedAnswers[String(q.id)];
+          if (userAns !== undefined && userAns !== null) {
+            const isCorrect = userAns === q.correct_answer;
+            allUniqueAnsweredQuestions.set(key, isCorrect);
+            if (!isCorrect) {
+              incorrectQuestionsMap.set(key, { ...q, chapterId: ch.id, chapterTitle: ch.shortTitle || ch.title, userAns });
+            }
+          }
+        });
+      });
+
+      // Also check global answer sets if saved under 'ncd' or 'ncd-all'
+      ['ncd', 'ncd-all'].forEach(qKey => {
+        const globalAnswers = this.loadStoredAnswers(qKey);
+        const globalFlags = this.loadStoredFlags(qKey);
+
+        chapters.forEach(ch => {
+          const questions = ch.fallbackQuestions || 
+            (window.QuizRegistry && window.QuizRegistry.questionsCache && window.QuizRegistry.questionsCache.get(ch.id)) || [];
+
+          questions.forEach(q => {
+            const key = `${ch.id}_${q.id}`;
+
+            if (globalFlags.includes(q.id) || globalFlags.includes(String(q.id))) {
+              flaggedSet.add(key);
+              flaggedQuestionsMap.set(key, { ...q, chapterId: ch.id, chapterTitle: ch.shortTitle || ch.title });
+            }
+
+            const userAns = globalAnswers[q.id] || globalAnswers[String(q.id)];
+            if (userAns !== undefined && userAns !== null && !allUniqueAnsweredQuestions.has(key)) {
+              const isCorrect = userAns === q.correct_answer;
+              allUniqueAnsweredQuestions.set(key, isCorrect);
+              if (!isCorrect) {
+                incorrectQuestionsMap.set(key, { ...q, chapterId: ch.id, chapterTitle: ch.shortTitle || ch.title, userAns });
+              }
+            }
+          });
+        });
+      });
+
+      totalAnswered = allUniqueAnsweredQuestions.size;
+      allUniqueAnsweredQuestions.forEach(isCorrect => {
+        if (isCorrect) totalCorrect++;
+        else totalIncorrect++;
+      });
+
+      const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+
+      return {
+        totalAnswered,
+        totalCorrect,
+        totalIncorrect,
+        accuracy,
+        flaggedCount: flaggedSet.size,
+        flaggedQuestions: Array.from(flaggedQuestionsMap.values()),
+        incorrectQuestions: Array.from(incorrectQuestionsMap.values())
+      };
+    }
+
+    updateStudentPerformanceOverview() {
+      const stats = this.computeStudentStats();
+      
+      const elTotal = document.getElementById('perfTotalAnswered');
+      const elAcc = document.getElementById('perfAccuracy');
+      const elFlag = document.getElementById('perfFlaggedCount');
+      const elInc = document.getElementById('perfIncorrectCount');
+
+      if (elTotal) elTotal.textContent = this.toPersianDigits(stats.totalAnswered);
+      if (elAcc) elAcc.textContent = stats.totalAnswered > 0 ? `${this.toPersianDigits(stats.accuracy)}٪` : '۰٪';
+      if (elFlag) elFlag.textContent = this.toPersianDigits(stats.flaggedCount);
+      if (elInc) elInc.textContent = this.toPersianDigits(stats.totalIncorrect);
+    }
+
+    launchSmartReview() {
+      const stats = this.computeStudentStats();
+      const combinedMap = new Map();
+      (stats.flaggedQuestions || []).forEach(q => combinedMap.set(`${q.chapterId}_${q.id}`, q));
+      (stats.incorrectQuestions || []).forEach(q => combinedMap.set(`${q.chapterId}_${q.id}`, q));
+      const questions = Array.from(combinedMap.values());
+
+      if (questions.length === 0) {
+        this.openReviewEmptyModal();
+        return;
+      }
+
+      this.startCustomReviewQuiz(questions, `بانک هوشمند مرور شخصی (${this.toPersianDigits(questions.length)} سوال)`);
+    }
+
+    openReviewEmptyModal() {
+      const modal = document.getElementById('reviewEmptyModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    closeReviewEmptyModal() {
+      const modal = document.getElementById('reviewEmptyModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async startCustomReviewQuiz(questions, title = 'بانک هوشمند مرور شخصی') {
+      try {
+        const quizMeta = {
+          id: 'smart-review',
+          title: title,
+          category: 'مرور هوشمند شخصی'
+        };
+
+        this.currentQuiz = quizMeta;
+        this.mode = 'study';
+        this.currentIndex = 0;
+        this.activeTopic = 'all';
+
+        this.allQuestions = [...questions];
+        this.filteredQuestions = this.shuffleArray([...this.allQuestions]);
+        this.answers = {};
+        this.flags = new Set(this.allQuestions.map(q => q.id));
+        this.isSubmitted = false;
+
+        if (this.dom.hubView) this.dom.hubView.style.display = 'none';
+        if (this.dom.courseView) this.dom.courseView.style.display = 'none';
+        if (this.dom.scorecardView) this.dom.scorecardView.style.display = 'none';
+        if (this.dom.activeView) this.dom.activeView.style.display = 'block';
+
+        if (this.dom.activeQuizTitle) {
+          this.dom.activeQuizTitle.textContent = quizMeta.title;
+        }
+
+        this.updateModePills();
+        this.renderCurrentQuestion();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error("Error starting custom review quiz:", err);
+      }
+    }
+
     renderHub() {
       if (!this.dom.hubView) return;
       this.dom.hubView.style.display = 'block';
@@ -199,41 +378,38 @@
       if (this.dom.activeView) this.dom.activeView.style.display = 'none';
       if (this.dom.scorecardView) this.dom.scorecardView.style.display = 'none';
 
+      // Update Student Performance Overview from LocalStorage
+      this.updateStudentPerformanceOverview();
+
       const quizzes = window.QuizRegistry ? window.QuizRegistry.getAllQuizzes() : [];
       if (!this.dom.quizzesGrid) return;
 
-      if (quizzes.length === 0) {
-        this.dom.quizzesGrid.innerHTML = `
-          <div style="grid-column: 1 / -1; text-align: center; padding: 48px 16px; background: var(--bg-surface); border: 1px dashed var(--border-default); border-radius: var(--radius-xl);">
-            <div style="width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; background: var(--bg-body-secondary); display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-            </div>
-            <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0 0 8px 0;">هیچ آزمونی در حال حاضر ثبت نشده است</h3>
-            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">بانک سوالات به محض بارگذاری فایل‌های مربوطه در این بخش نمایش داده خواهند شد.</p>
-          </div>
-        `;
-        return;
-      }
+      const ncdQuiz = quizzes.find(q => q.id === 'ncd') || quizzes[0];
+      const stats = this.computeStudentStats();
 
-      this.dom.quizzesGrid.innerHTML = quizzes.map(q => {
-        const individualChapters = (q.chapters && q.chapters.filter(c => !c.isAll)) || [];
-        const chaptersCount = individualChapters.length;
+      const flaggedCountPersian = this.toPersianDigits(stats.flaggedCount);
+      const incorrectCountPersian = this.toPersianDigits(stats.totalIncorrect);
+      const totalReviewCount = stats.flaggedCount + stats.totalIncorrect;
+      const totalReviewPersian = this.toPersianDigits(totalReviewCount);
 
-        return `
-          <div class="quiz-card" data-quiz-id="${q.id}">
+      const ncdIndividual = (ncdQuiz && ncdQuiz.chapters && ncdQuiz.chapters.filter(c => !c.isAll)) || [];
+      const ncdChaptersCount = ncdIndividual.length;
+
+      let html = '';
+
+      // Card 1: NCD Question Bank
+      if (ncdQuiz) {
+        html += `
+          <div class="quiz-card" data-quiz-id="${ncdQuiz.id}">
             <div>
               <div class="quiz-card-header">
-                <span class="quiz-card-category" style="color: ${q.categoryColor || '#0284c7'}; background: ${q.categoryColor ? q.categoryColor + '18' : 'rgba(2, 132, 199, 0.1)'};">
-                  ${q.category || 'آزمون تخصصی'}
+                <span class="quiz-card-category" style="color: ${ncdQuiz.categoryColor || '#0284c7'}; background: ${ncdQuiz.categoryColor ? ncdQuiz.categoryColor + '18' : 'rgba(2, 132, 199, 0.1)'};">
+                  ${ncdQuiz.category || 'بیماری‌های غیرواگیر'}
                 </span>
-                <span class="quiz-card-badge">${q.badge || `${q.totalQuestions} سوال`}</span>
+                <span class="quiz-card-badge">${ncdQuiz.badge || `${ncdQuiz.totalQuestions} سوال`}</span>
               </div>
-              <h3 class="quiz-card-title">${q.title}</h3>
-              <p class="quiz-card-desc">${q.description}</p>
+              <h3 class="quiz-card-title">${ncdQuiz.title}</h3>
+              <p class="quiz-card-desc">${ncdQuiz.description}</p>
             </div>
             <div>
               <div class="quiz-card-meta">
@@ -242,7 +418,7 @@
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                   </svg>
-                  <span>${chaptersCount} سرفصل و مبحث آموزشی</span>
+                  <span>${ncdChaptersCount} سرفصل و مبحث آموزشی</span>
                 </div>
                 <div class="quiz-card-meta-item">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -253,7 +429,7 @@
                 </div>
               </div>
               <div>
-                <button type="button" class="btn-open-course" onclick="window.medicalQuiz.openCourseTopics('${q.id}')">
+                <button type="button" class="btn-open-course" onclick="window.medicalQuiz.openCourseTopics('${ncdQuiz.id}')">
                   <span>مشاهده سرفصل‌ها و ورود به آزمون</span>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <polyline points="15 18 9 12 15 6"></polyline>
@@ -263,7 +439,102 @@
             </div>
           </div>
         `;
-      }).join('');
+      }
+
+      // Card 2: Smart Personal Review Bank (سوالات نشان‌شده و غلط‌ها)
+      html += `
+        <div class="quiz-card quiz-card-review" data-quiz-id="smart-review">
+          <div>
+            <div class="quiz-card-header">
+              <span class="quiz-card-category" style="color: #d97706; background: rgba(217, 119, 6, 0.12);">
+                مرور هوشمند شخصی
+              </span>
+              <span class="quiz-card-badge" style="background: rgba(217, 119, 6, 0.1); color: #d97706; border-color: rgba(217, 119, 6, 0.3);">
+                ${totalReviewCount > 0 ? `${totalReviewPersian} سوال آماده مرور` : 'شخصی‌سازی شده'}
+              </span>
+            </div>
+            <h3 class="quiz-card-title">بانک هوشمند مرور شخصی (سوالات نشان‌شده و غلط‌ها)</h3>
+            <p class="quiz-card-desc">
+              سامانه هوشمند بازآموزی بالینی؛ دسترسی متمرکز به سوالاتی که در جریان آزمون‌ها نشان‌کرده‌اید (⭐️) یا به آن‌ها پاسخ نادرست داده‌اید، جهت رفع خطاهای تشخیصی.
+            </p>
+          </div>
+          <div>
+            <div class="quiz-card-meta">
+              <div class="quiz-card-meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                <span style="font-weight: 700;">${flaggedCountPersian} سوال نشان‌شده (⭐️ شک‌دار)</span>
+              </div>
+              <div class="quiz-card-meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2.2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+                <span style="font-weight: 700;">${incorrectCountPersian} پاسخ نادرست برای بازبینی</span>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn-open-course" style="background: linear-gradient(135deg, #d97706, #b45309);" onclick="window.medicalQuiz.launchSmartReview()">
+                <span>شروع جلسه مرور شخصی</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Card 3: Radiology Clinical Cases Exam
+      html += `
+        <div class="quiz-card quiz-card-radiology" data-quiz-id="radiology-cases">
+          <div>
+            <div class="quiz-card-header">
+              <span class="quiz-card-category" style="color: #0ea5e9; background: rgba(14, 165, 233, 0.12);">
+                رادیولوژی بالینی
+              </span>
+              <span class="quiz-card-badge" style="background: rgba(14, 165, 233, 0.1); color: #0284c7; border-color: rgba(14, 165, 233, 0.3);">
+                ۲۰ کیس تصویری
+              </span>
+            </div>
+            <h3 class="quiz-card-title">آزمون کیس‌های بالینی رادیولوژی (۲۰ کیس تصویری)</h3>
+            <p class="quiz-card-desc">
+              آزمون تعاملی تفسیر گرافی‌های واقعی بالینی (ترومای اسکلتی، شکم حاد، CT مغز و مجاری ادراری) با قابلیت فعال‌سازی کادرهای تشخیصی پاتولوژی (Bounding Boxes).
+            </p>
+          </div>
+          <div>
+            <div class="quiz-card-meta">
+              <div class="quiz-card-meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                <span>۲۰ کیس استاندارد همراه با کلیشه</span>
+              </div>
+              <div class="quiz-card-meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2">
+                  <polyline points="9 11 12 14 22 4"></polyline>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+                <span>کادرهای اختصاصی پاتولوژی و پاسخ تشریحی</span>
+              </div>
+            </div>
+            <div>
+              <a href="./radiology.html#rad-exam" class="btn-open-course" style="background: linear-gradient(135deg, #0ea5e9, #0284c7); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <span>ورود به آزمون رادیولوژی</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+
+      this.dom.quizzesGrid.innerHTML = html;
     }
 
     /* ==========================================================================
@@ -571,6 +842,11 @@
     }
 
     returnToCourseView() {
+      if (this.currentQuiz && this.currentQuiz.id === 'smart-review') {
+        this.returnToHub();
+        return;
+      }
+
       if (this.timerInterval) {
         clearInterval(this.timerInterval);
         this.timerInterval = null;
