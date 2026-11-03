@@ -1292,7 +1292,9 @@ window.StudyFeatures = {
 
     container.querySelectorAll('p, li').forEach(el => {
       const text = el.textContent || '';
-      const hasKeyword = highYieldTags.some(t => text.includes(t));
+      const hasKeyword = highYieldTags.some(t => text.includes(t)) ||
+                         !!el.querySelector('.badge-theory') ||
+                         !!el.querySelector('.badge-trap');
       const hasHighlight = !!el.querySelector('mark.user-highlight');
 
       if (hasKeyword || hasHighlight) {

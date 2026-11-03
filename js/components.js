@@ -43,6 +43,9 @@ window.ComponentRenderer = {
           </div>
         </header>
 
+        <!-- Chapter Mind-Map if present -->
+        ${chapter.mindMapHtml || ''}
+
         <!-- Sections Stream -->
         <div class="sections-stream">
     `;
@@ -169,6 +172,20 @@ window.ComponentRenderer = {
 
     container.innerHTML = html;
     this.bindSectionActions(container);
+
+    const toggleMindmapBtn = container.querySelector('#btnToggleMindmap');
+    const mindmapContent = container.querySelector('#mindmapContent');
+    if (toggleMindmapBtn && mindmapContent) {
+      toggleMindmapBtn.addEventListener('click', () => {
+        const isCollapsed = mindmapContent.classList.toggle('is-collapsed');
+        toggleMindmapBtn.setAttribute('aria-expanded', !isCollapsed);
+        const label = toggleMindmapBtn.querySelector('.mindmap-btn-text');
+        if (label) {
+          label.textContent = isCollapsed ? 'مشاهده نقشه' : 'جمع‌بندی نقشه';
+        }
+        toggleMindmapBtn.classList.toggle('is-collapsed', isCollapsed);
+      });
+    }
     if (window.RadiologyModule && typeof window.RadiologyModule.bindContainerEvents === 'function') {
       window.RadiologyModule.bindContainerEvents(container);
     }
@@ -262,6 +279,8 @@ window.ComponentRenderer = {
           ${sectionBody}
         </div>
       `;
+    } else if (chapterId.startsWith('surg-') || section.contentHtml) {
+      sectionBody = section.contentHtml || `<p>${section.summary || ''}</p>`;
     } else {
       sectionBody = `<p>${section.summary || ''}</p>`;
     }

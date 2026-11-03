@@ -12,7 +12,8 @@ window.AppNavigation = {
   expandedFolders: {
     comm: true,
     ncd: true,
-    rad: true
+    rad: true,
+    surg: true
   },
 
   init() {
@@ -101,17 +102,21 @@ window.AppNavigation = {
     const activeSectionId = window.appState ? window.appState.activeSectionId : '';
 
     const isRadiology = chapters.some(ch => ch.id.startsWith('rad-') || ch.courseId === 'radiology');
+    const isSurgery = chapters.some(ch => ch.id.startsWith('surg-') || ch.courseId === 'surgery');
 
-    const commChapters = isRadiology ? [] : chapters.filter(ch => ch.number <= 16);
-    const ncdChapters = isRadiology ? [] : chapters.filter(ch => ch.number > 16 && ch.number <= 30);
+    const commChapters = (isRadiology || isSurgery) ? [] : chapters.filter(ch => ch.number <= 16);
+    const ncdChapters = (isRadiology || isSurgery) ? [] : chapters.filter(ch => ch.number > 16 && ch.number <= 30);
     const radChapters = isRadiology
       ? [...chapters.filter(ch => ch.isExam), ...chapters.filter(ch => !ch.isExam)]
       : [];
+    const surgChapters = isSurgery ? chapters : [];
 
     // Ensure the folder containing active chapter is open
     const activeCh = chapters.find(ch => ch.id === activeChapterId);
     if (activeCh) {
-      if (isRadiology) {
+      if (isSurgery) {
+        this.expandedFolders.surg = true;
+      } else if (isRadiology) {
         this.expandedFolders.rad = true;
       } else if (activeCh.number <= 16) {
         this.expandedFolders.comm = true;
@@ -216,10 +221,13 @@ window.AppNavigation = {
     const commHtml = commChapters.map(renderChapterItem).join('');
     const ncdHtml = ncdChapters.map(renderChapterItem).join('');
     const radHtml = radChapters.map(renderChapterItem).join('');
+    const surgHtml = surgChapters.map(renderChapterItem).join('');
 
     let fullTreeHtml = '';
     if (isRadiology) {
       fullTreeHtml = radHtml;
+    } else if (isSurgery) {
+      fullTreeHtml = surgHtml;
     } else {
       fullTreeHtml = `
         <!-- Folder 1: Communicable Diseases (واگیر) -->

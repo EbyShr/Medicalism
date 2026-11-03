@@ -110,6 +110,26 @@
                 </div>
               </div>
             </a>
+                      <!-- Course 3: General Surgery (Lawrence) -->
+            <a href="./surgery.html" class="dropdown-course-card" style="margin-block-start: 10px; margin-block-end: 0; border-color: rgba(225, 29, 72, 0.3); display: block; text-decoration: none; color: inherit;">
+              <div class="dropdown-course-header" style="margin-block-end: 0;">
+                <div class="dropdown-course-icon-active" style="background: rgba(225, 29, 72, 0.15); color: #e11d48;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
+                <div style="flex: 1;">
+                  <div class="dropdown-course-title" style="display: flex; align-items: center; justify-content: space-between;">
+                    <span>جراحی جنرال (رفرنس لارنس)</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                  </div>
+                  <div class="dropdown-course-meta">فصل ۱۰ (۷ بخش) • آماده مطالعه</div>
+                </div>
+              </div>
+            </a>
           </div>
         </div>
 
@@ -187,6 +207,7 @@
           <button type="button" class="hero-search-tag-chip" data-query="واکسن">بیماری‌های واکسن‌پذیر</button>
           <button type="button" class="hero-search-tag-chip" data-query="هاری">هاری و بروسلوز</button>
           <button type="button" class="hero-search-tag-chip" data-query="شکستگی">رادیولوژی و شکستگی‌ها</button>
+          <button type="button" class="hero-search-tag-chip" data-query="فتق">فتق و جدار شکم (لارنس)</button>
         </div>
       </div>
 
@@ -394,6 +415,47 @@
         </div>
       </article>
 
+      
+      <!-- Bento Card: General Surgery (Lawrence) -->
+      <article class="bento-card bento-card-surg" data-module="surgery">
+        <div>
+          <div class="bento-card-header">
+            <div class="bento-icon-wrapper bento-icon-surg">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="12" y1="18" x2="12" y2="12"></line>
+                <line x1="9" y1="15" x2="15" y2="15"></line>
+              </svg>
+            </div>
+            <span class="bento-badge bento-badge-surg">کورس ماژور بالینی • جدید</span>
+          </div>
+
+          <div class="bento-card-body">
+            <h3 class="bento-card-title">جراحی جنرال (رفرنس لارنس)</h3>
+            <p class="bento-card-text">
+              درسنامه جامع بالینی بر اساس رفرنس مصوب لارنس، آناتومی جدار شکم، فتق‌های ونترال و اینگوئینال، الگوریتم‌های لحظه‌به‌لحظه اختناق و اورژانس، تکنیک‌های باز و لاپاراسکوپی، مش‌ها و پیشگیری از عوارض بعد عمل.
+            </p>
+
+            <div class="bento-tags-list">
+              <span class="bento-tag">فصل ۱۰ لارنس</span>
+              <span class="bento-tag">۷ بخش بالینی</span>
+              <span class="bento-tag">الگوریتم‌های گام‌به‌گام</span>
+              <span class="bento-tag">مرور شب امتحان</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-card-footer">
+          <a href="./surgery.html" class="bento-cta-btn bento-cta-surg">
+            <span>ورود به درسنامه جراحی</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </a>
+        </div>
+      </article>
+
       <!-- Bento Card 3: Quiz & Analytical Test Bank -->
       <article class="bento-card bento-card-quiz" data-module="quiz">
         <div>
@@ -459,6 +521,7 @@
   <!-- Scripts -->
   <script src="./js/data/chapters-registry.js"></script>
   <script src="./js/data/radiology-registry.js"></script>
+  <script src="./js/data/surgery-registry.js"></script>
   <script src="./js/radiology.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -474,7 +537,13 @@
         trackLabel: 'رادیولوژی',
         trackPillClass: 'pill-rad'
       }));
-      const chapters = [...commAndNcd, ...rad];
+      const surgery = (window.SURGERY_REGISTRY || []).map(ch => ({
+        ...ch,
+        targetUrl: `./surgery.html#${ch.id}`,
+        trackLabel: 'جراحی جنرال',
+        trackPillClass: 'pill-surg'
+      }));
+      const chapters = [...commAndNcd, ...rad, ...surgery];
       const heroSearch = document.getElementById('heroSearchInput');
       const searchResults = document.getElementById('heroSearchResults');
       const dropdown = document.getElementById('coursesDropdown');

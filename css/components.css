@@ -1708,6 +1708,11 @@ mark.user-highlight[data-color="blue"] {
 .exam-cram-mode .section-header-row,
 .exam-cram-mode .medical-callout,
 .exam-cram-mode .clinical-callout-card,
+.exam-cram-mode .high-yield-exam-card,
+.exam-cram-mode .clinical-stepper-card,
+.exam-cram-mode .step-card,
+.exam-cram-mode .chapter-mindmap-container,
+.exam-cram-mode .chapter-mindmap-card,
 .exam-cram-mode .table-container,
 .exam-cram-mode table,
 .exam-cram-mode .stage-step-card,
@@ -1722,6 +1727,23 @@ mark.user-highlight[data-color="blue"] {
 .exam-cram-mode .cram-keep-visible,
 .exam-cram-mode mark.user-highlight {
   display: block;
+}
+
+.exam-cram-mode .chapter-mindmap-container,
+.exam-cram-mode .high-yield-exam-card,
+.exam-cram-mode .clinical-stepper-card {
+  display: block !important;
+}
+
+.exam-cram-mode .chapter-mindmap-card *,
+.exam-cram-mode .high-yield-exam-card *,
+.exam-cram-mode .clinical-stepper-card * {
+  display: revert;
+}
+
+.exam-cram-mode .badge-theory,
+.exam-cram-mode .badge-trap {
+  display: inline-flex !important;
 }
 
 .exam-cram-mode table {

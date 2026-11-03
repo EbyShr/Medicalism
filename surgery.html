@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>جراحی جنرال (رفرنس لارنس) | مدیکالیسم البرز</title>
+  <meta name="description" content="سامانه جامع آموزش و یادگیری جراحی جنرال بر اساس رفرنس مصوب لارنس (Lawrence's Essentials of General Surgery) ویژه دانشجویان دانشگاه علوم پزشکی البرز (ABZUMS)">
+  <meta name="theme-color" content="#e11d48">
+
+  <!-- Google Fonts: Vazirmatn & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- CDN Webfonts for Shabnam & Sahel -->
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/shabnam-font@v5.0.1/dist/font-face.css" rel="stylesheet" type="text/css">
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" type="text/css">
+
+  <!-- Core Application Stylesheets -->
+  <link rel="stylesheet" href="./css/tokens.css">
+  <link rel="stylesheet" href="./css/base.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/medical-widgets.css">
+  <link rel="stylesheet" href="./css/dark-theme.css">
+  <link rel="stylesheet" href="./css/exam.css">
+  <link rel="stylesheet" href="./css/print.css" media="print">
+</head>
+<body>
+  <!-- Ambient Animated Glowing Mesh Background -->
+  <div class="ambient-bg" aria-hidden="true">
+    <div class="ambient-orb ambient-orb-1" style="background: radial-gradient(circle, rgba(225, 29, 72, 0.22) 0%, transparent 70%);"></div>
+    <div class="ambient-orb ambient-orb-2" style="background: radial-gradient(circle, rgba(244, 63, 94, 0.18) 0%, transparent 70%);"></div>
+    <div class="ambient-orb ambient-orb-3"></div>
+  </div>
+
+  <!-- Real-time Reading Progress Bar -->
+  <div class="reading-progress-bar-container" aria-hidden="true">
+    <div class="reading-progress-bar" id="readingProgressBar"></div>
+  </div>
+
+  <!-- Application Shell -->
+  <div class="app-shell">
+    
+    <!-- Top Sticky Header -->
+    <header class="app-header">
+      <div style="display: flex; align-items: center; gap: var(--space-3); min-width: 0;">
+        <!-- Mobile Navigation Drawer Toggle -->
+        <button class="mobile-nav-toggle" id="mobileNavToggle" aria-label="باز کردن فهرست فصول و مباحث">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <!-- Brand Identity (Links to Portal Homepage) -->
+        <a href="./index.html" class="header-brand" title="بازگشت به صفحه اصلی مدیکالیسم البرز" aria-label="بازگشت به صفحه اصلی پورتال مدیکالیسم">
+          <div class="brand-icon-wrapper" style="background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+          </div>
+          <div class="brand-title-group">
+            <div style="display: flex; align-items: baseline; gap: 6px;">
+              <span class="brand-title">جراحی جنرال (لارنس)</span>
+              <span style="font-size: 10px; font-weight: 700; color: #e11d48; background: rgba(225, 29, 72, 0.12); padding: 1px 6px; border-radius: var(--radius-full); border: 1px solid rgba(225, 29, 72, 0.3);">البرز</span>
+            </div>
+            <span class="brand-subtitle">سامانه جامع آموزش علوم پزشکی مدیکالیسم (ABZUMS)</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Action & Study Controls Toolbar -->
+      <div class="header-actions">
+        
+        <!-- Search Trigger Button -->
+        <button class="search-trigger-btn btn-search-trigger" aria-label="جستجوی بالینی در فصول جراحی">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span style="display: none; @media(min-width: 640px) { display: inline; }">جستجو...</span>
+          <span class="search-shortcut-badge">⌘K</span>
+        </button>
+
+        <!-- Font Family Selector -->
+        <div class="font-selector-wrapper" title="انتخاب قلم متن">
+          <select class="font-select" id="fontSelect" aria-label="انتخاب نوع قلم">
+            <option value="vazirmatn">وزیرمتن (Vazirmatn)</option>
+            <option value="shabnam">شبنم (Shabnam)</option>
+            <option value="sahel">ساحل (Sahel)</option>
+          </select>
+        </div>
+
+        <!-- Continuous Font-Size Zoom Controls (A- / A+) -->
+        <div class="font-zoom-control" title="تنظیم پیوسته اندازه قلم متن">
+          <button class="zoom-btn" id="zoomOutBtn" aria-label="کوچک‌تر کردن اندازه متن (A−)">A−</button>
+          <span class="zoom-display" id="zoomDisplay" title="اندازه فعلی متن - کلیک برای بازنشانی">100%</span>
+          <button class="zoom-btn" id="zoomInBtn" aria-label="بزرگ‌تر کردن اندازه متن (A+)">A+</button>
+        </div>
+
+        <!-- Bookmarks Modal Trigger -->
+        <button class="btn-icon" id="bookmarksToggleBtn" title="مشاهده بخش‌های نشانک‌گذاری شده" aria-label="نشانک‌های مطالعه">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span id="bookmarksCountBadge" style="display: none; position: absolute; top: -4px; right: -4px; width: 17px; height: 17px; border-radius: 50%; background-color: var(--accent-primary); color: #fff; font-size: 10px; font-weight: 800; align-items: center; justify-content: center;">0</span>
+        </button>
+
+        <!-- Highlights Drawer Trigger -->
+        <button class="btn-icon btn-highlights-toggle" id="highlightsToggleBtn" title="هایلایت‌های من (🖍️ هایلایتها)" aria-label="هایلایت‌های من">
+          <span style="font-size: 15px;">🖍️</span>
+          <span id="highlightsCountBadge" class="header-count-badge" style="display: none;">0</span>
+        </button>
+
+        <!-- Exam Cram Mode Toggle Button -->
+        <button class="btn-exam-cram-toggle" id="examCramToggleBtn" title="⚡ حالت شب امتحان (مرور سریع)" aria-label="حالت شب امتحان (مرور سریع)" aria-pressed="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="cram-bolt-icon">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span class="exam-cram-desktop-label">شب امتحان</span>
+        </button>
+
+        <!-- Quiz Module Quick Link Button -->
+        <a href="./quiz.html" class="btn-icon" title="آزمون و بانک سوالات" aria-label="آزمون و بانک سوال" style="color: #e11d48; text-decoration: none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="9 11 12 14 22 4"></polyline>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+        </a>
+
+        <!-- Distraction-Free Focus Mode Toggle -->
+        <button class="btn-icon" id="focusModeToggleBtn" title="ورود به حالت تمرکز مطالعه (پنهان‌سازی حاشیه‌ها)" aria-label="حالت تمرکز">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+        </button>
+
+        <!-- Theme Toggle (Light / Dark) -->
+        <button class="btn-icon" id="themeToggleBtn" title="تغییر تم (روشن / تاریک)" aria-label="تغییر تم">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+      </div>
+    </header>
+
+    <!-- Main Responsive Two-Column Layout -->
+    <div class="app-layout">
+      
+      <!-- Right-Side Desktop Study Navigation Panel -->
+      <aside class="app-sidebar" aria-label="فهرست سرفصل‌های جراحی جنرال">
+        <div class="sidebar-header">
+          <div class="sidebar-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <span>جراحی جنرال (لارنس)</span>
+          </div>
+          <span style="font-size: 11px; color: var(--text-muted);">فصل ۱۰ (۷ بخش)</span>
+        </div>
+        <nav class="sidebar-scroll-container">
+          <ul class="nav-tree" id="desktopNavTree">
+            <!-- Injected dynamically via AppNavigation -->
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Central Reading Area (Chapter & Sections) -->
+      <main class="app-content chapter-content" id="chapterContentArea" tabindex="-1">
+        <!-- Content injected dynamically via ComponentRenderer -->
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Mobile Navigation Drawer (RTL Edge Slide-in) -->
+  <div class="drawer-backdrop" id="drawerBackdrop" aria-hidden="true"></div>
+  <aside class="mobile-drawer" id="mobileDrawer" aria-label="منوی ناوبری موبایل" aria-hidden="true">
+    <div class="drawer-header">
+      <a href="./index.html" class="sidebar-title" style="text-decoration: none;" title="بازگشت به صفحه اصلی مدیکالیسم">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2">
+          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+        <span>جراحی جنرال (لارنس)</span>
+      </a>
+      <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="بستن منو">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="drawer-content">
+      <!-- Mobile Search inside Right Drawer (Android/Mobile) -->
+      <div class="mobile-drawer-search">
+        <button class="mobile-search-trigger-btn btn-search-trigger" type="button" aria-label="جستجوی بالینی در فصول">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span>جستجوی سریع در فصول...</span>
+          </div>
+          <span class="mobile-search-badge">جستجو</span>
+        </button>
+      </div>
+
+      <div style="margin-block-end: var(--space-4); padding: var(--space-3); background-color: var(--bg-body-secondary); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+        <label for="mobileFontSelect" style="display: block; font-size: 11px; font-weight: 700; margin-block-end: 4px; color: var(--text-muted);">قلم مطالعه:</label>
+        <select class="font-select" id="mobileFontSelect" style="width: 100%;">
+          <option value="vazirmatn">وزیرمتن (Vazirmatn)</option>
+          <option value="shabnam">شبنم (Shabnam)</option>
+          <option value="sahel">ساحل (Sahel)</option>
+        </select>
+      </div>
+
+      <!-- Mobile Quiz Link -->
+      <div style="margin-block-end: var(--space-4);">
+        <a href="./quiz.html" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(225, 29, 72, 0.1); border: 1px solid rgba(225, 29, 72, 0.3); border-radius: var(--radius-md); text-decoration: none; color: #e11d48; font-weight: 800; font-size: 13px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            <span>آزمون و بانک سوالات</span>
+          </div>
+          <span style="font-size: 10.5px; background: #e11d48; color: #fff; padding: 2px 7px; border-radius: var(--radius-full);">شروع</span>
+        </a>
+      </div>
+      <ul class="nav-tree" id="mobileNavTree">
+        <!-- Injected dynamically via AppNavigation -->
+      </ul>
+    </div>
+  </aside>
+
+  <!-- Search Modal Dialog -->
+  <div class="search-modal-backdrop" id="searchModalBackdrop" role="dialog" aria-modal="true" aria-label="جستجوی بالینی">
+    <div class="search-dialog" id="searchDialog">
+      <div class="search-input-wrapper">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="جستجوی سریع در مباحث جراحی، فتق‌ها، داروها و نکات امتحانی..." autocomplete="off">
+        <span class="search-shortcut-badge">Esc</span>
+      </div>
+      <div class="search-results-list" id="searchResultsList">
+        <!-- Search results injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Bookmarks Modal Dialog -->
+  <div class="search-modal-backdrop" id="bookmarksModalBackdrop" role="dialog" aria-modal="true" aria-label="نشانک‌های من">
+    <div class="search-dialog" id="bookmarksDialog">
+      <div class="search-input-wrapper" style="justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: var(--space-2); font-weight: 700;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--state-warning)" stroke="var(--state-warning)">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>نشانک‌های مطالعه من</span>
+        </div>
+        <button class="action-mini-btn" id="bookmarksCloseBtn" aria-label="بستن پنجره نشانک‌ها">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="search-results-list" id="bookmarksList">
+        <!-- Bookmarked items injected here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Highlights Modal Dialog ("هایلایتهای من") -->
+  <div class="search-modal-backdrop" id="highlightsModalBackdrop" role="dialog" aria-modal="true" aria-label="هایلایت‌های من">
+    <div class="search-dialog highlights-dialog" id="highlightsDialog">
+      <div class="highlights-modal-header">
+        <div class="highlights-modal-title-group">
+          <span style="font-size: 19px;">🖍️</span>
+          <span>هایلایت‌های من</span>
+          <span class="highlights-count-pill" id="highlightsModalCountPill">۰ مورد</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" class="btn-highlight-action" id="printHighlightsBtn" title="پرینت خلاصه هایلایت‌ها">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            <span>پرینت خلاصه</span>
+          </button>
+          <button type="button" class="btn-highlight-action btn-danger-action" id="clearAllHighlightsBtn" title="پاک کردن تمام هایلایت‌ها">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span>پاک کردن همه</span>
+          </button>
+          <button type="button" class="action-mini-btn" id="highlightsCloseBtn" aria-label="بستن پنجره هایلایت‌ها">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="highlights-modal-list" id="highlightsList">
+        <!-- Highlights injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="./js/data/surgery-registry.js"></script>
+  <script>
+    window.ACTIVE_REGISTRY = window.SURGERY_REGISTRY;
+  </script>
+  <script src="./js/state.js"></script>
+  <script src="./js/components.js"></script>
+  <script src="./js/navigation.js"></script>
+  <script src="./js/search.js"></script>
+  <script src="./js/study-features.js"></script>
+  <script src="./js/router.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

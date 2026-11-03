@@ -857,26 +857,30 @@ def run_tests():
             mb_page.click("#coursesDropdownBtn")
             mb_page.wait_for_selector(".portal-dropdown.is-open")
             mb_cards = mb_page.locator("#coursesDropdownMenu .dropdown-course-card").all()
-            assert len(mb_cards) == 2, f"Expected 2 courses in dropdown at {bp}px"
+            assert len(mb_cards) == 3, f"Expected 3 courses in dropdown at {bp}px"
             mb_page.close()
         print("[Portal] PASS: Dropdown button and menu perfectly visible across all mobile viewports!")
 
-        # Verify Dropdown displays both courses
+        # Verify Dropdown displays all 3 courses
         page.click("#coursesDropdownBtn")
         page.wait_for_selector("#coursesDropdownMenu.is-open, .portal-dropdown.is-open")
         cards = page.locator("#coursesDropdownMenu .dropdown-course-card").all()
-        print(f"[Portal] Dropdown course cards: {len(cards)} (Expected: 2)")
-        assert len(cards) == 2, f"Expected 2 distinct courses in dropdown, got {len(cards)}"
+        print(f"[Portal] Dropdown course cards: {len(cards)} (Expected: 3)")
+        assert len(cards) == 3, f"Expected 3 distinct courses in dropdown, got {len(cards)}"
 
         card1_text = cards[0].inner_text()
         card2_text = cards[1].inner_text()
+        card3_text = cards[2].inner_text()
         assert "بیماری‌های واگیر و غیرواگیر" in card1_text
         assert "رادیولوژی و تصویربرداری بالینی" in card2_text
+        assert "جراحی جنرال" in card3_text
         assert cards[0].get_attribute("href") == "./communicable-and-noncommunicable-diseases.html", "Course 1 card must link directly to course 1"
         assert cards[0].locator(".dropdown-subfolders").count() == 0, "Course 1 card must not have subfolders in dropdown"
         assert cards[1].get_attribute("href") == "./radiology.html", "Course 2 card must link directly to ./radiology.html"
         assert cards[1].locator(".dropdown-subfolders").count() == 0, "Course 2 card must not have subfolders in dropdown"
-        print("[Portal] PASS: Dropdown presents both Course 1 and Course 2 clearly as direct clickable cards with no subfolders!")
+        assert cards[2].get_attribute("href") == "./surgery.html", "Course 3 card must link directly to ./surgery.html"
+        assert cards[2].locator(".dropdown-subfolders").count() == 0, "Course 3 card must not have subfolders in dropdown"
+        print("[Portal] PASS: Dropdown presents Course 1, Course 2, and Course 3 clearly as direct clickable cards with no subfolders!")
 
         # Verify Hero Search handles queries from both courses
         print("\n--- [Portal] Testing Hero Search across both courses ---")

@@ -1064,7 +1064,7 @@ body.portal-page,
 
 @media (min-width: 1024px) {
   .chapters-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 }
 
@@ -1249,7 +1249,7 @@ body.portal-page,
 
 @media (min-width: 1024px) {
   .dept-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 }
 
@@ -1682,7 +1682,7 @@ body.portal-page,
 
 .portal-bento-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: clamp(16px, 2.5vw, 24px);
   align-items: stretch;
 }
@@ -1924,4 +1924,51 @@ body.portal-page,
     grid-template-columns: 1fr;
     gap: var(--space-5);
   }
+}
+
+
+/* General Surgery Portal Card Styling */
+.bento-card-surg:hover {
+  border-color: #e11d48;
+}
+
+.bento-icon-surg {
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.15), rgba(190, 18, 60, 0.12));
+  color: #e11d48;
+}
+
+.bento-badge-surg {
+  color: #e11d48;
+  background: rgba(225, 29, 72, 0.08);
+  border: 1px solid rgba(225, 29, 72, 0.25);
+}
+
+[data-theme="dark"] .bento-badge-surg {
+  color: #fb7185;
+  background: rgba(225, 29, 72, 0.16);
+  border-color: rgba(251, 113, 133, 0.3);
+}
+
+.bento-cta-surg {
+  background: linear-gradient(135deg, #e11d48, #be123c);
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(225, 29, 72, 0.2);
+}
+
+.bento-cta-surg:hover {
+  background: linear-gradient(135deg, #be123c, #9f1239);
+  box-shadow: 0 4px 16px rgba(225, 29, 72, 0.35);
+  transform: translateY(-1px);
+}
+
+.pill-surg {
+  background: rgba(225, 29, 72, 0.12);
+  color: #e11d48;
+  border: 1px solid rgba(225, 29, 72, 0.3);
+}
+
+[data-theme="dark"] .pill-surg {
+  background: rgba(225, 29, 72, 0.2);
+  color: #fb7185;
+  border-color: rgba(251, 113, 133, 0.4);
 }
