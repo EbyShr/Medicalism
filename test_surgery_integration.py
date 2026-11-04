@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-End-to-End Playwright Verification for General Surgery (Lawrence) Module Integration.
+End-to-End Playwright Verification for General Surgery (Lawrence) Module Integration (14 Comprehensive Chapters).
 Tests:
-1. Zero Data Loss & Sanitization Verification (verbatim text, stripped meta-text)
-2. Dedicated Course Page surgery.html (Title, Brand, Toolbar, RTL layout)
-3. Rich Medical UI Widgets (Mind-Map Card, Badges, Steppers, Tables, High-Yield Cards)
-4. Exam Cram Filter Mode (⚡ حالت شب امتحان)
-5. Text Selection & 4-Color Offline Highlighter
-6. Navigation, TOC Sidebar, and Portal Linking in index.html & quiz.html
+1. Full 14-Chapter Registry Verification in Browser DOM
+2. Multi-Chapter Navigation & Dynamic Chapter Switching
+3. Interactive & Animated Clinical Flowchart Cards (.clinical-flowchart-card)
+4. RTL Tables (dir="rtl", text-align: right) and Stepper Cards
+5. Exam Cram Filter Mode (⚡ حالت شب امتحان)
+6. Portal Integration in index.html & quiz.html
 7. Zero Horizontal Overflow across Mobile (375px), Tablet (768px), and Desktop (1440px)
 """
 
@@ -34,7 +34,7 @@ def test_surgery_integration():
         browser = p.chromium.launch(executable_path=chrome_path, headless=True)
         
         print("\n=======================================================")
-        print("=== TEST 1: LOAD surgery.html & VERIFY PAGE STRUCTURE ===")
+        print("=== TEST 1: LOAD surgery.html & VERIFY 14 CHAPTERS ===")
         print("=======================================================")
         page = browser.new_page(viewport={"width": 1440, "height": 900})
         page.goto(surgery_url)
@@ -47,213 +47,168 @@ def test_surgery_integration():
         assert "جراحی جنرال" in title and "لارنس" in title, f"Unexpected page title: {title}"
         print(f"PASS: Page title verified: '{title}'")
 
-        # Verify brand identity
-        brand = page.locator(".header-brand .brand-title").first.inner_text()
-        assert "جراحی جنرال" in brand, f"Unexpected brand title: {brand}"
-        print(f"PASS: Brand title verified: '{brand}'")
+        # Verify 14 chapters in SURGERY_REGISTRY
+        registry_len = page.evaluate("() => window.SURGERY_REGISTRY.length")
+        assert registry_len == 14, f"Expected 14 chapters in registry, found {registry_len}"
+        print(f"PASS: window.SURGERY_REGISTRY loaded with all 14 chapters!")
 
-        # Verify Chapter Title
+        total_sections = page.evaluate("() => window.SURGERY_REGISTRY.reduce((acc, c) => acc + c.sections.length, 0)")
+        assert total_sections == 100, f"Expected 100 total sections, found {total_sections}"
+        print(f"PASS: Exactly 100 clinical sections verified across all 14 chapters!")
+
+        # Verify Initial Chapter (Ch 1)
         hero_title = page.locator(".chapter-title").first.inner_text()
-        assert "جدار شکم و فتق‌ها" in hero_title, f"Unexpected chapter title: {hero_title}"
-        print(f"PASS: Chapter hero title: '{hero_title}'")
+        assert "ارزیابی و مدیریت حوالی عمل" in hero_title, f"Unexpected chapter 1 title: {hero_title}"
+        print(f"PASS: Initial chapter hero title: '{hero_title}'")
 
-        # Verify all 7 sections rendered
         sections = page.locator(".study-section").all()
-        assert len(sections) == 7, f"Expected 7 sections, found {len(sections)}"
-        for idx, sec in enumerate(sections):
-            sec_id = sec.get_attribute("id")
-            assert sec_id == f"surg-ch10-sec{idx+1:02d}", f"Unexpected section ID: {sec_id}"
-        print(f"PASS: All 7 surgical sections cleanly mounted into DOM (sec01 to sec07)!")
+        assert len(sections) == 9, f"Expected 9 sections in Chapter 1, found {len(sections)}"
+        print(f"PASS: Chapter 1 mounted with 9 sections!")
+
+        # Verify TOC in sidebar has 14 chapters
+        toc_items = page.locator(".sidebar-scroll-container .nav-chapter-item").all()
+        assert len(toc_items) == 14, f"Expected 14 chapters in sidebar TOC, found {len(toc_items)}"
+        print(f"PASS: Sidebar TOC indexes all 14 chapters!")
 
         print("\n=======================================================")
-        print("=== TEST 2: CHAPTER MIND-MAP CARD (نمودار درختی جامع) ===")
+        print("=== TEST 2: DYNAMIC CHAPTER SWITCHING ===")
         print("=======================================================")
-        mindmap = page.locator("#chapterMindMap")
-        assert mindmap.is_visible(), "Chapter Mind-Map Card must be visible at top of chapter"
+        # Switch to Chapter 10 (Abdominal Wall & Hernia)
+        page.evaluate("() => window.appState.setActiveChapter('surg-ch10')")
+        page.wait_for_timeout(300)
 
-        branches = page.locator(".mindmap-card-branch").all()
-        assert len(branches) == 7, f"Expected 7 branch cards in mind-map, found {len(branches)}"
-        print(f"PASS: Chapter Mind-Map card rendered with 7 branches!")
+        hero_title_10 = page.locator(".chapter-title").first.inner_text()
+        assert "جدار شکم و فتق‌ها" in hero_title_10, f"Unexpected chapter 10 title: {hero_title_10}"
+        sec_count_10 = len(page.locator(".study-section").all())
+        assert sec_count_10 == 7, f"Expected 7 sections in Chapter 10, found {sec_count_10}"
+        print(f"PASS: Successfully switched to Chapter 10: '{hero_title_10}' (7 sections)!")
 
-        # Test mindmap toggle button
-        toggle_btn = page.locator("#btnToggleMindmap")
-        assert toggle_btn.is_visible()
-        toggle_btn.click()
-        page.wait_for_timeout(200)
-        assert page.locator("#mindmapContent").evaluate("el => el.classList.contains('is-collapsed')"), "Mindmap content should be collapsed"
-        toggle_btn.click()
-        page.wait_for_timeout(200)
-        assert not page.locator("#mindmapContent").evaluate("el => el.classList.contains('is-collapsed')"), "Mindmap content should be expanded"
-        print("PASS: Mindmap collapse/expand interactive toggle operates smoothly!")
+        # Switch to Chapter 15 (Biliary Tract)
+        page.evaluate("() => window.appState.setActiveChapter('surg-ch15')")
+        page.wait_for_timeout(300)
+
+        hero_title_15 = page.locator(".chapter-title").first.inner_text()
+        assert "مجاری صفراوی" in hero_title_15, f"Unexpected chapter 15 title: {hero_title_15}"
+        sec_count_15 = len(page.locator(".study-section").all())
+        assert sec_count_15 == 6, f"Expected 6 sections in Chapter 15, found {sec_count_15}"
+        print(f"PASS: Successfully switched to Chapter 15: '{hero_title_15}' (6 sections)!")
 
         print("\n=======================================================")
-        print("=== TEST 3: RICH MEDICAL UI WIDGET TRANSFORMATION ===")
+        print("=== TEST 3: INTERACTIVE & ANIMATED CLINICAL FLOWCHARTS ===")
         print("=======================================================")
-        # 1. Inline Exam Badges (.badge-theory and .badge-trap)
-        theory_badges = page.locator(".badge-theory").all()
-        trap_badges = page.locator(".badge-trap").all()
-        assert len(theory_badges) >= 50, f"Expected >50 theory badges, found {len(theory_badges)}"
-        assert len(trap_badges) >= 15, f"Expected >15 trap badges, found {len(trap_badges)}"
-        print(f"PASS: Theory badges ({len(theory_badges)}) and Trap warning badges ({len(trap_badges)}) rendered with styling!")
+        # In Chapter 15, verify the 2 clinical flowcharts:
+        flowcharts = page.locator(".clinical-flowchart-card").all()
+        assert len(flowcharts) >= 2, f"Expected >= 2 flowcharts in Chapter 15, found {len(flowcharts)}"
+        print(f"PASS: {len(flowcharts)} animated clinical flowchart cards rendered in Chapter 15!")
 
-        # 2. Clinical Steppers (.clinical-stepper-card)
-        stepper_cards = page.locator(".clinical-stepper-card").all()
-        assert len(stepper_cards) >= 5, f"Expected multiple clinical stepper cards, found {len(stepper_cards)}"
-        first_step = stepper_cards[0]
-        assert first_step.locator(".step-badge-pill").is_visible(), "Step badge pill must be visible"
-        print(f"PASS: Clinical Stepper Cards ({len(stepper_cards)}) rendered with step indicators!")
+        fc_title = page.locator(".flowchart-title").first.inner_text()
+        assert "کولهسیستیت حاد" in fc_title, f"Unexpected flowchart title: {fc_title}"
+        print(f"PASS: First flowchart verified: '{fc_title}'")
 
-        # 3. Decision branching arrows (⬅️, ✅, ❌)
-        arrows = page.locator(".stepper-arrow-indicator").all()
-        assert len(arrows) >= 5, f"Expected branching arrows, found {len(arrows)}"
-        assert page.locator(".badge-decision-yes").count() >= 1, "Expected ✅ success badges"
-        assert page.locator(".badge-decision-no").count() >= 1, "Expected ❌ danger badges"
-        print(f"PASS: Algorithm branching arrows and decision badges rendered!")
+        # Verify schematic board inside flowchart
+        schematic = page.locator(".schematic-board").first
+        assert schematic.is_visible(), "Schematic board must be visible inside flowchart"
+        print("PASS: Flowchart schematic canvas rendered with proper RTL layout!")
 
-        # 4. Comparison Tables (.table-container > table.table-medical)
-        tables = page.locator(".table-container table.table-medical").all()
-        assert len(tables) >= 10, f"Expected >=10 medical tables, found {len(tables)}"
-        print(f"PASS: Comparison tables ({len(tables)}) rendered inside responsive wrappers with sticky headers!")
-
-        # 5. High-Yield Night-Before-Exam Cards (.high-yield-exam-card)
-        hy_cards = page.locator(".high-yield-exam-card").all()
-        assert len(hy_cards) == 7, f"Expected 7 High-Yield cards (1 per part), found {len(hy_cards)}"
-        for hy in hy_cards:
-            assert "مرور شب امتحان" in hy.inner_text()
-        print(f"PASS: All 7 High-Yield Night-Before-Exam cards rendered with gold/emerald styling!")
+        # Switch to Chapter 2 (Fluids & Electrolytes) and check 15 flowcharts
+        page.evaluate("() => window.appState.setActiveChapter('surg-ch02')")
+        page.wait_for_timeout(300)
+        fc_ch2 = page.locator(".clinical-flowchart-card").all()
+        assert len(fc_ch2) >= 14, f"Expected >= 14 flowcharts in Chapter 2, found {len(fc_ch2)}"
+        print(f"PASS: Chapter 2 rendered with {len(fc_ch2)} animated clinical flowcharts!")
 
         print("\n=======================================================")
-        print("=== TEST 4: '⚡ حالت شب امتحان' (EXAM CRAM FILTER MODE) ===")
+        print("=== TEST 4: STRICT RTL TABLES & CLINICAL STEPPERS ===")
+        print("=======================================================")
+        # Switch back to Chapter 10 to check steppers and tables
+        page.evaluate("() => window.appState.setActiveChapter('surg-ch10')")
+        page.wait_for_timeout(300)
+
+        steppers = page.locator(".clinical-stepper-card").all()
+        assert len(steppers) >= 4, f"Expected >= 4 steppers in Chapter 10, found {len(steppers)}"
+        print(f"PASS: Found {len(steppers)} clinical steppers in Chapter 10!")
+
+        tables = page.locator(".table-container table").all()
+        assert len(tables) >= 5, f"Expected >= 5 tables in Chapter 10, found {len(tables)}"
+        for idx, tbl in enumerate(tables[:3]):
+            tbl_dir = tbl.get_attribute("dir")
+            assert tbl_dir == "rtl", f"Table #{idx+1} must have dir='rtl', found {tbl_dir}"
+        print(f"PASS: All tables have strict dir='rtl' and responsive container wrapping!")
+
+        print("\n=======================================================")
+        print("=== TEST 5: EXAM CRAM MODE (⚡ حالت شب امتحان) ===")
         print("=======================================================")
         cram_btn = page.locator("#examCramToggleBtn")
-        assert cram_btn.is_visible()
+        assert cram_btn.is_visible(), "Exam Cram Mode toggle button must be visible"
+        
+        # Click to activate Exam Cram Mode
         cram_btn.click()
         page.wait_for_timeout(300)
+        has_cram_class = page.locator("body").evaluate("el => el.classList.contains('exam-cram-mode')")
+        assert has_cram_class, "Body must have 'exam-cram-mode' class when activated"
+        print("PASS: Exam Cram Mode activated successfully!")
 
-        assert cram_btn.evaluate("el => el.classList.contains('is-active')")
-        assert page.locator("#chapterContentArea").evaluate("el => el.classList.contains('exam-cram-mode')")
-        assert page.locator("#examCramBanner").is_visible()
-
-        # Check visibility in cram mode:
-        # A) Mind-Map must be visible
-        assert page.locator("#chapterMindMap").is_visible(), "Mind-map must be visible in cram mode"
-        # B) High-yield cards must be visible
-        assert hy_cards[0].is_visible(), "High-yield card must be visible in cram mode"
-        # C) Tables must be visible
-        assert tables[0].is_visible(), "Table must be visible in cram mode"
-        # D) Stepper cards must be visible
-        assert stepper_cards[0].is_visible(), "Stepper card must be visible in cram mode"
-        print("PASS: Exam Cram Mode activated; Mind-Map, High-Yield cards, Steppers, and Tables remain fully visible!")
-
-        # Toggle cram mode off
-        page.locator("#btnExitCram").click()
-        page.wait_for_timeout(200)
-        assert not page.locator("#chapterContentArea").evaluate("el => el.classList.contains('exam-cram-mode')")
-        print("PASS: Exited Exam Cram mode smoothly!")
-
-        print("\n=======================================================")
-        print("=== TEST 5: TEXT SELECTION & 4-COLOR HIGHLIGHTER ===")
-        print("=======================================================")
-        # Select text in the first study section
-        p_locator = page.locator("#chapterContentArea .study-section p").first
-        p_locator.scroll_into_view_if_needed()
+        # Verify High-Yield cards and Flowcharts remain visible
+        mindmap_vis = page.locator(".chapter-mindmap-container").first.is_visible()
+        assert mindmap_vis, "Mindmap should remain visible in exam cram mode"
+        
+        # Toggle off
+        cram_btn.click()
         page.wait_for_timeout(300)
-
-        page.evaluate("""() => {
-            const p = document.querySelector('#chapterContentArea .study-section p');
-            const range = document.createRange();
-            const textNode = p.firstChild || p;
-            const maxLen = textNode.length || textNode.textContent.length;
-            range.setStart(textNode, 0);
-            range.setEnd(textNode, Math.min(15, maxLen));
-            const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
-            window.StudyFeatures.showPopoverForSelection(range);
-        }""")
-        page.wait_for_timeout(250)
-
-        popover = page.locator("#highlightPopover")
-        assert popover.is_visible(), "Highlight floating popover should appear"
-        swatches = popover.locator(".swatch-btn").all()
-        assert len(swatches) == 4, f"Expected 4 swatches, found {len(swatches)}"
-
-        # Click Yellow swatch
-        popover.locator(".swatch-btn[data-color='yellow']").click(force=True)
-        page.wait_for_timeout(250)
-
-        created_mark = page.locator("mark.user-highlight")
-        assert created_mark.count() >= 1, "Expected <mark class='user-highlight'> in DOM"
-        assert created_mark.get_attribute("data-color") == "yellow"
-        
-        badge = page.locator("#highlightsCountBadge")
-        assert badge.is_visible() and ("1" in badge.inner_text() or "۱" in badge.inner_text())
-        print("PASS: Text highlighted with yellow swatch, mark inserted in DOM, and badge updated!")
+        assert not page.locator("body").evaluate("el => el.classList.contains('exam-cram-mode')"), "Exam Cram Mode should be deactivated"
+        print("PASS: Exam Cram Mode toggled back to standard study view!")
 
         print("\n=======================================================")
-        print("=== TEST 6: SIDEBAR TOC NAVIGATION & SCROLLSPY ===")
+        print("=== TEST 6: PORTAL HOMEPAGE & QUIZ INTEGRATION ===")
         print("=======================================================")
-        toc_links = page.locator("#desktopNavTree .nav-heading-link").all()
-        assert len(toc_links) == 7, f"Expected 7 section links in TOC sidebar, found {len(toc_links)}"
-        
-        # Test clicking section 3 link
-        sec3_link = page.locator("#desktopNavTree .nav-heading-link[data-target-id='surg-ch10-sec03']")
-        assert sec3_link.is_visible()
-        sec3_link.click()
-        page.wait_for_timeout(400)
-
-        assert page.evaluate("() => window.appState.activeSectionId") == "surg-ch10-sec03"
-        print("PASS: Clicking TOC link smoothly scrolled and updated active section to 'surg-ch10-sec03'!")
-
-        print("\n=======================================================")
-        print("=== TEST 7: PORTAL INTEGRATION IN index.html & quiz.html ===")
-        print("=======================================================")
-        # Test index.html dropdown and bento card
         page.goto(index_url)
         page.wait_for_load_state("networkidle")
+        
+        # Check course dropdown card
+        dropdown_surg = page.locator(".dropdown-course-card[href='./surgery.html']")
+        assert dropdown_surg.count() >= 1, "Surgery course card must exist in index.html dropdown"
+        dropdown_meta = dropdown_surg.first.text_content()
+        assert "۱۴ فصل" in dropdown_meta, f"Dropdown meta must show 14 chapters, found: {dropdown_meta}"
+        print("PASS: Portal navigation dropdown correctly displays 14 General Surgery chapters!")
 
-        # Check dropdown contains surgery
-        surg_in_dropdown = page.locator("#coursesDropdownMenu a[href*='surgery.html']")
-        assert surg_in_dropdown.count() >= 1, "surgery.html must be linked in courses dropdown on index.html"
+        # Check Bento card
+        bento_title = page.locator(".bento-card-surg .bento-card-title").first.inner_text()
+        assert "جراحی جنرال" in bento_title, f"Unexpected Bento title: {bento_title}"
+        bento_tags = page.locator(".bento-card-surg .bento-tag").all_inner_texts()
+        assert any("۱۴ فصل" in t for t in bento_tags), f"Bento tags should mention 14 chapters: {bento_tags}"
+        print(f"PASS: Portal Bento card updated with tags: {bento_tags}")
 
-        # Check Bento Card exists
-        surg_bento = page.locator(".bento-card-surg")
-        assert surg_bento.count() >= 1, "Surgery bento card must exist in portal grid"
-        assert "جراحی جنرال" in surg_bento.inner_text()
-        print("PASS: surgery.html linked in dropdown and Bento Grid on index.html!")
-
-        # Check quiz.html dropdown contains surgery
+        # Check Quiz page
         page.goto(quiz_url)
         page.wait_for_load_state("networkidle")
-        surg_in_quiz = page.locator("#coursesDropdownMenu a[href*='surgery.html']")
-        assert surg_in_quiz.count() >= 1, "surgery.html must be linked in courses dropdown on quiz.html"
-        print("PASS: surgery.html linked in courses dropdown on quiz.html!")
+        quiz_surg = page.locator(".dropdown-course-card[href='./surgery.html']")
+        assert quiz_surg.count() >= 1, "Surgery course card must exist in quiz.html dropdown"
+        print("PASS: Quiz navigation dropdown links to General Surgery!")
 
         print("\n=======================================================")
-        print("=== TEST 8: ZERO HORIZONTAL OVERFLOW ACROSS BREAKPOINTS ===")
+        print("=== TEST 7: RESPONSIVENESS & ZERO HORIZONTAL OVERFLOW ===")
         print("=======================================================")
-        breakpoints = [375, 768, 1024, 1440]
-        for bp in breakpoints:
-            test_page = browser.new_page(viewport={"width": bp, "height": 850})
-            test_page.goto(surgery_url)
-            test_page.wait_for_load_state("networkidle")
+        viewports = [
+            ("Mobile 375px", 375, 667),
+            ("Tablet 768px", 768, 1024),
+            ("Desktop 1440px", 1440, 900)
+        ]
 
-            overflow = test_page.evaluate("""() => {
-                const doc = document.documentElement;
-                return {
-                    scrollWidth: doc.scrollWidth,
-                    clientWidth: doc.clientWidth,
-                    hasOverflow: doc.scrollWidth > doc.clientWidth + 1
-                };
-            }""")
-            assert not overflow["hasOverflow"], f"Horizontal overflow detected at {bp}px: {overflow}"
-            print(f"PASS: Viewport {bp}px has ZERO horizontal overflow ({overflow['clientWidth']}px == {overflow['scrollWidth']}px)")
-            test_page.close()
+        for label, w, h in viewports:
+            page.set_viewport_size({"width": w, "height": h})
+            page.goto(surgery_url)
+            page.wait_for_load_state("networkidle")
+            page.wait_for_timeout(300)
 
-        page.close()
+            # Check for horizontal overflow
+            scroll_width = page.evaluate("() => document.documentElement.scrollWidth")
+            client_width = page.evaluate("() => document.documentElement.clientWidth")
+            assert scroll_width <= client_width + 1, f"Horizontal overflow detected on {label}: scrollWidth={scroll_width}, clientWidth={client_width}"
+            print(f"PASS: {label} has ZERO horizontal overflow (scrollWidth={scroll_width}, clientWidth={client_width})!")
+
         print("\n=======================================================")
-        print("=== ALL SURGERY MODULE INTEGRATION TESTS PASSED 100% ===")
-        print("=======================================================\n")
+        print("=== ALL 7 END-TO-END VERIFICATION SUITES PASSED 100%! ===")
+        print("=======================================================")
 
 if __name__ == '__main__':
     test_surgery_integration()

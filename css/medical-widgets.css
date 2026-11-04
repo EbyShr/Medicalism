@@ -2334,3 +2334,438 @@
 .mindmap-card-branch[data-branch="6"] .branch-badge { background: #059669; }
 .mindmap-card-branch[data-branch="7"] { border-inline-start-color: #0d9488; }
 .mindmap-card-branch[data-branch="7"] .branch-badge { background: #0d9488; }
+
+
+/* ==========================================================================
+   9. INTERACTIVE & ANIMATED CLINICAL FLOWCHARTS & DECISION TREES
+   ========================================================================== */
+.clinical-flowchart-card {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  margin-block: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.clinical-flowchart-card:hover {
+  border-color: rgba(14, 165, 233, 0.4);
+  box-shadow: 0 8px 30px rgba(14, 165, 233, 0.1);
+}
+
+[data-theme="dark"] .clinical-flowchart-card {
+  background: rgba(15, 23, 42, 0.75);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .clinical-flowchart-card:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 8px 32px rgba(56, 189, 248, 0.12);
+}
+
+/* Flowchart Header */
+.flowchart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-block-end: 20px;
+  padding-block-end: 14px;
+  border-block-end: 1px solid var(--border-subtle);
+}
+
+.flowchart-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.flowchart-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+}
+
+.flowchart-pulse-ring {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #38bdf8;
+  display: inline-block;
+  box-shadow: 0 0 0 rgba(56, 189, 248, 0.6);
+  animation: pulseGlowRing 2s infinite;
+}
+
+@keyframes pulseGlowRing {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(56, 189, 248, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+}
+
+.flowchart-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+/* Root node */
+.flowchart-root-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-block-end: 16px;
+}
+
+.root-node-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.12), rgba(99, 102, 241, 0.12));
+  border: 1.5px solid rgba(2, 132, 199, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 12px 20px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.08);
+  max-width: 100%;
+  text-align: center;
+}
+
+[data-theme="dark"] .root-node-inner {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.flowchart-root-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-block-start: 6px;
+  text-align: center;
+}
+
+/* Connector down with animated pulse */
+.flowchart-connector-down {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-block: 10px;
+  position: relative;
+}
+
+.flow-pulse-line {
+  width: 2px;
+  height: 24px;
+  background: linear-gradient(to bottom, #0284c7, #38bdf8);
+  position: relative;
+  display: block;
+}
+
+.flow-pulse-line::after {
+  content: '▼';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: #0284c7;
+}
+
+[data-theme="dark"] .flow-pulse-line::after {
+  color: #38bdf8;
+}
+
+/* Branch Grid */
+.flowchart-branches-grid {
+  display: grid;
+  gap: 16px;
+  margin-block-start: 12px;
+  width: 100%;
+}
+
+.flowchart-branches-grid.cols-1 { grid-template-columns: 1fr; }
+.flowchart-branches-grid.cols-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.flowchart-branches-grid.cols-3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.flowchart-branches-grid.cols-4 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+
+/* Flowchart Branch Cards */
+.flowchart-branch-card {
+  background: var(--bg-surface-secondary);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-fast);
+  position: relative;
+  border-inline-start-width: 4px;
+}
+
+.flowchart-branch-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-default);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .flowchart-branch-card {
+  background: rgba(30, 41, 59, 0.5);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Branch Themes */
+.branch-theme-emerald { border-inline-start-color: #059669 !important; }
+.badge-emerald { background: #059669; color: #fff; }
+.dot-emerald { background: #059669; }
+
+.branch-theme-amber { border-inline-start-color: #d97706 !important; }
+.badge-amber { background: #d97706; color: #fff; }
+.dot-amber { background: #d97706; }
+
+.branch-theme-rose { border-inline-start-color: #e11d48 !important; }
+.badge-rose { background: #e11d48; color: #fff; }
+.dot-rose { background: #e11d48; }
+
+.branch-theme-cyan { border-inline-start-color: #0284c7 !important; }
+.badge-cyan { background: #0284c7; color: #fff; }
+.dot-cyan { background: #0284c7; }
+
+.branch-theme-indigo { border-inline-start-color: #6366f1 !important; }
+.badge-indigo { background: #6366f1; color: #fff; }
+.dot-indigo { background: #6366f1; }
+
+.branch-theme-purple { border-inline-start-color: #8b5cf6 !important; }
+.badge-purple { background: #8b5cf6; color: #fff; }
+.dot-purple { background: #8b5cf6; }
+
+.branch-theme-teal { border-inline-start-color: #0d9488 !important; }
+.badge-teal { background: #0d9488; color: #fff; }
+.dot-teal { background: #0d9488; }
+
+.branch-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-block-end: 12px;
+  padding-block-end: 8px;
+  border-block-end: 1px dashed var(--border-subtle);
+}
+
+.branch-pill-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.branch-card-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.branch-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.tree-leaf-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.leaf-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.tree-step-connector {
+  display: flex;
+  justify-content: center;
+  margin-block: 4px;
+}
+
+.flow-pulsing-arrow {
+  display: inline-block;
+  animation: bounceArrow 1.5s infinite;
+}
+
+@keyframes bounceArrow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+
+.tree-action-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: 0.86rem;
+  font-weight: 700;
+  margin-block-start: 6px;
+}
+
+.tree-action-node.action-success {
+  background: rgba(5, 150, 105, 0.12);
+  border: 1px solid rgba(5, 150, 105, 0.3);
+  color: #047857;
+}
+
+[data-theme="dark"] .tree-action-node.action-success {
+  background: rgba(5, 150, 105, 0.2);
+  color: #34d399;
+}
+
+.tree-action-node.action-danger {
+  background: rgba(225, 29, 72, 0.12);
+  border: 1px solid rgba(225, 29, 72, 0.3);
+  color: #be123c;
+}
+
+[data-theme="dark"] .tree-action-node.action-danger {
+  background: rgba(225, 29, 72, 0.2);
+  color: #fb7185;
+}
+
+.tree-action-node.action-neutral {
+  background: rgba(100, 116, 139, 0.12);
+  border: 1px solid rgba(100, 116, 139, 0.3);
+  color: var(--text-primary);
+}
+
+/* Linear Stepper Diagrams */
+.linear-stepper-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.linear-flow-step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-surface-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px 18px;
+  transition: all var(--transition-fast);
+}
+
+.linear-flow-step:hover {
+  transform: translateX(-4px);
+  border-color: var(--border-default);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .linear-flow-step {
+  background: rgba(30, 41, 59, 0.55);
+}
+
+.step-badge-indicator {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #ffffff;
+  background: #0284c7;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
+}
+
+.linear-flow-step.step-root .step-badge-indicator {
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+}
+
+.linear-flow-step.step-success .step-badge-indicator {
+  background: linear-gradient(135deg, #059669, #10b981);
+}
+
+.linear-flow-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #0284c7;
+  font-size: 11px;
+  margin-block: -4px;
+  opacity: 0.8;
+  animation: bounceArrow 1.8s infinite;
+}
+
+/* Box-Branch Diagram Visual Board */
+.schematic-board {
+  background: rgba(2, 132, 199, 0.03);
+  border: 1.5px solid rgba(2, 132, 199, 0.15);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  overflow-x: auto;
+  direction: rtl;
+}
+
+[data-theme="dark"] .schematic-board {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(56, 189, 248, 0.18);
+}
+
+.schematic-root-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  margin-block-end: 14px;
+}
+
+.schematic-tree-code {
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  direction: rtl;
+  text-align: right;
+  white-space: pre;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* Exam Cram Mode Integration: Flowcharts are preserved */
+.exam-cram-mode .clinical-flowchart-card {
+  display: block !important;
+  opacity: 1 !important;
+  border-color: rgba(2, 132, 199, 0.4) !important;
+}
