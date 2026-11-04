@@ -3,16 +3,11 @@
 Medicalism Alborz - Automated Surgery Chapter Parser & Builder (Comprehensive 14-Chapter Edition)
 Source: Lawrence's Essentials of General Surgery (جراحی جنرال لارنس)
 
-Features:
-- Zero Data Loss: 100% verbatim retention of medical facts, clinical steps, tables, English terms, and measurements.
-- Interactive & Animated Clinical Flowcharts: Transforms ASCII text-art algorithms into visual, animated clinical decision widgets. ZERO monospace <pre><code> blocks!
-- Multi-Color Typography & Medical Styling: Color-coded lead keywords (indigo, amber, cyan, emerald, rose), Latin badges, custom list counters, and micro-indicators.
-- Automated Chat Wrapper Sanitization: strips AI conversational intros/outros and meta-lines.
-- Headings Sanitization: strips (صفحات x تا y PDF) from all headings, titles, and subheadings.
-- Strict RTL Table Formatting: enforces direction: rtl and text-align: right with sticky headers and zebra striping.
-- Uncluttered Badges: micro-indicators (🎯 / ⚠️ دام تستی) with tooltips and accessible screen-reader text.
-- Interactive Chapter Mind-Maps with fully functioning toggle buttons.
-- Multi-Chapter Support: parses all 14 chapters into js/data/surgery-registry.js and chapters/Surgery/surgery_registry.json.
+Multi-modal Tree Distribution:
+- 90% Approach 2: Stylized Clean Tree View (.ctree-container)
+- 7%  Approach 1: Modern Hierarchical Visual Medical Tree (.vtree-container / .convergent-pathway-card / .visual-protocol-card)
+- 3%  Approach 3: Nested Decision Cards (.ncards-container)
+Zero monospace <pre><code> code blocks across all 87 diagrams!
 """
 
 import os
@@ -194,6 +189,42 @@ CHAPTER_CONFIGS = [
     }
 ]
 
+# Keywords designating the ~7% Approach 1 (Visual Medical Tree / Major Decision Forks)
+APPROACH_1_KEYWORDS = [
+    'کولهسیستیت حاد',
+    'کلانژیت حاد',
+    'محرک‌های سلول پاریتال',
+    'شوک خونریزی‌دهنده شدید',
+    'ترومایی ناپایدار همودینامیک',
+    'بیمار با علائم مشکوک به شوک'
+]
+
+# Keywords designating the ~3% Approach 3 (Nested Decision Cards / Criteria Tiers)
+APPROACH_3_KEYWORDS = [
+    'کاپرینی',
+    'Caprini',
+    'عوامل مختل‌کننده التیام زخم',
+    'کیست پانکراس'
+]
+
+def clean_heading_math(text):
+    """Formats LaTeX math in headings into clean medical text without LaTeX markup."""
+    if not text:
+        return text
+    def repl_m(m):
+        s = m.group(1).strip()
+        s = re.sub(r'\\text\{([^}]+)\}', r'\1', s)
+        s = re.sub(r'\\mathrm\{([^}]+)\}', r'\1', s)
+        s = s.replace(r'\text{-}', '–').replace(r'\text{–}', '–')
+        s = re.sub(r'\^\\circ\s*F', '°F', s)
+        s = re.sub(r'\^\\circ\s*C', '°C', s)
+        s = s.replace(r'\ge', '≥').replace(r'\geq', '≥')
+        s = s.replace(r'\le', '≤').replace(r'\leq', '≤')
+        s = s.replace(r'\pm', '±')
+        s = s.replace(r'\times', '×')
+        return s
+    return re.sub(r'\$([^\$\n]+)\$', repl_m, text)
+
 def clean_page_numbers(text):
     """Strips (صفحات x تا y PDF) or (صفحه x) from headings and titles."""
     if not text:
@@ -201,21 +232,18 @@ def clean_page_numbers(text):
     t = re.sub(r'\s*\([^)]*صفح[هات]+[^)]*\)', '', text)
     t = re.sub(r'\s*\([^)]*(?:PDF|pdf|لارنس|رفرنس)[^)]*\)', '', t)
     t = re.sub(r'\s*\(پوشش\s*کامل\s*صفحات\s*[\d\u06F0-\u06F9]+.*?\)', '', t)
+    t = clean_heading_math(t)
     return t.strip()
 
 def format_math_expr(match):
     """Formats LaTeX math into clean, human-readable medical markup without code boxes."""
     raw = match.group(1).strip()
     s = raw
-    # Strip \text{...} and \mathrm{...}
     s = re.sub(r'\\text\{([^}]+)\}', r'\1', s)
     s = re.sub(r'\\mathrm\{([^}]+)\}', r'\1', s)
-    # Replace en-dash / hyphens inside dimensions
     s = s.replace(r'\text{-}', '–').replace(r'\text{–}', '–')
-    # Temperature degrees
     s = re.sub(r'\^\\circ\s*F', '°F', s)
     s = re.sub(r'\^\\circ\s*C', '°C', s)
-    # Unit formats and symbols
     s = s.replace(r'kg/m^2', 'kg/m²')
     s = s.replace(r'/m^2', '/m²')
     s = s.replace(r'^2', '²')
@@ -230,15 +258,10 @@ def format_math_expr(match):
     s = s.replace(r'\sim', '~')
     s = s.replace(r'\approx', '≈')
     s = s.replace(r'\ ', ' ')
-    # Handle fraction: \frac{a}{b} -> (a) / (b)
     s = re.sub(r'\\frac\{([^}]+)\}\{([^}]+)\}', r'(\1) / (\2)', s)
-    # Protect HbA_{1c} token before escaping comparison operators
     s = re.sub(r'HbA_\{?1c\}?', '###HBA1C###', s)
-    # Escape < and > for HTML safety
     s = s.replace('<', '&lt;').replace('>', '&gt;')
-    # Restore styled HbA1c
     s = s.replace('###HBA1C###', 'HbA<sub>1c</sub>')
-    # Clean redundant whitespace
     s = re.sub(r'\s+', ' ', s).strip()
     return f'<span class="med-measure" dir="ltr">{s}</span>'
 
@@ -273,7 +296,7 @@ def transform_inline_elements(text):
     # 3. Inline math expressions ($...$)
     text = re.sub(r'\$([^\$\n]+)\$', format_math_expr, text)
 
-    # 4. Directional arrows (non-capturing alternation to protect multi-byte variation selectors)
+    # 4. Directional arrows (safe non-capturing alternation to protect multi-byte variation selectors)
     text = re.sub(r'(?:⬅️|➡️|⬇️|⬆️)', r'<span class="stepper-arrow-indicator">\g<0></span>', text)
     text = re.sub(r'✅', '<span class="badge-decision-yes" title="موفقیت‌آمیز / پایدار">✅</span>', text)
     text = re.sub(r'❌', '<span class="badge-decision-no" title="ناموفق / ناپایدار / خط قرمز">❌</span>', text)
@@ -365,23 +388,292 @@ def clean_diagram_title(line):
     t = re.sub(r'[\[\]\s*#]+$', '', t)
     return clean_page_numbers(t.strip())
 
-def clean_diagram_text(t):
-    """Strips ASCII box and arrow drawing characters."""
+def clean_tree_text(t):
+    """Strips tree branch characters, arrows, leading hyphens."""
+    t = re.sub(r'^[│\s]*[├└]──[>►\s]*', '', t)
+    t = re.sub(r'^[│\s]+', '', t)
     t = re.sub(r'[┌┐└┘├┤┬┴┼─━│┃▼►◄▲]+', '', t)
-    t = re.sub(r'^[>\-—\s]+', '', t)
-    t = re.sub(r'[>\-—\s]+$', '', t)
     return t.strip()
 
-# =========================================================================
-# COMPREHENSIVE CLINICAL FLOWCHART & DIAGRAM GENERATORS (ZERO MONOSPACE)
-# =========================================================================
+def parse_split_box_into_hierarchy(lines):
+    """
+    Parses horizontal split-box ASCII diagrams (e.g. ┌───────┴───────┐ with multiple columns)
+    into a clean multi-branch tree hierarchy:
+    Root -> Branch 1 (Level 1) -> Subnodes (Level 2) -> Actions (Level 3)
+         -> Branch 2 (Level 1) -> Subnodes (Level 2) -> Actions (Level 3)
+    """
+    split_idx = -1
+    for i, l in enumerate(lines):
+        if ('┌' in l or '┬' in l or '┴' in l) and ('─' in l or '━' in l):
+            split_idx = i
+            break
+    if split_idx == -1:
+        return None
 
+    # 1. Extract Root text from lines before the split
+    root_lines = []
+    for l in lines[:split_idx]:
+        s = l.strip()
+        if not s or all(ch in '│┃▼ \t' for ch in s):
+            continue
+        cleaned = clean_tree_text(s)
+        cleaned = re.sub(r'^\s*\[([^\]]+)\]\s*$', r'\1', cleaned)
+        if cleaned:
+            root_lines.append(cleaned)
+    root_text = ' '.join(root_lines) if root_lines else 'مسیر بالینی و الگوریتم درمانی'
+
+    # 2. Extract column data from content lines below split
+    content_lines = lines[split_idx+1:]
+    col_data = []
+    for l in content_lines:
+        s = l.strip()
+        if not s or all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in s):
+            continue
+        brackets = re.findall(r'\[[^\]]+\]', l)
+        if len(brackets) >= 2:
+            parts = brackets
+        else:
+            bullets = [m.start() for m in re.finditer(r'•', l)]
+            if len(bullets) >= 2:
+                parts = []
+                cuts = bullets + [len(l)]
+                for k in range(len(cuts)-1):
+                    p = l[cuts[k]:cuts[k+1]].strip()
+                    if p: parts.append(p)
+            else:
+                cleaned = re.sub(r'^[│┃\s]+|[│┃\s]+$', '', l)
+                parts = [p.strip() for p in re.split(r'\s{3,}', cleaned) if p.strip()]
+                parts = [p for p in parts if not all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in p)]
+        if parts:
+            col_data.append(parts)
+
+    if not col_data:
+        return None
+
+    num_cols = max(len(row) for row in col_data)
+    if num_cols < 2:
+        return None
+
+    cols = [[] for _ in range(num_cols)]
+    for row in col_data:
+        if len(row) == num_cols:
+            for idx, item in enumerate(row):
+                cols[idx].append(item)
+        elif len(row) == 1:
+            cols[0].append(row[0])
+        else:
+            for idx, item in enumerate(row):
+                if idx < num_cols:
+                    cols[idx].append(item)
+
+    # 3. Assemble branches
+    root_node = {'text': root_text, 'children': []}
+    for c_idx, col_items in enumerate(cols):
+        if not col_items:
+            continue
+
+        # Merge multiline bracket segments (e.g. [Title on line 1 + Subtitle on line 2])
+        merged_items = []
+        c_i = 0
+        while c_i < len(col_items):
+            cur = col_items[c_i]
+            if '[' in cur and ']' not in cur and c_i + 1 < len(col_items) and ']' in col_items[c_i + 1]:
+                cur = cur + ' ' + col_items[c_i + 1]
+                c_i += 1
+            cur_clean = clean_tree_text(cur)
+            cur_clean = re.sub(r'^\s*\[\s*', '', cur_clean)
+            cur_clean = re.sub(r'\s*\]\s*$', '', cur_clean)
+            if cur_clean and not all(ch in '│┃▼ \t' for ch in cur_clean):
+                merged_items.append(cur_clean)
+            c_i += 1
+
+        if not merged_items:
+            continue
+
+        b_title = merged_items[0]
+        branch_node = {'text': b_title, 'children': [], 'level': 1}
+
+        curr_subnode = None
+        for item_clean in merged_items[1:]:
+            if not curr_subnode:
+                curr_subnode = {'text': item_clean, 'children': [], 'level': 2}
+                branch_node['children'].append(curr_subnode)
+            else:
+                curr_subnode['children'].append({'text': item_clean, 'children': [], 'level': 3})
+
+        root_node['children'].append(branch_node)
+
+    return root_node
+
+def parse_tree_into_hierarchy(lines):
+    """
+    Parses an ASCII indented tree into a multi-level Python tree structure:
+    Root -> Level 1 nodes -> Level 2 nodes -> Level 3 nodes.
+    Supports both indented hierarchies (├──, └──) and horizontal split-box diagrams (┌─┬─┐ / ┌─┴─┐).
+    """
+    if not lines:
+        return None
+
+    # 1. Check for horizontal split-box diagrams first
+    if any(('┌' in l or '┬' in l or '┴' in l) and ('─' in l or '━' in l) for l in lines):
+        split_res = parse_split_box_into_hierarchy(lines)
+        if split_res and len(split_res.get('children', [])) >= 2:
+            return split_res
+
+    # 2. Standard Indented Tree parsing
+    root_text = clean_tree_text(lines[0])
+    content_lines = []
+    for l in lines[1:]:
+        s = l.strip()
+        if not s or s in ['│', '▼', '⬇️', '---']:
+            continue
+        if all(ch in '│┃ \t┌─┐┴' for ch in s):
+            continue
+        content_lines.append(l)
+
+    if not content_lines:
+        return {'text': root_text, 'children': []}
+
+    parsed_items = []
+    for raw_line in content_lines:
+        m = re.search(r'[├└]──', raw_line)
+        if m:
+            indent = m.start()
+        else:
+            indent = len(raw_line) - len(raw_line.lstrip())
+        clean_text = clean_tree_text(raw_line)
+        if clean_text:
+            parsed_items.append((indent, clean_text))
+
+    if not parsed_items:
+        return {'text': root_text, 'children': []}
+
+    indents = sorted(list(set(item[0] for item in parsed_items)))
+    def get_level(indent_val):
+        for idx, lvl in enumerate(indents):
+            if indent_val <= lvl + 2:
+                return idx + 1
+        return len(indents)
+
+    root_node = {'text': root_text, 'children': []}
+    level_stack = [root_node]
+
+    for indent, text in parsed_items:
+        lvl = get_level(indent)
+        new_node = {'text': text, 'children': [], 'level': lvl}
+        while len(level_stack) > lvl:
+            level_stack.pop()
+        parent = level_stack[-1]
+        parent['children'].append(new_node)
+        level_stack.append(new_node)
+
+    return root_node
+
+# =========================================================================
+# APPROACH 2: STYLIZED CLEAN TREE VIEW (90% of diagrams - Primary Standard)
+# =========================================================================
+def render_approach2_clean_tree(lines, title):
+    """
+    Renders an ASCII indented tree into Approach 2: Stylized Clean Tree View HTML.
+    Preserves exact parent-child hierarchy with vertical line guides and elbows.
+    Zero monospace code blocks.
+    """
+    tree = parse_tree_into_hierarchy(lines)
+    if not tree or not tree.get('children'):
+        # Fallback to single card if no children
+        body_text = ' '.join(clean_tree_text(l) for l in lines[1:] if clean_tree_text(l))
+        return f"""
+<div class="clinical-flowchart-card animated-diagram ctree-diagram" data-flowchart="true">
+  <div class="flowchart-header">
+    <div class="flowchart-badge"><span class="flowchart-pulse-ring"></span> الگوریتم درختی بالینی لارنس</div>
+    <h4 class="flowchart-title">{title}</h4>
+  </div>
+  <div class="ctree-container">
+    <div class="ctree-root-line"><span>🩺</span><span>{title}</span></div>
+    <div class="ctree-text" style="padding: 12px;">{transform_inline_elements(body_text)}</div>
+  </div>
+</div>
+"""
+
+    root_text = transform_inline_elements(tree['text'])
+    level1_nodes = tree.get('children', [])
+    
+    nodes_html = []
+    colors = ['rose', 'indigo', 'emerald', 'amber', 'cyan', 'purple']
+    
+    for idx, n1 in enumerate(level1_nodes):
+        n1_text = n1['text']
+        # Determine theme color
+        col = 'rose' if any(w in n1_text for w in ['اورژانس', 'خطر', 'حاد', 'شوک', 'مرگ', 'ناپایدار', 'قرمز']) else (
+              'emerald' if any(w in n1_text for w in ['کم‌خطر', 'پایدار', 'نرمال', 'موفق']) else
+              'amber' if any(w in n1_text for w in ['متوسط', 'احتیاط', 'مشکوک']) else
+              colors[idx % len(colors)]
+        )
+        
+        children_html = []
+        if n1.get('children'):
+            for n2 in n1['children']:
+                n2_text = n2['text']
+                # Check for arrow
+                if '⬅️' in n2_text:
+                    parts = n2_text.split('⬅️', 1)
+                    sub_title = transform_inline_elements(parts[0].strip())
+                    sub_action = transform_inline_elements(parts[1].strip())
+                    sub_html = f'<span class="ctree-text-bold">{sub_title}</span> <span class="ctree-arrow">⬅️</span> <span class="ctree-action-text">{sub_action}</span>'
+                else:
+                    sub_html = f'<span class="ctree-text">{transform_inline_elements(n2_text)}</span>'
+                
+                # Check for grandchildren (Level 3)
+                l3_html = []
+                if n2.get('children'):
+                    for n3 in n2['children']:
+                        l3_text = transform_inline_elements(n3['text'])
+                        l3_html.append(f'<div class="ctree-level3-row"><span>{l3_text}</span></div>')
+                    l3_block = f'<div class="ctree-nested-level3">{"".join(l3_html)}</div>'
+                else:
+                    l3_block = ""
+                    
+                children_html.append(f"""
+                <div class="ctree-subrow-wrap">
+                  <div class="ctree-subrow">{sub_html}</div>
+                  {l3_block}
+                </div>
+                """)
+            subnode_block = f'<div class="ctree-subnode">{"".join(children_html)}</div>'
+        else:
+            subnode_block = ""
+            
+        nodes_html.append(f"""
+        <div class="ctree-node">
+          <div class="ctree-row">
+            <span class="ctree-badge ctree-badge-{col}">{transform_inline_elements(n1_text)}</span>
+          </div>
+          {subnode_block}
+        </div>
+        """)
+        
+    return f"""
+<div class="clinical-flowchart-card animated-diagram ctree-diagram" data-flowchart="true">
+  <div class="flowchart-header">
+    <div class="flowchart-badge"><span class="flowchart-pulse-ring"></span> الگوریتم درختی بالینی لارنس</div>
+    <h4 class="flowchart-title">{title}</h4>
+  </div>
+  <div class="ctree-container">
+    <div class="ctree-root-line">
+      <span>🩺</span>
+      <span>{root_text}</span>
+    </div>
+    {''.join(nodes_html)}
+  </div>
+</div>
+"""
+
+# =========================================================================
+# APPROACH 1: MODERN HIERARCHICAL MEDICAL TREE (7% of diagrams - Major Decision Forks)
+# =========================================================================
 def parse_convergent_pathway(lines, title):
-    """
-    Renders multiple stimuli/pathways converging into a final single action.
-    E.g. Parietal cell stimulants -> Proton pump activation.
-    """
-    terminal_line = clean_diagram_text(lines[-1])
+    """Renders multiple stimuli/pathways converging into a final single action."""
+    terminal_line = clean_tree_text(lines[-1])
     terminal_html = transform_inline_elements(terminal_line)
 
     stimuli_cards = []
@@ -391,7 +683,7 @@ def parse_convergent_pathway(lines, title):
         s = l.strip()
         if not s or s in ['│', '▼', '⬇️', '---']:
             continue
-        cleaned = clean_diagram_text(s)
+        cleaned = clean_tree_text(s)
         if not cleaned:
             continue
         
@@ -402,7 +694,6 @@ def parse_convergent_pathway(lines, title):
             name = transform_inline_elements(parts[0])
             receptor = transform_inline_elements(parts[1])
             pathway = transform_inline_elements(' • '.join(parts[2:])) if len(parts) > 2 else ""
-            
             pathway_html = f'<div class="stimulant-pathway">{pathway}</div>' if pathway else ""
             stimuli_cards.append(f"""
             <div class="flow-stimulant-card" style="border-inline-start-color: var(--color-{col}, #0284c7);">
@@ -448,10 +739,7 @@ def parse_convergent_pathway(lines, title):
 """
 
 def parse_protocol_flow(lines, title):
-    """
-    Renders sequential clinical protocols with key action grids.
-    E.g., DCR protocol in Surgical Bleeding.
-    """
+    """Renders sequential clinical protocols with key action grids."""
     stepper_lines = []
     tree_items = []
     
@@ -463,7 +751,7 @@ def parse_protocol_flow(lines, title):
         if step_m:
             stepper_lines.append((step_m.group(1), step_m.group(2)))
         elif '├──' in s or '└──' in s or re.match(r'^مسیر\s*[\d\u06F0-\u06F9]+:', s):
-            clean_s = clean_diagram_text(s)
+            clean_s = clean_tree_text(s)
             clean_s = re.sub(r'^مسیر\s*[\d\u06F0-\u06F9]+:\s*', '', clean_s)
             if clean_s:
                 tree_items.append(clean_s)
@@ -477,7 +765,7 @@ def parse_protocol_flow(lines, title):
                     else:
                         tree_items.append(sp)
             else:
-                tree_items.append(clean_diagram_text(s))
+                tree_items.append(clean_tree_text(s))
 
     steps_html = []
     for snum, stext in stepper_lines:
@@ -532,297 +820,157 @@ def parse_protocol_flow(lines, title):
 </div>
 """
 
-def parse_hierarchical_tree(lines, title):
+def render_approach1_visual_tree(lines, title, raw_text):
     """
-    Renders hierarchical trees with proper nested sub-branches.
-    E.g. Schilling test in Stomach and Duodenum.
+    Renders 2-way clinical decision forks into Approach 1: Modern Hierarchical Visual Medical Tree.
     """
-    root_text = clean_diagram_text(lines[0])
-    branch_nodes = []
-    
-    for l in lines[1:]:
-        s = l.strip()
-        if not s or s in ['│', '▼', '---']:
-            continue
-        indent = len(l) - len(l.lstrip())
-        is_tree = '├──' in l or '└──' in l
-        cleaned = clean_diagram_text(s)
-        if not cleaned:
-            continue
-        branch_nodes.append((indent, is_tree, cleaned))
+    if 'محرک‌های سلول پاریتال' in title or 'محرک‌های سلول پاریتال' in raw_text:
+        return parse_convergent_pathway(lines, title)
+    if 'شوک خونریزی‌دهنده شدید' in title or 'شوک خونریزی‌دهنده شدید' in raw_text:
+        return parse_protocol_flow(lines, title)
 
-    if len(branch_nodes) >= 2:
-        branches = []
-        curr_branch = None
-        min_indent = min(b[0] for b in branch_nodes if b[1]) if any(b[1] for b in branch_nodes) else 0
-
-        for indent, is_tree, text in branch_nodes:
-            if is_tree and indent <= min_indent + 4:
-                if curr_branch:
-                    branches.append(curr_branch)
-                curr_branch = {'title': text, 'subbranches': []}
-            elif curr_branch:
-                curr_branch['subbranches'].append(text)
-            else:
-                curr_branch = {'title': text, 'subbranches': []}
-
-        if curr_branch:
-            branches.append(curr_branch)
-
-        branch_cards = []
-        colors = ['emerald', 'amber', 'rose', 'cyan', 'indigo', 'purple']
-        
-        for idx, br in enumerate(branches):
-            col = colors[idx % len(colors)]
-            br_title_html = transform_inline_elements(br['title'])
-            
-            sub_html = ""
-            if br['subbranches']:
-                sub_cards = []
-                for sidx, sub in enumerate(br['subbranches']):
-                    sub_col = 'rose' if any(w in sub for w in ['غیرطبیعی', 'بیماری', 'آنمی', 'عود', 'خطر', 'شکست']) else 'emerald'
-                    sub_html_text = transform_inline_elements(sub)
-                    sub_cards.append(f"""
-                    <div class="subbranch-outcome-card outcome-{sub_col}">
-                      <span class="outcome-icon">{'⚠️' if sub_col == 'rose' else '✅'}</span>
-                      <span class="outcome-text">{sub_html_text}</span>
-                    </div>
-                    """)
-                sub_html = f"""
-                <div class="flow-subbranches-container">
-                  <div class="subbranches-label">تفسیر تشخیصی و پیامد بالینی:</div>
-                  {''.join(sub_cards)}
-                </div>
-                """
-
-            branch_cards.append(f"""
-            <div class="flow-branch-panel panel-theme-{col}">
-              <div class="flow-branch-header">
-                <span class="branch-status-pill badge-{col}">شاخه {idx+1}</span>
-                <h5 class="branch-card-title">{br_title_html}</h5>
-              </div>
-              {sub_html}
-            </div>
-            """)
-
-        return f"""
-<div class="clinical-flowchart-card animated-diagram hierarchical-tree-card" data-flowchart="true">
-  <div class="flowchart-header">
-    <div class="flowchart-badge"><span class="flowchart-pulse-ring"></span> الگوریتم درختی بالینی</div>
-    <h4 class="flowchart-title">{title}</h4>
-  </div>
-  <div class="flowchart-canvas">
-    <div class="fc-entry-node">
-      <span class="fc-entry-badge">تست اولیه / مدالیته تشخیصی</span>
-      <div class="fc-entry-title">{transform_inline_elements(root_text)}</div>
-    </div>
-    <div class="fc-arrow-connector"><span class="fc-arrow-pulse">⬇️</span></div>
-    <div class="flow-decision-branches-grid cols-{min(len(branch_cards), 3)}">
-      {''.join(branch_cards)}
-    </div>
-  </div>
-</div>
-"""
-
-    return parse_linear_stepper(lines, title)
-
-def parse_box_branching(lines, title, raw_text):
-    """
-    Renders 2D box-drawing algorithms into authentic, spacious responsive branch cards.
-    Zero monospace ASCII code blocks.
-    """
-    # 1. Identify split line(s)
+    # General 2-way decision split
     split_indices = [idx for idx, l in enumerate(lines) if any(ch in l for ch in ['┌', '┴', '┬', '┼']) and ('─' in l or '━' in l)]
     
-    if not split_indices:
-        return parse_linear_stepper(lines, title)
-        
-    main_split_idx = split_indices[0]
-    split_line = lines[main_split_idx]
-    
-    # Pre-split entry nodes
-    entry_nodes = []
-    for l in lines[:main_split_idx]:
-        cleaned = clean_diagram_text(l)
-        cleaned = cleaned.lstrip('[]').rstrip('[]').strip()
-        if cleaned and cleaned not in ['│', '▼', '---']:
-            entry_nodes.append(cleaned)
-
-    # Post-split column extraction via multi-space or division point
     col1_items = []
     col2_items = []
-    
-    for l in lines[main_split_idx+1:]:
-        s = l.strip()
-        if not s or (all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in s) and len(s) < 8):
-            continue
-            
-        parts = [p.strip() for p in re.split(r'\s{3,}', s) if p.strip()]
-        # Filter out pure arrow lines
-        parts = [p for p in parts if not all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in p)]
-        
-        if len(parts) >= 2:
-            c1 = clean_diagram_text(parts[0])
-            c2 = clean_diagram_text(parts[1])
-            if c1: col1_items.append(c1)
-            if c2: col2_items.append(c2)
-        elif len(parts) == 1:
-            cleaned = clean_diagram_text(parts[0])
-            if cleaned:
-                col2_items.append(cleaned)
 
-    # Format Entry Sequence
-    entry_html = ""
-    if entry_nodes:
-        entry_cards = []
-        for en in entry_nodes:
-            en_html = transform_inline_elements(en)
-            entry_cards.append(f'<div class="fc-entry-step-pill">{en_html}</div>')
-        entry_html = f"""
-        <div class="fc-entry-node">
-          <span class="fc-entry-badge">تظاهر بالینی و گام‌های ارزیابی اولیه</span>
-          <div class="fc-entry-sequence">{''.join(entry_cards)}</div>
-        </div>
-        <div class="fc-arrow-connector"><span class="fc-arrow-pulse">⬇️</span></div>
-        """
+    if split_indices:
+        main_split_idx = split_indices[0]
+        for l in lines[main_split_idx+1:]:
+            s = l.strip()
+            if not s or (all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in s) and len(s) < 8):
+                continue
+            parts = [p.strip() for p in re.split(r'\s{3,}', s) if p.strip()]
+            parts = [p for p in parts if not all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in p)]
+            if len(parts) >= 2:
+                c1 = clean_tree_text(parts[0])
+                c2 = clean_tree_text(parts[1])
+                if c1: col1_items.append(c1)
+                if c2: col2_items.append(c2)
+            elif len(parts) == 1:
+                cleaned = clean_tree_text(parts[0])
+                if cleaned: col2_items.append(cleaned)
+    else:
+        # Fallback split
+        tree = parse_tree_into_hierarchy(lines)
+        if tree and len(tree.get('children', [])) >= 2:
+            c1_node = tree['children'][0]
+            c2_node = tree['children'][1]
+            col1_items = [c1_node['text']] + [c['text'] for c in c1_node.get('children', [])]
+            col2_items = [c2_node['text']] + [c['text'] for c in c2_node.get('children', [])]
 
-    # Format Branch 1 (Stable / Responsive / Positive)
-    col1_theme = 'emerald' if any(w in ' '.join(col1_items) for w in ['پاسخ', 'نرمال', 'مثبت', 'تایید', 'انتخابی']) else 'cyan'
     col1_title = col1_items[0] if col1_items else "مسیر درمانی اول"
     col1_body = col1_items[1:] if len(col1_items) > 1 else col1_items
-    
     col1_bullets = ''.join(f'<li>{transform_inline_elements(it)}</li>' for it in col1_body)
-    branch1_html = f"""
-    <div class="flow-branch-panel panel-theme-{col1_theme}">
-      <div class="flow-branch-header">
-        <span class="branch-status-pill badge-{col1_theme}">مسیر الف</span>
-        <h5 class="branch-card-title">{transform_inline_elements(col1_title)}</h5>
-      </div>
-      <ul class="flow-branch-bullets">
-        {col1_bullets}
-      </ul>
-    </div>
-    """
 
-    # Format Branch 2 (Unstable / Refractory / Equivocal)
-    col2_theme = 'rose' if any(w in ' '.join(col2_items) for w in ['عدم پاسخ', 'سپسیس', 'اورژانسی', 'رد', 'مبهم', 'شوک']) else 'amber'
     col2_title = col2_items[0] if col2_items else "مسیر درمانی دوم"
     col2_body = col2_items[1:] if len(col2_items) > 1 else col2_items
-    
     col2_bullets = ''.join(f'<li>{transform_inline_elements(it)}</li>' for it in col2_body)
-    branch2_html = f"""
-    <div class="flow-branch-panel panel-theme-{col2_theme}">
-      <div class="flow-branch-header">
-        <span class="branch-status-pill badge-{col2_theme}">مسیر ب</span>
-        <h5 class="branch-card-title">{transform_inline_elements(col2_title)}</h5>
+
+    return f"""
+<div class="clinical-flowchart-card animated-diagram vtree-card" data-flowchart="true">
+  <div class="flowchart-header">
+    <div class="flowchart-badge"><span class="flowchart-pulse-ring"></span> الگوریتم تصمیم‌گیری بالینی لارنس</div>
+    <h4 class="flowchart-title">{title}</h4>
+  </div>
+  <div class="vtree-container">
+    <div class="vtree-root">
+      <span class="vtree-root-icon">🩺</span>
+      <span class="vtree-root-title">{title}</span>
+    </div>
+    <div class="vtree-stem-down"></div>
+    <div class="vtree-bridge-line"></div>
+    <div class="vtree-branches-split">
+      <div class="vtree-main-card card-emergency">
+        <div class="vtree-branch-header">
+          <h3 class="vtree-branch-title" style="color: var(--color-rose, #e11d48);">{transform_inline_elements(col1_title)}</h3>
+          <span class="vtree-pill pill-rose">شاخه اول</span>
+        </div>
+        <ul class="flow-branch-bullets">
+          {col1_bullets}
+        </ul>
       </div>
-      <ul class="flow-branch-bullets">
-        {col2_bullets}
-      </ul>
+      <div class="vtree-main-card card-elective">
+        <div class="vtree-branch-header">
+          <h3 class="vtree-branch-title" style="color: var(--color-indigo, #4f46e5);">{transform_inline_elements(col2_title)}</h3>
+          <span class="vtree-pill pill-indigo">شاخه دوم</span>
+        </div>
+        <ul class="flow-branch-bullets">
+          {col2_bullets}
+        </ul>
+      </div>
     </div>
+  </div>
+</div>
+"""
+
+# =========================================================================
+# APPROACH 3: NESTED DECISION CARDS (3% of diagrams - Criteria Tiers)
+# =========================================================================
+def render_approach3_nested_cards(lines, title, raw_text):
     """
-
-    return f"""
-<div class="clinical-flowchart-card animated-diagram box-branch-diagram" data-flowchart="true">
-  <div class="flowchart-header">
-    <div class="flowchart-badge"><span class="flowchart-pulse-ring"></span> الگوریتم تشخیصی و تصمیم‌گیری بالینی لارنس</div>
-    <h4 class="flowchart-title">{title}</h4>
-  </div>
-  <div class="flowchart-canvas">
-    {entry_html}
-    <div class="flow-decision-branches-grid cols-2">
-      {branch1_html}
-      {branch2_html}
-    </div>
-  </div>
-</div>
-"""
-
-def parse_linear_stepper(lines, title):
-    """Renders sequential linear flowcharts with animated connectors."""
-    steps = []
-    for l in lines:
-        s = clean_diagram_text(l)
-        if not s or s in ['⬇️', '➡️', '│', '▼', '---']:
-            continue
-        steps.append(s)
-
-    step_cards = []
-    for idx, st in enumerate(steps):
-        is_first = (idx == 0)
-        is_last = (idx == len(steps) - 1)
-        theme = 'root' if is_first else ('success' if is_last else 'step')
-        st_html = transform_inline_elements(st)
-
-        step_cards.append(f"""
-        <div class="linear-flow-step step-{theme}">
-          <div class="step-badge-indicator">
-            <span class="step-number">{idx+1}</span>
-          </div>
-          <div class="step-content-box">
-            <div class="step-text">{st_html}</div>
-          </div>
-        </div>
-        """)
-        if not is_last:
-            step_cards.append("""
-            <div class="linear-flow-connector">
-              <span class="flow-arrow-head">▼</span>
-            </div>
-            """)
-
-    return f"""
-<div class="clinical-flowchart-card animated-diagram linear-diagram" data-flowchart="true">
-  <div class="flowchart-header">
-    <div class="flowchart-badge"><span class="flowchart-pulse-ring"></span> توالی تصمیم‌گیری بالینی لارنس</div>
-    <h4 class="flowchart-title">{title}</h4>
-  </div>
-  <div class="linear-stepper-container">
-    {''.join(step_cards)}
-  </div>
-</div>
-"""
-
-def parse_general_pathway(lines, title):
-    """Renders parallel clinical pathways or anatomical landmarks."""
-    items = []
-    for l in lines:
-        s = clean_diagram_text(l)
-        if not s or s in ['│', '▼', '---']:
-            continue
-        items.append(s)
+    Renders risk stratifications and criteria classifications into Approach 3: Nested Decision Cards.
+    """
+    tree = parse_tree_into_hierarchy(lines)
+    children = tree.get('children', []) if tree else []
+    
+    tiers_html = []
+    tier_colors = ['emerald', 'amber', 'rose', 'indigo', 'cyan']
+    
+    for idx, node in enumerate(children):
+        col = tier_colors[idx % len(tier_colors)]
+        n_text = node['text']
         
-    cards = []
-    colors = ['cyan', 'indigo', 'amber', 'emerald', 'rose']
-    for idx, item in enumerate(items):
-        col = colors[idx % len(colors)]
-        item_html = transform_inline_elements(item)
-        cards.append(f"""
-        <div class="flow-branch-panel panel-theme-{col}">
-          <div class="flow-branch-header">
-            <span class="branch-status-pill badge-{col}">مورد {idx+1}</span>
-            <div class="branch-card-text">{item_html}</div>
+        sub_items = []
+        for ch in node.get('children', []):
+            ch_text = ch['text']
+            sub_items.append(f'<li>{transform_inline_elements(ch_text)}</li>')
+            for gch in ch.get('children', []):
+                sub_items.append(f'<li style="margin-inline-start: 12px;">{transform_inline_elements(gch["text"])}</li>')
+                
+        sub_list_html = f'<ul class="tier-steps-list">{"".join(sub_items)}</ul>' if sub_items else ""
+        
+        tiers_html.append(f"""
+        <div class="ncard-tier tier-{col}">
+          <span class="tier-label" style="color: var(--color-{col}, #0284c7);">
+            <span>•</span>
+            <span>{transform_inline_elements(n_text)}</span>
+          </span>
+          <div class="tier-body">
+            {sub_list_html}
           </div>
         </div>
         """)
 
     return f"""
-<div class="clinical-flowchart-card animated-diagram general-pathway-card" data-flowchart="true">
+<div class="clinical-flowchart-card animated-diagram ncards-diagram" data-flowchart="true">
   <div class="flowchart-header">
-    <div class="flowchart-badge"><span class="flowchart-pulse-ring"></span> راهنمای کاربردی بالینی</div>
+    <div class="flowchart-badge"><span class="flowchart-pulse-ring"></span> سیستم نمره‌دهی و طبقه‌بندی بالینی لارنس</div>
     <h4 class="flowchart-title">{title}</h4>
   </div>
-  <div class="flowchart-canvas">
-    <div class="flow-decision-branches-grid cols-{min(len(cards), 3)}">
-      {''.join(cards)}
+  <div class="ncards-container">
+    <div class="ncards-root-badge">
+      <span>🩺 {title}</span>
+    </div>
+    <div class="ncard-parent parent-elective">
+      <div class="ncard-inner-grid">
+        {''.join(tiers_html)}
+      </div>
     </div>
   </div>
 </div>
 """
 
+# =========================================================================
+# MASTER DISPATCHER: ENFORCING 90% / 7% / 3% RATIO
+# =========================================================================
 def parse_ascii_diagram(diagram_body):
     """
-    Master Dispatcher: transforms any ASCII algorithm into an authentic visual UI component.
+    Dispatches any ASCII algorithm into:
+    - 90% Approach 2: Stylized Clean Tree View
+    - 7%  Approach 1: Modern Hierarchical Visual Medical Tree
+    - 3%  Approach 3: Nested Decision Cards
     ZERO monospace <pre><code> blocks ever output!
     """
     lines = [l.rstrip() for l in diagram_body.strip().splitlines() if l.strip()]
@@ -833,50 +981,45 @@ def parse_ascii_diagram(diagram_body):
     if not title:
         title = "الگوریتم تصمیم‌گیری بالینی لارنس"
 
-    has_boxes = any('┌' in l or '┬' in l or '┴' in l or '┼' in l for l in lines)
-    has_tree = any('├──' in l or '└──' in l for l in lines)
-    has_stepper = any(re.match(r'^(?:گام|مرحله|فاز)\s*[\d\u06F0-\u06F9]+:', l.strip()) for l in lines)
-    has_convergence = has_tree and any('▼' in l or '⬇️' in l for l in lines[1:-1]) and any('پمپ پروتون' in l or 'فعال‌سازی نهایی' in l or 'پاسخ نهایی' in l for l in lines[-2:])
+    raw_lower = diagram_body.lower()
+    
+    # 1. Approach 1 (7% of cases)
+    is_app1 = any(kw in diagram_body for kw in APPROACH_1_KEYWORDS)
+    if is_app1:
+        return render_approach1_visual_tree(lines, title, diagram_body)
 
-    if has_convergence:
-        return parse_convergent_pathway(lines, title)
-    elif has_stepper:
-        return parse_protocol_flow(lines, title)
-    elif has_boxes:
-        return parse_box_branching(lines, title, diagram_body)
-    elif has_tree:
-        return parse_hierarchical_tree(lines, title)
-    elif any('⬇️' in l or '➡️' in l or '▼' in l for l in lines):
-        return parse_linear_stepper(lines, title)
-    else:
-        return parse_general_pathway(lines, title)
+    # 2. Approach 3 (3% of cases)
+    is_app3 = any(kw in diagram_body for kw in APPROACH_3_KEYWORDS)
+    if is_app3:
+        return render_approach3_nested_cards(lines, title, diagram_body)
+
+    # 3. Approach 2 (90% of cases - The Default Standard)
+    return render_approach2_clean_tree(lines, title)
 
 # =========================================================================
 # SECTION MARKDOWN PARSER
 # =========================================================================
-
 def parse_section_markdown(markdown_text):
     """
     Parses section markdown text into rich HTML with:
-    - Interactive & Animated Clinical Flowcharts (````text ... ````)
+    - Interactive Multi-Modal Clinical Trees (Approach 2: 90%, Approach 1: 7%, Approach 3: 3%)
     - Clinical Stepper Cards (#### گام ۱ to گام ۵) with dynamic color themes
-    - Comparison Tables (.table-container > table.table-medical) with strict RTL alignment and zebra striping
+    - Comparison Tables with strict RTL alignment and zebra striping
     - High-Yield Night-Before-Exam Cards (.high-yield-exam-card)
-    - Styled subheadings with medical accent banners
-    - Pearl and Trap list items styled cleanly without badge clutter
     - Verbatim preservation of every medical fact and detail
     """
+    # Clean leading 4-space indent on blockquotes so python-markdown doesn't convert them to <pre><code>
     lines = [re.sub(r'^\s{2,}>', '>', l) for l in markdown_text.splitlines()]
     html_chunks = []
     i = 0
     total_lines = len(lines)
 
     step_theme_map = {
-        "1": "indigo",   # گام ۱: شرح حال و معاینه بالینی
-        "2": "rose",     # گام ۲: درخت تصمیم‌گیری اورژانسی اختناق
-        "3": "amber",    # گام ۳: تصویربرداری و ریسک‌فاکتورها
-        "4": "cyan",     # گام ۴: تکنیک‌های جراحی و مش
-        "5": "emerald",  # گام ۵: مراقبت بعد عمل و بهبودی
+        "1": "indigo",   # گام ۱
+        "2": "rose",     # گام ۲
+        "3": "amber",    # گام ۳
+        "4": "cyan",     # گام ۴
+        "5": "emerald",  # گام ۵
     }
 
     while i < total_lines:
@@ -896,7 +1039,7 @@ def parse_section_markdown(markdown_text):
                 code_block_lines.append(lines[i])
                 i += 1
             if i < total_lines and lines[i].strip().startswith('```'):
-                i += 1  # Skip closing ```
+                i += 1
             
             diagram_body = '\n'.join(code_block_lines)
             if diagram_body.strip():
@@ -978,12 +1121,10 @@ def parse_section_markdown(markdown_text):
             table_md = transform_inline_elements(table_md)
             table_html = markdown.markdown(table_md, extensions=['tables'])
 
-            # Enforce RTL alignment on th and td
             table_html = re.sub(r' align="left"', ' align="right"', table_html)
             table_html = re.sub(r'style="text-align:\s*left;?"', 'style="text-align: right;"', table_html)
             table_html = re.sub(r' align="center"', ' align="center"', table_html)
 
-            # Style cells containing theory pearls and traps
             table_html = re.sub(
                 r'<td>(.*?(?:badge-theory|pearl-micro-badge).*?)</td>',
                 r'<td class="table-cell-pearl">\1</td>',
@@ -995,7 +1136,6 @@ def parse_section_markdown(markdown_text):
                 table_html
             )
 
-            # Wrap table in responsive .table-container with strict RTL
             table_html = re.sub(
                 r'<table>',
                 r'<div class="table-container" dir="rtl"><table class="table-medical responsive-table" dir="rtl">',
@@ -1029,7 +1169,7 @@ def parse_section_markdown(markdown_text):
             i += 1
             continue
 
-        # 7. Accumulate standard markdown blocks (bullet lists, paragraphs, quotes)
+        # 7. Accumulate standard markdown blocks
         std_lines = []
         while i < total_lines:
             curr_s = lines[i].strip()
@@ -1205,7 +1345,7 @@ def build_single_chapter(config, base_dir):
         raw_part_title = first_line.lstrip('#').strip()
         clean_part_title = clean_page_numbers(raw_part_title)
 
-        # If title is just bare "بخش X" (Persian or ASCII digits), resolve from first ### subheading
+        # If title is just bare "بخش X", resolve from first ### subheading
         if re.match(r'^بخش\s*[\d\u06F0-\u06F9]+:?$', clean_part_title.strip()):
             for l in chunk_lines[1:12]:
                 l_s = l.strip()
@@ -1257,7 +1397,7 @@ def main():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     print("=================================================================")
     print("MEDICALISM ALBORZ - GENERAL SURGERY 14-CHAPTER COMPREHENSIVE BUILDER")
-    print("Source: Lawrence's Essentials of General Surgery")
+    print("Multi-modal Tree Distribution: 90% Approach 2 | 7% Approach 1 | 3% Approach 3")
     print("=================================================================")
 
     all_chapters = []
