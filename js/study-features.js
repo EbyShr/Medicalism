@@ -545,11 +545,16 @@ window.StudyFeatures = {
     const padding = 12;
     x = Math.max(popoverWidth / 2 + padding, Math.min(window.innerWidth - popoverWidth / 2 - padding, x));
 
-    let y = rect.top - 8;
-    let isBelow = false;
-    if (y < popoverHeight + 10) {
-      y = rect.bottom + 8;
-      isBelow = true;
+    // Place popover BELOW text selection by default to avoid collision with OS/browser selection toolbar (Copy, Share, etc.)
+    let y = rect.bottom + 10;
+    let isBelow = true;
+
+    // Only flip above if placing below would overflow the viewport bottom edge
+    if (rect.bottom + 10 + popoverHeight > window.innerHeight) {
+      if (rect.top - popoverHeight - 10 > 0) {
+        y = rect.top - 10;
+        isBelow = false;
+      }
     }
 
     popover.style.left = `${x}px`;

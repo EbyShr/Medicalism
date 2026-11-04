@@ -1759,7 +1759,7 @@
 /* 3. Clinical Stepper Cards (گام‌های ۱ تا ۵) with Rich Thematic Color Palette */
 .clinical-stepper-card {
   background: var(--bg-surface);
-  border: 1.5px solid var(--border-subtle);
+  border: 1.5px solid var(--border-default);
   border-radius: var(--radius-xl);
   padding: 22px 26px;
   margin-block: 24px;
@@ -2263,7 +2263,7 @@
 }
 
 .table-medical tr:nth-child(even) td {
-  background-color: rgba(241, 245, 249, 0.55);
+  background-color: rgba(226, 232, 240, 0.45);
 }
 
 .table-medical tr:hover td {
@@ -2341,7 +2341,7 @@
    ========================================================================== */
 .clinical-flowchart-card {
   background: var(--bg-surface);
-  border: 1.5px solid var(--border-subtle);
+  border: 1.5px solid var(--border-default);
   border-radius: var(--radius-xl);
   padding: 24px;
   margin-block: 28px;
@@ -3161,7 +3161,8 @@
    -------------------------------------------------------------------------- */
 .ctree-container {
   background: var(--bg-surface-secondary);
-  border: 1px solid var(--border-default);
+  border: 1.5px solid var(--border-default);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
   border-radius: var(--radius-lg);
   padding: 22px 26px;
   font-size: 0.94rem;
@@ -3209,7 +3210,7 @@
   top: -12px;
   bottom: 0;
   width: 2px;
-  background: var(--border-default, rgba(0, 0, 0, 0.15));
+  background: var(--border-default, #94a3b8);
 }
 
 [data-theme="dark"] .ctree-node::before {
@@ -3235,7 +3236,7 @@
   top: 50%;
   width: 20px;
   height: 2px;
-  background: var(--border-default, rgba(0, 0, 0, 0.15));
+  background: var(--border-default, #94a3b8);
 }
 
 [data-theme="dark"] .ctree-row::before {
@@ -3351,7 +3352,7 @@
   top: 0;
   bottom: 12px;
   width: 2px;
-  background: var(--border-default, rgba(0, 0, 0, 0.15));
+  background: var(--border-default, #94a3b8);
 }
 [data-theme="dark"] .ctree-subnode::before {
   background: rgba(255, 255, 255, 0.16);
@@ -3377,7 +3378,7 @@
   top: 50%;
   width: 16px;
   height: 2px;
-  background: var(--border-default, rgba(0, 0, 0, 0.15));
+  background: var(--border-default, #94a3b8);
 }
 [data-theme="dark"] .ctree-subrow::before {
   background: rgba(255, 255, 255, 0.16);
@@ -3794,7 +3795,8 @@
   align-items: center;
   gap: 8px;
   background: rgba(2, 132, 199, 0.08);
-  border-inline-start: 4px solid var(--color-cyan, #0284c7);
+  border: 1px solid rgba(2, 132, 199, 0.28);
+  border-inline-start: 4.5px solid var(--color-cyan, #0284c7);
   padding: 6px 14px;
   border-radius: var(--radius-md, 6px);
   margin-bottom: 8px;
@@ -3823,7 +3825,7 @@ ol.nested-sublist,
 ul.nested-sublist {
   padding-inline-start: 28px !important;
   margin-block: 6px 14px !important;
-  border-inline-start: 2.5px solid rgba(2, 132, 199, 0.25);
+  border-inline-start: 2.5px solid rgba(2, 132, 199, 0.42);
   margin-inline-start: 14px !important;
   list-style-position: outside !important;
 }
