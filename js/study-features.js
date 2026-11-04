@@ -1346,3 +1346,26 @@ window.showToast = function(message, duration = 2800) {
     setTimeout(() => toast.remove(), 250);
   }, duration);
 };
+
+
+
+/**
+ * Global handler for Chapter Mind-Map toggle button (with debounce against double-trigger)
+ */
+window.toggleMindmapSection = function(btn) {
+  if (!btn) return;
+  if (btn._lastToggleTime && (Date.now() - btn._lastToggleTime < 250)) {
+    return;
+  }
+  btn._lastToggleTime = Date.now();
+  const card = btn.closest('.chapter-mindmap-card') || btn.closest('.chapter-mindmap-container') || document;
+  const content = card.querySelector('#mindmapContent, .mindmap-content');
+  if (!content) return;
+  const isCollapsed = content.classList.toggle('is-collapsed');
+  btn.setAttribute('aria-expanded', !isCollapsed);
+  btn.classList.toggle('is-collapsed', isCollapsed);
+  const label = btn.querySelector('.mindmap-btn-text');
+  if (label) {
+    label.textContent = isCollapsed ? 'مشاهده نقشه' : 'جمع‌بندی نقشه';
+  }
+};

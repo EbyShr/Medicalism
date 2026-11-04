@@ -173,17 +173,13 @@ window.ComponentRenderer = {
     container.innerHTML = html;
     this.bindSectionActions(container);
 
-    const toggleMindmapBtn = container.querySelector('#btnToggleMindmap');
-    const mindmapContent = container.querySelector('#mindmapContent');
-    if (toggleMindmapBtn && mindmapContent) {
-      toggleMindmapBtn.addEventListener('click', () => {
-        const isCollapsed = mindmapContent.classList.toggle('is-collapsed');
-        toggleMindmapBtn.setAttribute('aria-expanded', !isCollapsed);
-        const label = toggleMindmapBtn.querySelector('.mindmap-btn-text');
-        if (label) {
-          label.textContent = isCollapsed ? 'مشاهده نقشه' : 'جمع‌بندی نقشه';
+    const toggleMindmapBtn = container.querySelector('#btnToggleMindmap, .btn-toggle-mindmap');
+    if (toggleMindmapBtn) {
+      toggleMindmapBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (typeof window.toggleMindmapSection === 'function') {
+          window.toggleMindmapSection(toggleMindmapBtn);
         }
-        toggleMindmapBtn.classList.toggle('is-collapsed', isCollapsed);
       });
     }
     if (window.RadiologyModule && typeof window.RadiologyModule.bindContainerEvents === 'function') {

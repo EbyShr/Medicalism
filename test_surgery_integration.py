@@ -2,13 +2,14 @@
 """
 End-to-End Playwright Verification for General Surgery (Lawrence) Module Integration (14 Comprehensive Chapters).
 Tests:
-1. Full 14-Chapter Registry Verification in Browser DOM
-2. Multi-Chapter Navigation & Dynamic Chapter Switching
-3. Interactive & Animated Clinical Flowchart Cards (.clinical-flowchart-card)
-4. RTL Tables (dir="rtl", text-align: right) and Stepper Cards
-5. Exam Cram Filter Mode (⚡ حالت شب امتحان)
-6. Portal Integration in index.html & quiz.html
-7. Zero Horizontal Overflow across Mobile (375px), Tablet (768px), and Desktop (1440px)
+1. Full 14-Chapter Registry Verification in Browser DOM (99 clinical sections, zero duplicates)
+2. Interactive Chapter Mind-Map Toggle (جمع‌بندی نقشه / باز کردن نقشه)
+3. Multi-Chapter Navigation & Dynamic Chapter Switching
+4. Interactive & Animated Clinical Flowchart Cards (Zero <pre><code> code blocks)
+5. RTL Tables (dir="rtl", text-align: right) and Stepper Cards
+6. Exam Cram Filter Mode (⚡ حالت شب امتحان)
+7. Portal Integration in index.html & quiz.html
+8. Zero Horizontal Overflow across Mobile (375px), Tablet (768px), and Desktop (1440px)
 """
 
 import os
@@ -53,8 +54,8 @@ def test_surgery_integration():
         print(f"PASS: window.SURGERY_REGISTRY loaded with all 14 chapters!")
 
         total_sections = page.evaluate("() => window.SURGERY_REGISTRY.reduce((acc, c) => acc + c.sections.length, 0)")
-        assert total_sections == 100, f"Expected 100 total sections, found {total_sections}"
-        print(f"PASS: Exactly 100 clinical sections verified across all 14 chapters!")
+        assert total_sections == 99, f"Expected 99 total sections, found {total_sections}"
+        print(f"PASS: Exactly 99 clinical sections verified across all 14 chapters!")
 
         # Verify Initial Chapter (Ch 1)
         hero_title = page.locator(".chapter-title").first.inner_text()
@@ -62,8 +63,8 @@ def test_surgery_integration():
         print(f"PASS: Initial chapter hero title: '{hero_title}'")
 
         sections = page.locator(".study-section").all()
-        assert len(sections) == 9, f"Expected 9 sections in Chapter 1, found {len(sections)}"
-        print(f"PASS: Chapter 1 mounted with 9 sections!")
+        assert len(sections) == 8, f"Expected 8 sections in Chapter 1, found {len(sections)}"
+        print(f"PASS: Chapter 1 mounted with 8 sections (zero duplication)!")
 
         # Verify TOC in sidebar has 14 chapters
         toc_items = page.locator(".sidebar-scroll-container .nav-chapter-item").all()
@@ -71,7 +72,31 @@ def test_surgery_integration():
         print(f"PASS: Sidebar TOC indexes all 14 chapters!")
 
         print("\n=======================================================")
-        print("=== TEST 2: DYNAMIC CHAPTER SWITCHING ===")
+        print("=== TEST 2: CHAPTER MIND-MAP TOGGLE FUNCTIONALITY ===")
+        print("=======================================================")
+        mindmap_btn = page.locator("#btnToggleMindmap").first
+        assert mindmap_btn.is_visible(), "Mindmap toggle button must be visible"
+        
+        # Click to collapse
+        mindmap_btn.click()
+        page.wait_for_timeout(300)
+        is_collapsed = page.locator("#mindmapContent").first.evaluate("el => el.classList.contains('is-collapsed')")
+        assert is_collapsed, "Mindmap content must have 'is-collapsed' class when toggled"
+        btn_label = mindmap_btn.locator(".mindmap-btn-text").inner_text()
+        assert "مشاهده نقشه" in btn_label, f"Expected label 'مشاهده نقشه', got '{btn_label}'"
+        print("PASS: Mindmap successfully collapsed!")
+
+        # Click to expand again
+        mindmap_btn.click()
+        page.wait_for_timeout(300)
+        is_collapsed_again = page.locator("#mindmapContent").first.evaluate("el => el.classList.contains('is-collapsed')")
+        assert not is_collapsed_again, "Mindmap content must be visible when expanded"
+        btn_label_again = mindmap_btn.locator(".mindmap-btn-text").inner_text()
+        assert "جمع‌بندی نقشه" in btn_label_again, f"Expected label 'جمع‌بندی نقشه', got '{btn_label_again}'"
+        print("PASS: Mindmap successfully expanded back!")
+
+        print("\n=======================================================")
+        print("=== TEST 3: DYNAMIC CHAPTER SWITCHING ===")
         print("=======================================================")
         # Switch to Chapter 10 (Abdominal Wall & Hernia)
         page.evaluate("() => window.appState.setActiveChapter('surg-ch10')")
@@ -94,9 +119,8 @@ def test_surgery_integration():
         print(f"PASS: Successfully switched to Chapter 15: '{hero_title_15}' (6 sections)!")
 
         print("\n=======================================================")
-        print("=== TEST 3: INTERACTIVE & ANIMATED CLINICAL FLOWCHARTS ===")
+        print("=== TEST 4: INTERACTIVE & ANIMATED CLINICAL FLOWCHARTS ===")
         print("=======================================================")
-        # In Chapter 15, verify the 2 clinical flowcharts:
         flowcharts = page.locator(".clinical-flowchart-card").all()
         assert len(flowcharts) >= 2, f"Expected >= 2 flowcharts in Chapter 15, found {len(flowcharts)}"
         print(f"PASS: {len(flowcharts)} animated clinical flowchart cards rendered in Chapter 15!")
@@ -105,10 +129,10 @@ def test_surgery_integration():
         assert "کولهسیستیت حاد" in fc_title, f"Unexpected flowchart title: {fc_title}"
         print(f"PASS: First flowchart verified: '{fc_title}'")
 
-        # Verify schematic board inside flowchart
-        schematic = page.locator(".schematic-board").first
-        assert schematic.is_visible(), "Schematic board must be visible inside flowchart"
-        print("PASS: Flowchart schematic canvas rendered with proper RTL layout!")
+        # Verify NO raw monospace <pre><code> blocks inside flowcharts
+        pre_blocks = page.locator(".clinical-flowchart-card pre").all()
+        assert len(pre_blocks) == 0, f"Zero <pre> blocks must exist in flowcharts, found {len(pre_blocks)}"
+        print("PASS: Verified ZERO monospace <pre> blocks in flowcharts! All diagrams are pure responsive cards.")
 
         # Switch to Chapter 2 (Fluids & Electrolytes) and check 15 flowcharts
         page.evaluate("() => window.appState.setActiveChapter('surg-ch02')")
@@ -118,7 +142,7 @@ def test_surgery_integration():
         print(f"PASS: Chapter 2 rendered with {len(fc_ch2)} animated clinical flowcharts!")
 
         print("\n=======================================================")
-        print("=== TEST 4: STRICT RTL TABLES & CLINICAL STEPPERS ===")
+        print("=== TEST 5: STRICT RTL TABLES & CLINICAL STEPPERS ===")
         print("=======================================================")
         # Switch back to Chapter 10 to check steppers and tables
         page.evaluate("() => window.appState.setActiveChapter('surg-ch10')")
@@ -136,7 +160,7 @@ def test_surgery_integration():
         print(f"PASS: All tables have strict dir='rtl' and responsive container wrapping!")
 
         print("\n=======================================================")
-        print("=== TEST 5: EXAM CRAM MODE (⚡ حالت شب امتحان) ===")
+        print("=== TEST 6: EXAM CRAM MODE (⚡ حالت شب امتحان) ===")
         print("=======================================================")
         cram_btn = page.locator("#examCramToggleBtn")
         assert cram_btn.is_visible(), "Exam Cram Mode toggle button must be visible"
@@ -159,7 +183,7 @@ def test_surgery_integration():
         print("PASS: Exam Cram Mode toggled back to standard study view!")
 
         print("\n=======================================================")
-        print("=== TEST 6: PORTAL HOMEPAGE & QUIZ INTEGRATION ===")
+        print("=== TEST 7: PORTAL HOMEPAGE & QUIZ INTEGRATION ===")
         print("=======================================================")
         page.goto(index_url)
         page.wait_for_load_state("networkidle")
@@ -186,7 +210,7 @@ def test_surgery_integration():
         print("PASS: Quiz navigation dropdown links to General Surgery!")
 
         print("\n=======================================================")
-        print("=== TEST 7: RESPONSIVENESS & ZERO HORIZONTAL OVERFLOW ===")
+        print("=== TEST 8: RESPONSIVENESS & ZERO HORIZONTAL OVERFLOW ===")
         print("=======================================================")
         viewports = [
             ("Mobile 375px", 375, 667),
@@ -207,7 +231,7 @@ def test_surgery_integration():
             print(f"PASS: {label} has ZERO horizontal overflow (scrollWidth={scroll_width}, clientWidth={client_width})!")
 
         print("\n=======================================================")
-        print("=== ALL 7 END-TO-END VERIFICATION SUITES PASSED 100%! ===")
+        print("=== ALL 8 END-TO-END VERIFICATION SUITES PASSED 100%! ===")
         print("=======================================================")
 
 if __name__ == '__main__':

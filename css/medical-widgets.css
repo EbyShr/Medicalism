@@ -2769,3 +2769,384 @@
   opacity: 1 !important;
   border-color: rgba(2, 132, 199, 0.4) !important;
 }
+
+
+/* ==========================================================================
+   10. RICH MEDICAL TEXT ENHANCEMENTS & LATIN TAGS
+   ========================================================================== */
+.med-latin-tag {
+  display: inline-block;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.85em;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: var(--radius-sm);
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.22);
+  color: #4f46e5;
+  margin-inline: 2px;
+  direction: ltr;
+  vertical-align: baseline;
+  transition: all var(--transition-fast);
+}
+
+.med-latin-tag:hover {
+  background: rgba(99, 102, 241, 0.16);
+  border-color: #6366f1;
+}
+
+[data-theme="dark"] .med-latin-tag {
+  background: rgba(99, 102, 241, 0.18);
+  border-color: rgba(129, 140, 248, 0.35);
+  color: #a5b4fc;
+}
+
+.med-lead {
+  font-weight: 800;
+  display: inline-block;
+  margin-inline-end: 4px;
+}
+
+.med-lead-indigo { color: #4f46e5 !important; }
+.med-lead-amber { color: #d97706 !important; }
+.med-lead-emerald { color: #059669 !important; }
+.med-lead-rose { color: #e11d48 !important; }
+.med-lead-cyan { color: #0284c7 !important; }
+
+[data-theme="dark"] .med-lead-indigo { color: #818cf8 !important; }
+[data-theme="dark"] .med-lead-amber { color: #fbbf24 !important; }
+[data-theme="dark"] .med-lead-emerald { color: #34d399 !important; }
+[data-theme="dark"] .med-lead-rose { color: #f43f5e !important; }
+[data-theme="dark"] .med-lead-cyan { color: #38bdf8 !important; }
+
+/* Ordered Lists with Custom Counter Pills */
+.study-section ol {
+  counter-reset: med-counter;
+  list-style: none;
+  padding-inline-start: 0;
+  margin-block: 16px;
+}
+
+.study-section ol > li {
+  counter-increment: med-counter;
+  position: relative;
+  padding-inline-start: 36px;
+  margin-block-end: 14px;
+  line-height: 1.85;
+}
+
+.study-section ol > li::before {
+  content: counter(med-counter);
+  position: absolute;
+  inset-inline-start: 0;
+  top: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.78rem;
+  font-family: var(--font-mono), monospace;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.12), rgba(99, 102, 241, 0.12));
+  color: #0284c7;
+  border: 1.5px solid rgba(2, 132, 199, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .study-section ol > li::before {
+  background: rgba(30, 41, 59, 0.85);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+/* ==========================================================================
+   11. REDESIGNED AUTHENTIC CLINICAL FLOWCHART & DECISION TREE ENGINE
+   ========================================================================== */
+.fc-entry-node {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.1), rgba(99, 102, 241, 0.1));
+  border: 1.5px solid rgba(2, 132, 199, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  text-align: center;
+  position: relative;
+  margin-block-end: 8px;
+}
+
+[data-theme="dark"] .fc-entry-node {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.fc-entry-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  background: #0284c7;
+  color: #fff;
+  margin-block-end: 6px;
+}
+
+.fc-entry-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.fc-arrow-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-block: 6px;
+  position: relative;
+}
+
+.fc-arrow-pulse {
+  display: inline-block;
+  font-size: 14px;
+  animation: bounceArrow 1.6s infinite ease-in-out;
+  color: #0284c7;
+}
+
+.fc-protocol-sequence {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-block: 8px;
+}
+
+.fc-protocol-step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-surface-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px 18px;
+  border-inline-start: 4px solid #0284c7;
+  transition: all var(--transition-fast);
+}
+
+.fc-protocol-step:hover {
+  transform: translateX(-3px);
+  border-color: var(--border-default);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .fc-protocol-step {
+  background: rgba(30, 41, 59, 0.55);
+}
+
+.fc-step-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: #0284c7;
+  color: #fff;
+  flex-shrink: 0;
+  font-family: var(--font-mono), monospace;
+}
+
+.fc-step-body {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.fc-protocol-subgroup {
+  margin-block-start: 14px;
+  padding: 16px;
+  background: rgba(2, 132, 199, 0.04);
+  border: 1.5px dashed rgba(2, 132, 199, 0.3);
+  border-radius: var(--radius-lg);
+}
+
+[data-theme="dark"] .fc-protocol-subgroup {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(56, 189, 248, 0.25);
+}
+
+.fc-subgroup-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0284c7;
+  margin-block-end: 12px;
+}
+
+[data-theme="dark"] .fc-subgroup-title {
+  color: #38bdf8;
+}
+
+.fc-pills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.fc-action-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  font-weight: 700;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  line-height: 1.5;
+}
+
+.fc-pill-emerald { border-color: rgba(5, 150, 105, 0.35); background: rgba(5, 150, 105, 0.06); }
+.fc-pill-cyan { border-color: rgba(2, 132, 199, 0.35); background: rgba(2, 132, 199, 0.06); }
+.fc-pill-amber { border-color: rgba(217, 119, 6, 0.35); background: rgba(217, 119, 6, 0.06); }
+.fc-pill-rose { border-color: rgba(225, 29, 72, 0.35); background: rgba(225, 29, 72, 0.06); }
+
+.flow-decision-branches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin-block-start: 12px;
+}
+
+.flow-branch-panel {
+  background: var(--bg-surface-secondary);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-top-width: 4px;
+}
+
+.flow-branch-header {
+  margin-block-end: 12px;
+  padding-block-end: 8px;
+  border-block-end: 1px dashed var(--border-subtle);
+}
+
+.branch-status-pill {
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  display: inline-block;
+}
+
+.flow-branch-bullets {
+  list-style: none;
+  padding-inline-start: 0;
+  margin: 0 0 14px 0;
+}
+
+.flow-branch-bullets li {
+  position: relative;
+  padding-inline-start: 16px;
+  margin-block-end: 8px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.flow-branch-bullets li::before {
+  content: '•';
+  position: absolute;
+  inset-inline-start: 0;
+  color: #0284c7;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.flow-branch-action {
+  margin-block-start: auto;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.86rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.flow-subbranches-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-block-start: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-subtle);
+}
+
+.flow-subbranch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.flow-subbranch.sub-success { background: rgba(5, 150, 105, 0.08); border-inline-start: 3px solid #059669; }
+.flow-subbranch.sub-danger { background: rgba(225, 29, 72, 0.08); border-inline-start: 3px solid #e11d48; }
+
+.flow-converge-inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.flow-stimulant-card {
+  background: var(--bg-surface-secondary);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  border-inline-start-width: 4px;
+}
+
+.stimulant-header {
+  font-weight: 800;
+  font-size: 0.92rem;
+  margin-block-end: 6px;
+}
+
+.stimulant-pathway {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+}
+
+.flow-terminal-card {
+  background: linear-gradient(135deg, rgba(5, 150, 105, 0.12), rgba(16, 185, 129, 0.12));
+  border: 1.5px solid rgba(5, 150, 105, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  text-align: center;
+  margin-block-start: 6px;
+}
+
+.terminal-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  background: #059669;
+  color: #fff;
+  display: inline-block;
+  margin-block-end: 6px;
+}
+
+.terminal-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #047857;
+}
+
+[data-theme="dark"] .terminal-title {
+  color: #34d399;
+}
