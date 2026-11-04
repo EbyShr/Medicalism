@@ -3904,3 +3904,302 @@ ul.nested-bullet-list > li.exam-trap-item {
   white-space: nowrap;
   direction: ltr;
 }
+
+
+/* ==========================================================================
+   CLINICAL PART CARDS & MODULAR STUDY SECTIONS (Lawrence General Surgery)
+   Elevated semantic containers for:
+   - Part 1: Foundations & Pathophysiology (.part-foundations)
+   - Part 2: Step-by-Step Clinical Encounter (.part-workflow)
+   - Part 3: Reference Tables & Classifications (.part-tables)
+   - Part 4: High-Yield Exam Cram (.high-yield-exam-card)
+   - Part 5: Question Anatomy (.part-questions)
+   ========================================================================== */
+
+.clinical-part-card {
+  margin-block: 28px;
+  background-color: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-medium, #cbd5e1);
+  border-radius: var(--radius-lg, 14px);
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+  transition: transform var(--transition-fast, 0.2s ease), box-shadow var(--transition-fast, 0.2s ease);
+  position: relative;
+  overflow: visible;
+}
+
+[data-theme="dark"] .clinical-part-card {
+  background-color: var(--bg-surface, #1e293b);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+
+.clinical-intro-card {
+  margin-block: 20px;
+  padding: 16px 20px;
+  background: rgba(2, 132, 199, 0.04);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+  border-radius: var(--radius-md, 10px);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .clinical-intro-card {
+  background: rgba(56, 189, 248, 0.06);
+  border-color: rgba(56, 189, 248, 0.25);
+}
+
+/* Part Card Header */
+.part-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-block-end: 14px;
+  margin-block-end: 18px;
+  border-block-end: 1px solid var(--border-subtle, #e2e8f0);
+}
+
+[data-theme="dark"] .part-card-header {
+  border-block-end-color: rgba(255, 255, 255, 0.08);
+}
+
+.part-tag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.part-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.part-title-text {
+  margin: 0 !important;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  line-height: 1.5 !important;
+  color: var(--text-primary, #0f172a);
+}
+
+[data-theme="dark"] .part-title-text {
+  color: #f8fafc !important;
+}
+
+/* Themed Part Card Accents */
+/* 1. Foundations (Cyan) */
+.clinical-part-card.part-foundations {
+  border-inline-start: 4.5px solid #0284c7;
+}
+.badge-foundations {
+  background: rgba(2, 132, 199, 0.1);
+  color: #0284c7;
+  border: 1px solid rgba(2, 132, 199, 0.25);
+}
+[data-theme="dark"] .clinical-part-card.part-foundations {
+  border-inline-start-color: #38bdf8;
+}
+[data-theme="dark"] .badge-foundations {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+/* 2. Workflow / Steppers / Trees (Indigo) */
+.clinical-part-card.part-workflow {
+  border-inline-start: 4.5px solid #6366f1;
+}
+.badge-workflow {
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+}
+[data-theme="dark"] .clinical-part-card.part-workflow {
+  border-inline-start-color: #818cf8;
+}
+[data-theme="dark"] .badge-workflow {
+  background: rgba(129, 140, 248, 0.15);
+  color: #a5b4fc;
+  border-color: rgba(129, 140, 248, 0.3);
+}
+
+/* 3. Reference Tables (Emerald) */
+.clinical-part-card.part-tables {
+  border-inline-start: 4.5px solid #059669;
+}
+.badge-tables {
+  background: rgba(5, 150, 105, 0.1);
+  color: #059669;
+  border: 1px solid rgba(5, 150, 105, 0.25);
+}
+[data-theme="dark"] .clinical-part-card.part-tables {
+  border-inline-start-color: #34d399;
+}
+[data-theme="dark"] .badge-tables {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+/* 4. Questions Analysis (Amber) */
+.clinical-part-card.part-questions {
+  border-inline-start: 4.5px solid #d97706;
+}
+.badge-questions {
+  background: rgba(217, 119, 6, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(217, 119, 6, 0.25);
+}
+[data-theme="dark"] .clinical-part-card.part-questions {
+  border-inline-start-color: #fbbf24;
+}
+[data-theme="dark"] .badge-questions {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+/* 5. General Part Card (Slate) */
+.clinical-part-card.part-general {
+  border-inline-start: 4.5px solid #64748b;
+}
+.badge-general {
+  background: rgba(100, 116, 139, 0.1);
+  color: #64748b;
+  border: 1px solid rgba(100, 116, 139, 0.25);
+}
+
+/* High-Yield Exam Card Styling */
+.high-yield-exam-card {
+  margin-block: 30px;
+  background: rgba(225, 29, 72, 0.03);
+  border: 1.5px solid rgba(225, 29, 72, 0.3);
+  border-inline-start: 5px solid #e11d48;
+  border-radius: var(--radius-lg, 14px);
+  padding: 24px;
+  box-shadow: 0 4px 18px rgba(225, 29, 72, 0.08);
+  position: relative;
+}
+
+[data-theme="dark"] .high-yield-exam-card {
+  background: rgba(225, 29, 72, 0.08);
+  border-color: rgba(244, 63, 94, 0.35);
+  border-inline-start-color: #f43f5e;
+  box-shadow: 0 4px 22px rgba(225, 29, 72, 0.15);
+}
+
+.exam-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-block-end: 14px;
+  margin-block-end: 18px;
+  border-block-end: 1px solid rgba(225, 29, 72, 0.2);
+}
+
+.exam-pulse-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(225, 29, 72, 0.12);
+  border-radius: 50%;
+  font-size: 1.15rem;
+  animation: pulse-ring 2s infinite ease-in-out;
+}
+
+.exam-title-text {
+  margin: 0 !important;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  color: #e11d48 !important;
+}
+
+[data-theme="dark"] .exam-title-text {
+  color: #fb7185 !important;
+}
+
+/* Distinctive Subheadings Styling (H4) */
+.part-card-body h4,
+.study-section h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-block: 22px 12px !important;
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  color: #0284c7 !important;
+  padding-inline-start: 12px;
+  border-inline-start: 3.5px solid #0284c7;
+  line-height: 1.6 !important;
+}
+
+[data-theme="dark"] .part-card-body h4,
+[data-theme="dark"] .study-section h4 {
+  color: #38bdf8 !important;
+  border-inline-start-color: #38bdf8;
+}
+
+/* Strict Table RTL Alignment & Contrast */
+.table-responsive .clinical-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  direction: rtl !important;
+  margin-block: 16px !important;
+}
+
+.table-responsive .clinical-table th,
+.table-responsive .clinical-table td {
+  text-align: right !important;
+  direction: rtl !important;
+  padding: 12px 14px !important;
+  border: 1px solid var(--border-subtle, #cbd5e1) !important;
+}
+
+.table-responsive .clinical-table th {
+  background-color: var(--color-indigo-subtle, #f1f5f9) !important;
+  color: var(--text-primary, #0f172a) !important;
+  font-weight: 700 !important;
+  border-bottom: 2px solid var(--border-medium, #94a3b8) !important;
+}
+
+[data-theme="dark"] .table-responsive .clinical-table th {
+  background-color: rgba(99, 102, 241, 0.15) !important;
+  color: #f1f5f9 !important;
+  border-bottom-color: rgba(99, 102, 241, 0.4) !important;
+}
+
+[data-theme="dark"] .table-responsive .clinical-table td {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Elevated Light Mode Contrast */
+[data-theme="light"] .clinical-part-card,
+[data-theme="light"] .clinical-flowchart-card,
+[data-theme="light"] .callout {
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.07) !important;
+}
+
+[data-theme="light"] .ctree-container {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .ctree-node {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .ctree-text,
+[data-theme="light"] .ctree-action-text {
+  color: #1e293b !important;
+}

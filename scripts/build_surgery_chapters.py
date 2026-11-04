@@ -279,7 +279,6 @@ CHAPTER_CONFIGS = [
 
 # Keywords designating the ~7% Approach 1 (Modern Hierarchical Medical Trees)
 APPROACH_1_KEYWORDS = [
-    'کولهسیستیت حاد',
     'کلانژیت حاد',
     'محرک‌های سلول پاریتال',
     'شوک خونریزی‌دهنده شدید',
@@ -698,7 +697,10 @@ def render_approach2_clean_tree(lines, title):
                     parts = n2_text.split('⬅️', 1)
                     sub_title = transform_inline_elements(parts[0].strip())
                     sub_action = transform_inline_elements(parts[1].strip())
-                    sub_html = f'<span class="ctree-text-bold">{sub_title}</span> <span class="ctree-arrow">⬅️</span> <span class="ctree-action-text">{sub_action}</span>'
+                    if sub_title:
+                        sub_html = f'<span class="ctree-text-bold">{sub_title}</span> <span class="ctree-arrow">⬅️</span> <span class="ctree-action-text">{sub_action}</span>'
+                    else:
+                        sub_html = f'<span class="ctree-arrow">⬅️</span> <span class="ctree-action-text">{sub_action}</span>'
                 else:
                     sub_html = f'<span class="ctree-text">{transform_inline_elements(n2_text)}</span>'
                 
@@ -1071,6 +1073,7 @@ def normalize_list_indentation(text):
 
 def format_tables_with_rtl(html_content):
     """Ensures all markdown-generated tables have dir='rtl' and full-width responsive classes."""
+    html_content = re.sub(r'style="text-align:\s*left;?"', 'style="text-align: right;"', html_content)
     html_content = re.sub(r'<table>', r'<div class="table-responsive"><table class="data-table clinical-table" dir="rtl">', html_content)
     html_content = re.sub(r'</table>', r'</table></div>', html_content)
     return html_content
@@ -1145,15 +1148,17 @@ def parse_steppers(text):
 """
     return pattern.sub(repl, text)
 
-def parse_section_markdown(section_md):
-    """Parses and renders markdown content into rich semantic HTML with multi-modal diagrams."""
-    parts = re.split(r'(```(?:text|markdown)?\s*\n[\s\S]*?```)', section_md)
+def render_part_body(body_md):
+    """Renders markdown content within a part card, strictly preserving code diagrams."""
+    bt3 = chr(96) * 3
+    code_pattern = re.compile(r'(?m)(^' + bt3 + r'[^\n]*\n[\s\S]*?\n' + bt3 + r'[ \t]*$)')
+    parts = code_pattern.split(body_md)
     html_chunks = []
 
     for part in parts:
-        if part.startswith('```'):
-            code_content = re.sub(r'^```(?:text|markdown)?\s*\n', '', part)
-            code_content = re.sub(r'\n```$', '', code_content)
+        if part.strip().startswith(bt3):
+            code_content = re.sub(r'^' + bt3 + r'[^\n]*\n', '', part.strip())
+            code_content = re.sub(r'\n' + bt3 + r'$', '', code_content)
             
             is_ascii = any(ch in code_content for ch in ['┌', '├', '└', '├──', '└──', '─', '━', '│', '╔', '╗', '╚', '╝', '║', '═'])
             if is_ascii:
@@ -1164,6 +1169,8 @@ def parse_section_markdown(section_md):
                 html_chunks.append(f'<div class="clinical-quote-card">{body_clean}</div>')
         else:
             txt = part
+            if not txt.strip():
+                continue
             txt = parse_callouts(txt)
             txt = parse_steppers(txt)
             txt = normalize_list_indentation(txt)
@@ -1174,6 +1181,91 @@ def parse_section_markdown(section_md):
             html_chunks.append(chunk_html)
 
     return '\n'.join(html_chunks)
+
+def parse_section_markdown(section_md):
+    """
+    Parses and renders markdown content into rich semantic HTML organized into
+    elevated clinical part cards:
+    - Part 1: Foundations & Pathophysiology (.part-foundations)
+    - Part 2: Step-by-Step Clinical Encounter (.part-workflow)
+    - Part 3: Reference Tables & Classifications (.part-tables)
+    - Part 4: High-Yield Exam Cram (.high-yield-exam-card)
+    - Questions: Sample Questions Anatomy (.part-questions)
+    """
+    section_md = section_md.replace('\r\n', '\n')
+    part_matches = list(re.finditer(r'(?m)^###\s+(?:([\d\u06F0-\u06F9]+)[\.\:\s\-—]*)?(.*?)$', section_md))
+    if not part_matches:
+        rendered = render_part_body(section_md)
+        return f'<div class="clinical-part-card part-general"><div class="part-card-body">{rendered}</div></div>'
+        
+    splits = [m.start() for m in part_matches] + [len(section_md)]
+    card_htmls = []
+    
+    intro = section_md[:splits[0]].strip()
+    if intro:
+        intro_clean = re.sub(r'^\*\(.*?\)\*\s*$', '', intro, flags=re.MULTILINE).strip()
+        intro_clean = re.sub(r'^\-\-\-\s*$', '', intro_clean, flags=re.MULTILINE).strip()
+        if intro_clean:
+            intro_html = render_part_body(intro_clean)
+            card_htmls.append(f'<div class="clinical-intro-card">{intro_html}</div>')
+            
+    for i, p in enumerate(part_matches):
+        p_num = p.group(1) or str(i+1)
+        p_title = p.group(2).strip()
+        p_chunk = section_md[splits[i]:splits[i+1]]
+        
+        if any(w in p_title for w in ['مبانی', 'پاتوفیزیولوژی', 'اصول']):
+            theme = 'foundations'
+            badge = f'پارت {p_num}: مبانی و پاتوفیزیولوژی'
+            icon = '🧬'
+        elif any(w in p_title for w in ['مسیر بالینی', 'تصمیم‌گیری', 'مدیریت', 'گام', 'پروتکل']):
+            theme = 'workflow'
+            badge = f'پارت {p_num}: مسیر بالینی و تصمیم‌گیری'
+            icon = '🩺'
+        elif any(w in p_title for w in ['جدول', 'جداول', 'رده‌بندی', 'مقایسه']):
+            theme = 'tables'
+            badge = f'پارت {p_num}: جداول و رده‌بندی‌های مرجع'
+            icon = '📊'
+        elif any(w in p_title for w in ['مرور شب امتحان', 'High-Yield']):
+            theme = 'exam'
+            badge = '⚡ مرور شب امتحان (High-Yield Summary)'
+            icon = '⚡'
+        elif any(w in p_title for w in ['سوال', 'کالبدشکافی', 'تست']):
+            theme = 'questions'
+            badge = f'پارت {p_num}: کالبدشکافی سوالات آزمون'
+            icon = '📝'
+        else:
+            theme = 'general'
+            badge = f'پارت {p_num}: {p_title[:30]}'
+            icon = '📌'
+            
+        chunk_lines = p_chunk.splitlines()
+        body_lines = chunk_lines[1:]
+        body_md = '\n'.join(body_lines).strip()
+        body_html = render_part_body(body_md)
+        
+        if theme == 'exam':
+            card_htmls.append(f'''<div class="high-yield-exam-card" data-cram-target="true">
+  <div class="exam-card-header">
+    <span class="exam-pulse-icon">⚡</span>
+    <h3 class="exam-title-text">{p_title}</h3>
+  </div>
+  <div class="exam-card-body">
+    {body_html}
+  </div>
+</div>''')
+        else:
+            card_htmls.append(f'''<div class="clinical-part-card part-{theme}">
+  <div class="part-card-header">
+    <span class="part-tag-badge badge-{theme}"><span class="part-icon">{icon}</span> {badge}</span>
+    <h3 class="part-title-text">{p_title}</h3>
+  </div>
+  <div class="part-card-body">
+    {body_html}
+  </div>
+</div>''')
+
+    return '\n'.join(card_htmls)
 
 def extract_plain_text(html_str):
     """Strips HTML tags for client-side search engine indexing."""
