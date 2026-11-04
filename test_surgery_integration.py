@@ -35,7 +35,7 @@ def test_surgery_integration():
         browser = p.chromium.launch(executable_path=chrome_path, headless=True)
         
         print("\n=======================================================")
-        print("=== TEST 1: LOAD surgery.html & VERIFY 14 CHAPTERS ===")
+        print("=== TEST 1: LOAD surgery.html & VERIFY 22 CHAPTERS ===")
         print("=======================================================")
         page = browser.new_page(viewport={"width": 1440, "height": 900})
         page.goto(surgery_url)
@@ -48,14 +48,14 @@ def test_surgery_integration():
         assert "جراحی جنرال" in title and "لارنس" in title, f"Unexpected page title: {title}"
         print(f"PASS: Page title verified: '{title}'")
 
-        # Verify 14 chapters in SURGERY_REGISTRY
+        # Verify 22 chapters in SURGERY_REGISTRY
         registry_len = page.evaluate("() => window.SURGERY_REGISTRY.length")
-        assert registry_len == 14, f"Expected 14 chapters in registry, found {registry_len}"
-        print(f"PASS: window.SURGERY_REGISTRY loaded with all 14 chapters!")
+        assert registry_len == 22, f"Expected 22 chapters in registry, found {registry_len}"
+        print(f"PASS: window.SURGERY_REGISTRY loaded with all 22 chapters!")
 
         total_sections = page.evaluate("() => window.SURGERY_REGISTRY.reduce((acc, c) => acc + c.sections.length, 0)")
-        assert total_sections == 99, f"Expected 99 total sections, found {total_sections}"
-        print(f"PASS: Exactly 99 clinical sections verified across all 14 chapters!")
+        assert total_sections == 164, f"Expected 164 total sections, found {total_sections}"
+        print(f"PASS: Exactly 164 clinical sections verified across all 22 chapters!")
 
         # Verify Initial Chapter (Ch 1)
         hero_title = page.locator(".chapter-title").first.inner_text()
@@ -66,10 +66,10 @@ def test_surgery_integration():
         assert len(sections) == 8, f"Expected 8 sections in Chapter 1, found {len(sections)}"
         print(f"PASS: Chapter 1 mounted with 8 sections (zero duplication)!")
 
-        # Verify TOC in sidebar has 14 chapters
+        # Verify TOC in sidebar has 22 chapters
         toc_items = page.locator(".sidebar-scroll-container .nav-chapter-item").all()
-        assert len(toc_items) == 14, f"Expected 14 chapters in sidebar TOC, found {len(toc_items)}"
-        print(f"PASS: Sidebar TOC indexes all 14 chapters!")
+        assert len(toc_items) == 22, f"Expected 22 chapters in sidebar TOC, found {len(toc_items)}"
+        print(f"PASS: Sidebar TOC indexes all 22 chapters!")
 
         print("\n=======================================================")
         print("=== TEST 2: CHAPTER MIND-MAP TOGGLE FUNCTIONALITY ===")
@@ -148,11 +148,11 @@ def test_surgery_integration():
         page.evaluate("() => window.appState.setActiveChapter('surg-ch10')")
         page.wait_for_timeout(300)
 
-        steppers = page.locator(".clinical-stepper-card").all()
+        steppers = page.locator(".clinical-step").all()
         assert len(steppers) >= 4, f"Expected >= 4 steppers in Chapter 10, found {len(steppers)}"
         print(f"PASS: Found {len(steppers)} clinical steppers in Chapter 10!")
 
-        tables = page.locator(".table-container table").all()
+        tables = page.locator("table.clinical-table").all()
         assert len(tables) >= 5, f"Expected >= 5 tables in Chapter 10, found {len(tables)}"
         for idx, tbl in enumerate(tables[:3]):
             tbl_dir = tbl.get_attribute("dir")
@@ -192,14 +192,14 @@ def test_surgery_integration():
         dropdown_surg = page.locator(".dropdown-course-card[href='./surgery.html']")
         assert dropdown_surg.count() >= 1, "Surgery course card must exist in index.html dropdown"
         dropdown_meta = dropdown_surg.first.text_content()
-        assert "۱۴ فصل" in dropdown_meta, f"Dropdown meta must show 14 chapters, found: {dropdown_meta}"
-        print("PASS: Portal navigation dropdown correctly displays 14 General Surgery chapters!")
+        assert "۲۲ فصل" in dropdown_meta, f"Dropdown meta must show 22 chapters, found: {dropdown_meta}"
+        print("PASS: Portal navigation dropdown correctly displays 22 General Surgery chapters!")
 
         # Check Bento card
         bento_title = page.locator(".bento-card-surg .bento-card-title").first.inner_text()
         assert "جراحی جنرال" in bento_title, f"Unexpected Bento title: {bento_title}"
         bento_tags = page.locator(".bento-card-surg .bento-tag").all_inner_texts()
-        assert any("۱۴ فصل" in t for t in bento_tags), f"Bento tags should mention 14 chapters: {bento_tags}"
+        assert any("۲۲ فصل" in t for t in bento_tags), f"Bento tags should mention 22 chapters: {bento_tags}"
         print(f"PASS: Portal Bento card updated with tags: {bento_tags}")
 
         # Check Quiz page

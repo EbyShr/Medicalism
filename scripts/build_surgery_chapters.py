@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Medicalism Alborz - Automated Surgery Chapter Parser & Builder (Comprehensive 14-Chapter Edition)
-Source: Lawrence's Essentials of General Surgery (جراحی جنرال لارنس)
+Medicalism Alborz - Automated Surgery Chapter Parser & Builder (Comprehensive 22-Chapter Edition)
+Source: Lawrence's Essentials of General Surgery (جراحی جنرال لارنس - ویرایش جامع ۲۲ فصل)
 
 Multi-modal Tree Distribution:
 - 90% Approach 2: Stylized Clean Tree View (.ctree-container)
 - 7%  Approach 1: Modern Hierarchical Visual Medical Tree (.vtree-container / .convergent-pathway-card / .visual-protocol-card)
 - 3%  Approach 3: Nested Decision Cards (.ncards-container)
-Zero monospace <pre><code> code blocks across all 87 diagrams!
+Zero monospace <pre><code> code blocks across all 140 diagrams!
 """
 
 import os
@@ -111,6 +111,28 @@ CHAPTER_CONFIGS = [
         "estimatedReadTime": "۶۰ دقیقه مطالعه عمیق و مرور بالینی"
     },
     {
+        "filename": "Burns.md",
+        "id": "surg-ch08",
+        "number": 8,
+        "title": "فصل ۸: سوختگی‌ها، آسیب‌های استنشاقی و احیا (Burns)",
+        "shortTitle": "سوختگی‌ها و آسیب‌های حرارتی",
+        "latinTitle": "Burns & Thermal Injuries",
+        "author": "گروه جراحی عمومی و مرکز سوختگی",
+        "authorAffiliation": "دانشگاه علوم پزشکی البرز (ABZUMS) • رفرنس مصوب لارنس",
+        "estimatedReadTime": "۴۵ دقیقه مطالعه عمیق و مرور بالینی"
+    },
+    {
+        "filename": "Surgical Infection.md",
+        "id": "surg-ch09",
+        "number": 9,
+        "title": "فصل ۹: عفونت‌های جراحی و آنتی‌بیوتیک‌پروفیلاکسی (Surgical Infection)",
+        "shortTitle": "عفونت‌های جراحی و پروفیلاکسی",
+        "latinTitle": "Surgical Infection & Antimicrobial Prophylaxis",
+        "author": "گروه جراحی عمومی و کنترل عفونت",
+        "authorAffiliation": "دانشگاه علوم پزشکی البرز (ABZUMS) • رفرنس مصوب لارنس",
+        "estimatedReadTime": "۳۵ دقیقه مطالعه عمیق و مرور بالینی"
+    },
+    {
         "filename": "Abdominal Wall, Including Hernia.md",
         "id": "surg-ch10",
         "number": 10,
@@ -120,6 +142,28 @@ CHAPTER_CONFIGS = [
         "author": "گروه جراحی عمومی و لاپاراسکوپی بالینی",
         "authorAffiliation": "دانشگاه علوم پزشکی البرز (ABZUMS) • رفرنس مصوب لارنس",
         "estimatedReadTime": "۴۵ دقیقه مطالعه عمیق و مرور بالینی"
+    },
+    {
+        "filename": "Esophagus.md",
+        "id": "surg-ch11",
+        "number": 11,
+        "title": "فصل ۱۱: بیماری‌های مری و اختلالات حرکتی آن (Esophagus)",
+        "shortTitle": "بیماری‌های مری",
+        "latinTitle": "Esophagus & Motility Disorders",
+        "author": "گروه جراحی عمومی و توراکس",
+        "authorAffiliation": "دانشگاه علوم پزشکی البرز (ABZUMS) • رفرنس مصوب لارنس",
+        "estimatedReadTime": "۵۰ دقیقه مطالعه عمیق و مرور بالینی"
+    },
+    {
+        "filename": "Stomach and Duodenum.md",
+        "id": "surg-ch12",
+        "number": 12,
+        "title": "فصل ۱۲: معده و دئودنوم (Stomach and Duodenum)",
+        "shortTitle": "معده و دئودنوم",
+        "latinTitle": "Stomach and Duodenum",
+        "author": "گروه جراحی عمومی و جراحی چاقی",
+        "authorAffiliation": "دانشگاه علوم پزشکی البرز (ABZUMS) • رفرنس مصوب لارنس",
+        "estimatedReadTime": "۵۵ دقیقه مطالعه عمیق و مرور بالینی"
     },
     {
         "filename": "Small Intestine and Appendix.md",
@@ -133,15 +177,15 @@ CHAPTER_CONFIGS = [
         "estimatedReadTime": "۴۵ دقیقه مطالعه عمیق و مرور بالینی"
     },
     {
-        "filename": "Stomach and Duodenum.md",
+        "filename": "Colon, Rectum, and Anus.md",
         "id": "surg-ch14",
         "number": 14,
-        "title": "فصل ۱۴: معده و دئودنوم (Stomach and Duodenum)",
-        "shortTitle": "معده و دئودنوم",
-        "latinTitle": "Stomach and Duodenum",
-        "author": "گروه جراحی عمومی و جراحی چاقی",
+        "title": "فصل ۱۴: کولون، رکتوم و مقعد (Colon, Rectum, and Anus)",
+        "shortTitle": "کولون، رکتوم و آنوس",
+        "latinTitle": "Colon, Rectum, and Anus",
+        "author": "گروه جراحی عمومی و کولورکتال",
         "authorAffiliation": "دانشگاه علوم پزشکی البرز (ABZUMS) • رفرنس مصوب لارنس",
-        "estimatedReadTime": "۵۵ دقیقه مطالعه عمیق و مرور بالینی"
+        "estimatedReadTime": "۶۰ دقیقه مطالعه عمیق و مرور بالینی"
     },
     {
         "filename": "Biliary Tract.md",
@@ -166,6 +210,17 @@ CHAPTER_CONFIGS = [
         "estimatedReadTime": "۴۵ دقیقه مطالعه عمیق و مرور بالینی"
     },
     {
+        "filename": "Breast.md",
+        "id": "surg-ch17",
+        "number": 17,
+        "title": "فصل ۱۷: بیماری‌های پستان و نئوپلاسم‌ها (Breast)",
+        "shortTitle": "بیماری‌های پستان",
+        "latinTitle": "Breast & Oncologic Surgery",
+        "author": "گروه جراحی عمومی و جراحی پستان",
+        "authorAffiliation": "دانشگاه علوم پزشکی البرز (ABZUMS) • رفرنس مصوب لارنس",
+        "estimatedReadTime": "۵۵ دقیقه مطالعه عمیق و مرور بالینی"
+    },
+    {
         "filename": "Liver and Spleen.md",
         "id": "surg-ch19",
         "number": 19,
@@ -177,26 +232,63 @@ CHAPTER_CONFIGS = [
         "estimatedReadTime": "۵۰ دقیقه مطالعه عمیق و مرور بالینی"
     },
     {
+        "filename": "Surgical Endocrinology.md",
+        "id": "surg-ch21",
+        "number": 21,
+        "title": "فصل ۲۱: اندوکرینولوژی جراحی (تیروئید، پاراتیروئید و آدرنال) (Surgical Endocrinology)",
+        "shortTitle": "اندوکرینولوژی جراحی",
+        "latinTitle": "Surgical Endocrinology (Thyroid, Parathyroid, Adrenal)",
+        "author": "گروه جراحی عمومی و اندوکرینولوژی",
+        "authorAffiliation": "دانشگاه علوم پزشکی البرز (ABZUMS) • رفرنس مصوب لارنس",
+        "estimatedReadTime": "۶۰ دقیقه مطالعه عمیق و مرور بالینی"
+    },
+    {
+        "filename": "Plastic Surgery.md",
+        "id": "surg-ch22",
+        "number": 22,
+        "title": "فصل ۲۲: جراحی پلاستیک، پوست، بافت نرم، صورت و دست (Plastic Surgery)",
+        "shortTitle": "جراحی پلاستیک و ترمیمی",
+        "latinTitle": "Plastic Surgery, Skin, Soft Tissue, Face & Hand",
+        "author": "گروه جراحی عمومی و پلاستیک",
+        "authorAffiliation": "دانشگاه علوم پزشکی البرز (ABZUMS) • رفرنس مصوب لارنس",
+        "estimatedReadTime": "۵۰ دقیقه مطالعه عمیق و مرور بالینی"
+    },
+    {
         "filename": "Diseases of the Vascular System.md",
         "id": "surg-ch24",
         "number": 24,
-        "title": "فصل ۲۴: بیماری‌های سیستم عروقی (Diseases of the Vascular System)",
+        "title": "فصل ۲۴: بیماری‌های عروقی (شریانی، وریدی و لنفاوی) (Diseases of the Vascular System)",
         "shortTitle": "بیماری‌های سیستم عروقی",
         "latinTitle": "Diseases of the Vascular System",
         "author": "گروه جراحی عمومی و جراحی عروق",
         "authorAffiliation": "دانشگاه علوم پزشکی البرز (ABZUMS) • رفرنس مصوب لارنس",
-        "estimatedReadTime": "۷۵ دقیقه مطالعه عمیق و مرور بالینی"
+        "estimatedReadTime": "۶۰ دقیقه مطالعه عمیق و مرور بالینی"
+    },
+    {
+        "filename": "Neurosurgery.md",
+        "id": "surg-ch28",
+        "number": 28,
+        "title": "فصل ۲۸: جراحی مغز و اعصاب و ستون فقرات (Neurosurgery)",
+        "shortTitle": "جراحی مغز و اعصاب",
+        "latinTitle": "Neurosurgery & Diseases of the Nervous System",
+        "author": "گروه جراحی اعصاب و ستون فقرات",
+        "authorAffiliation": "دانشگاه علوم پزشکی البرز (ABZUMS) • رفرنس مصوب لارنس",
+        "estimatedReadTime": "۶۰ دقیقه مطالعه عمیق و مرور بالینی"
     }
 ]
 
-# Keywords designating the ~7% Approach 1 (Visual Medical Tree / Major Decision Forks)
+# Keywords designating the ~7% Approach 1 (Modern Hierarchical Medical Trees)
 APPROACH_1_KEYWORDS = [
     'کولهسیستیت حاد',
     'کلانژیت حاد',
     'محرک‌های سلول پاریتال',
     'شوک خونریزی‌دهنده شدید',
     'ترومایی ناپایدار همودینامیک',
-    'بیمار با علائم مشکوک به شوک'
+    'بیمار با علائم مشکوک به شوک',
+    'آسیب استنشاقی و سوختگی',
+    'ترومای حاد سر',
+    'رویکرد به سپسیس و شکم حاد',
+    'شک بالینی به سندرم کوشینگ'
 ]
 
 # Keywords designating the ~3% Approach 3 (Nested Decision Cards / Criteria Tiers)
@@ -204,7 +296,10 @@ APPROACH_3_KEYWORDS = [
     'کاپرینی',
     'Caprini',
     'عوامل مختل‌کننده التیام زخم',
-    'کیست پانکراس'
+    'کیست پانکراس',
+    'شکستگی‌های ستون فقرات',
+    'طبقه‌بندی پریتونیت',
+    'معیارهای ده‌گانه ارجاع'
 ]
 
 def clean_heading_math(text):
@@ -272,135 +367,80 @@ def transform_inline_elements(text):
     """
     # 1. Flexible Inline Theory badge
     def repl_theory(m):
-        inner = m.group(1).strip()
+        inner = m.group(1).strip() if m.group(1) else ""
         punct = m.group(2) or ''
-        tooltip = f'نکته تئوری: {inner}' if len(inner) > 10 else 'نکته تئوری امتحانی'
+        tooltip = f'نکته تئوری: {inner}' if len(inner) > 5 else 'نکته تئوری امتحانی'
         return f'{punct} <span class="badge-theory pearl-micro-badge" data-exam-point="theory" title="{tooltip}"><span class="badge-icon" aria-hidden="true">🎯</span><span class="badge-text sr-only">نکته تئوری</span></span>'
 
-    text = re.sub(r'`?\[🎯[ \t]*([^\]]+)\]`?[ \t]*([\.،؛:!؟\?]?)', repl_theory, text)
+    text = re.sub(r'`?\[🎯[ \t]*(.*?)\]`?[ \t]*([\.،؛:!؟\?]?)', repl_theory, text)
 
     # 2. Flexible Inline Trap badge
     def repl_trap(m):
-        inner = m.group(1).strip()
+        inner = m.group(1).strip() if m.group(1) else ""
         punct = m.group(2) or ''
         label = "دام تستی"
         if "بزرگ" in inner or "فوق‌العاده" in inner or "بسیار مهم" in inner:
             label = "تله ماژور"
         elif "خط قرمز" in inner or "Never Do" in inner:
             label = "خط قرمز"
-        tooltip = f'تله امتحانی: {inner}' if len(inner) > 10 else 'تله و دام امتحانی'
+        tooltip = f'تله امتحانی: {inner}' if len(inner) > 5 else 'تله و دام امتحانی'
         return f'{punct} <span class="badge-trap trap-micro-badge" data-exam-point="trap" title="{tooltip}"><span class="badge-icon" aria-hidden="true">⚠️</span><span class="trap-label-mini">{label}</span><span class="badge-text sr-only">{inner}</span></span>'
 
-    text = re.sub(r'`?\[⚠️[ \t]*([^\]]+)\]`?[ \t]*([\.،؛:!؟\?]?)', repl_trap, text)
+    text = re.sub(r'`?\[⚠️[ \t]*(.*?)\]`?[ \t]*([\.،؛:!؟\?]?)', repl_trap, text)
     
     # 3. Inline math expressions ($...$)
     text = re.sub(r'\$([^\$\n]+)\$', format_math_expr, text)
 
     # 4. Directional arrows (safe non-capturing alternation to protect multi-byte variation selectors)
     text = re.sub(r'(?:⬅️|➡️|⬇️|⬆️)', r'<span class="stepper-arrow-indicator">\g<0></span>', text)
-    text = re.sub(r'✅', '<span class="badge-decision-yes" title="موفقیت‌آمیز / پایدار">✅</span>', text)
-    text = re.sub(r'❌', '<span class="badge-decision-no" title="ناموفق / ناپایدار / خط قرمز">❌</span>', text)
 
-    # 5. English medical terms in parentheses: (Term) -> (<span class="med-latin-tag" dir="ltr">Term</span>)
-    def repl_latin_tag(m):
-        term = m.group(1).strip()
-        if re.search(r'^[A-Za-z0-9\s\-_/:\.,\+]+$', term) and len(term) >= 2 and not term.isdigit():
-            return f'<span class="med-latin-wrap" dir="ltr">(<span class="med-latin-tag">{term}</span>)</span>'
-        return m.group(0)
+    # 5. English terms in parentheses: (Term) -> pill
+    def repl_paren(m):
+        prefix = m.group(1)
+        term = m.group(2).strip()
+        if re.search(r'[\u0600-\u06FF]', term):
+            return m.group(0)
+        if len(term) < 2 or len(term) > 55:
+            return m.group(0)
+        return f'{prefix}<span class="term-en badge-pill-subtle" dir="ltr">{term}</span>'
 
-    text = re.sub(r'\(([A-Za-z0-9\s\-_/:\.,\+]+)\)', repl_latin_tag, text)
+    text = re.sub(r'([\s\(\[\{،؛:])\(([A-Za-z0-9\s\-\+\/\.\,\%\:\&]+)\)', repl_paren, text)
 
-    # 6. Color-coded lead keywords: **Keyword:**
-    def repl_lead(m):
-        kw = m.group(1).strip()
-        theme = 'indigo'
-        if any(w in kw for w in ['علائم', 'تظاهر', 'یافته', 'علامت', 'بیدار']):
-            theme = 'amber'
-        elif any(w in kw for w in ['درمان', 'اقدام', 'مدیریت', 'انتخاب اول']):
-            theme = 'emerald'
-        elif any(w in kw for w in ['عوارض', 'خطر', 'بیهوشی', 'منع', 'تله', 'مرگ', 'خط قرمز']):
-            theme = 'rose'
-        elif any(w in kw for w in ['تشخیص', 'بررسی', 'تست', 'آزمایش', 'تصویر', 'سونوگرافی']):
-            theme = 'cyan'
-        return f'<strong class="med-lead med-lead-{theme}">{kw}</strong>'
+    # 6. Lead bold keywords
+    text = re.sub(r'^[ \t]*\*\*(تعریف|اتیولوژی|پاتوفیزیولوژی|تظاهرات بالینی|علائم بالینی|تشخیص|درمان|عوارض|اندیکاسیون|کنترااندیکاسیون|مدیریت|پیش‌آگهی|نکته کلیدی|رویکرد بالینی|تفسیر|معیارها|پایش)\*\*:', 
+                  r'<span class="lead-term-label label-\1">\1:</span>', text, flags=re.MULTILINE)
 
-    text = re.sub(r'\*\*([^*:]+:\s*)\*\*', repl_lead, text)
-
-    # 7. Highlight English medical terms in bold (**English Term**) for crisp contrast
-    def replace_med_term(match):
-        term = match.group(1)
-        if re.search(r'[A-Za-z]', term) and not re.search(r'[\u0600-\u06FF]', term):
-            return f'<strong class="med-term" dir="ltr">{term}</strong>'
-        return f'<strong>{term}</strong>'
-
-    text = re.sub(r'\*\*([^*]+)\*\*', replace_med_term, text)
+    # 7. Decision pill badges (YES/NO, positive/negative)
+    text = re.sub(r'\[(بله|مثبت|\+|Yes|Positive)\]', r'<span class="badge-decision badge-yes">\1</span>', text, flags=re.IGNORECASE)
+    text = re.sub(r'\[(خیر|منفی|\-|No|Negative)\]', r'<span class="badge-decision badge-no">\1</span>', text, flags=re.IGNORECASE)
 
     return text
 
-def parse_high_yield_card(block_lines):
-    """Converts a high-yield blockquote into a gold/emerald callout card."""
-    title = "مرور شب امتحان (High-Yield Summary)"
-    items = []
-    for line in block_lines:
-        line_clean = line.lstrip('>').strip()
-        if not line_clean:
-            continue
-        if line_clean.startswith('###') or 'مرور شب امتحان' in line_clean:
-            m = re.search(r'مرور شب امتحان\s*(?:\([^\)]+\))?:\s*(.*)', line_clean)
-            if m and m.group(1).strip():
-                title = f"مرور شب امتحان: {m.group(1).strip()}"
-        elif line_clean.startswith('-') or line_clean.startswith('*'):
-            item_text = line_clean.lstrip('-*').strip()
-            item_html = transform_inline_elements(item_text)
-            items.append(item_html)
-        else:
-            p_html = transform_inline_elements(line_clean)
-            items.append(p_html)
-
-    items_html = ''.join(f'<li class="high-yield-item">{it}</li>' for it in items)
-    return f"""
-<div class="high-yield-exam-card" data-high-yield="true">
-  <div class="high-yield-header">
-    <div class="high-yield-title-wrap">
-      <div class="high-yield-glow-badge" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-        </svg>
-      </div>
-      <div>
-        <h4 class="high-yield-title">{title}</h4>
-        <span class="high-yield-subtitle">High-Yield Summary • خلاصه کلیدی و نکات پرتکرار آزمون لارنس</span>
-      </div>
-    </div>
-    <span class="high-yield-badge">⚡ شب امتحان</span>
-  </div>
-  <div class="high-yield-body">
-    <ul class="high-yield-list">
-      {items_html}
-    </ul>
-  </div>
-</div>
-"""
+BOX_CHARS = r'[┌┐└┘├┤┬┴┼─━│┃▼►◄▲╔╗╚╝║═╠╣╦╩╬]+'
 
 def clean_diagram_title(line):
+    """Cleans the diagram header line to produce an elegant title."""
     t = line.strip()
-    t = re.sub(r'^[🎯⚠️\[\]\s*#]+', '', t)
-    t = re.sub(r'[\[\]\s*#]+$', '', t)
-    return clean_page_numbers(t.strip())
+    t = re.sub(r'^[┌│━─╔║\s#\*]+', '', t)
+    t = re.sub(r'[┐│━─╗║\s#\*]+$', '', t)
+    t = re.sub(r'^\s*\[\s*', '', t)
+    t = re.sub(r'\s*\]\s*$', '', t)
+    t = re.sub(r'^[🎯⚠️\[\]\s*#]+|[\[\]\s*#]+$', '', t)
+    t = re.sub(BOX_CHARS, '', t)
+    return t.strip()
 
 def clean_tree_text(t):
     """Strips tree branch characters, arrows, leading hyphens."""
-    t = re.sub(r'^[│\s]*[├└]──[>►\s]*', '', t)
-    t = re.sub(r'^[│\s]+', '', t)
-    t = re.sub(r'[┌┐└┘├┤┬┴┼─━│┃▼►◄▲]+', '', t)
+    t = re.sub(r'^[│┃║\s]*[├└╠╚]──[>►\s]*', '', t)
+    t = re.sub(r'^[│┃║\s]+|[│┃║\s]+$', '', t)
+    t = re.sub(BOX_CHARS, '', t)
     return t.strip()
 
-def parse_split_box_into_hierarchy(lines):
+def parse_split_diagram_robust(lines):
     """
-    Parses horizontal split-box ASCII diagrams (e.g. ┌───────┴───────┐ with multiple columns)
-    into a clean multi-branch tree hierarchy:
-    Root -> Branch 1 (Level 1) -> Subnodes (Level 2) -> Actions (Level 3)
-         -> Branch 2 (Level 1) -> Subnodes (Level 2) -> Actions (Level 3)
+    Robust spatial parser for horizontal split-box ASCII diagrams (┌───────┴───────┐).
+    Prevents cross-column line flattening, binds badges, zips outcomes,
+    and completely eliminates lone emojis.
     """
     split_idx = -1
     for i, l in enumerate(lines):
@@ -410,7 +450,7 @@ def parse_split_box_into_hierarchy(lines):
     if split_idx == -1:
         return None
 
-    # 1. Extract Root text from lines before the split
+    # 1. Root text
     root_lines = []
     for l in lines[:split_idx]:
         s = l.strip()
@@ -422,84 +462,117 @@ def parse_split_box_into_hierarchy(lines):
             root_lines.append(cleaned)
     root_text = ' '.join(root_lines) if root_lines else 'مسیر بالینی و الگوریتم درمانی'
 
-    # 2. Extract column data from content lines below split
-    content_lines = lines[split_idx+1:]
-    col_data = []
-    for l in content_lines:
-        s = l.strip()
+    # 2. Find column boundaries
+    split_line = lines[split_idx]
+    conns = [m.start() for m in re.finditer(r'[┬┴┼]', split_line)]
+    if not conns:
+        if split_idx + 1 < len(lines):
+            arrows = [m.start() for m in re.finditer(r'[▼▼►◄▲]', lines[split_idx + 1])]
+            if len(arrows) >= 2:
+                conns = [(arrows[i] + arrows[i+1]) // 2 for i in range(len(arrows)-1)]
+    if not conns:
+        start_x = split_line.find('┌')
+        end_x = split_line.rfind('┐')
+        if start_x != -1 and end_x != -1 and end_x > start_x:
+            conns = [(start_x + end_x) // 2]
+        else:
+            conns = [len(split_line) // 2]
+
+    bounds = [0] + [c + 2 for c in conns] + [9999]
+    num_cols = len(bounds) - 1
+
+    col_raw_lines = [[] for _ in range(num_cols)]
+    for raw_l in lines[split_idx + 1:]:
+        s = raw_l.strip()
         if not s or all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in s):
             continue
-        brackets = re.findall(r'\[[^\]]+\]', l)
-        if len(brackets) >= 2:
-            parts = brackets
-        else:
-            bullets = [m.start() for m in re.finditer(r'•', l)]
-            if len(bullets) >= 2:
-                parts = []
-                cuts = bullets + [len(l)]
-                for k in range(len(cuts)-1):
-                    p = l[cuts[k]:cuts[k+1]].strip()
-                    if p: parts.append(p)
-            else:
-                cleaned = re.sub(r'^[│┃\s]+|[│┃\s]+$', '', l)
-                parts = [p.strip() for p in re.split(r'\s{3,}', cleaned) if p.strip()]
-                parts = [p for p in parts if not all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in p)]
-        if parts:
-            col_data.append(parts)
+        l_bound = re.sub(r'\]\s*\[([⚠️🎯][^\]]*)\]', r' \1]', raw_l)
+        l_bound = re.sub(r'\)\s*\[([⚠️🎯][^\]]*)\]', r') \1', l_bound)
 
-    if not col_data:
-        return None
+        for col_i in range(num_cols):
+            b_start = bounds[col_i]
+            b_end = bounds[col_i + 1]
+            if len(l_bound) > b_start:
+                slice_txt = l_bound[b_start:min(len(l_bound), b_end)].strip()
+                if slice_txt and not all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in slice_txt):
+                    col_raw_lines[col_i].append(slice_txt)
 
-    num_cols = max(len(row) for row in col_data)
-    if num_cols < 2:
-        return None
-
-    cols = [[] for _ in range(num_cols)]
-    for row in col_data:
-        if len(row) == num_cols:
-            for idx, item in enumerate(row):
-                cols[idx].append(item)
-        elif len(row) == 1:
-            cols[0].append(row[0])
-        else:
-            for idx, item in enumerate(row):
-                if idx < num_cols:
-                    cols[idx].append(item)
-
-    # 3. Assemble branches
+    # 3. Assemble each column
     root_node = {'text': root_text, 'children': []}
-    for c_idx, col_items in enumerate(cols):
-        if not col_items:
+    for col_i in range(num_cols):
+        raw_items = col_raw_lines[col_i]
+        if not raw_items:
             continue
 
-        # Merge multiline bracket segments (e.g. [Title on line 1 + Subtitle on line 2])
-        merged_items = []
-        c_i = 0
-        while c_i < len(col_items):
-            cur = col_items[c_i]
-            if '[' in cur and ']' not in cur and c_i + 1 < len(col_items) and ']' in col_items[c_i + 1]:
-                cur = cur + ' ' + col_items[c_i + 1]
-                c_i += 1
-            cur_clean = clean_tree_text(cur)
-            cur_clean = re.sub(r'^\s*\[\s*', '', cur_clean)
-            cur_clean = re.sub(r'\s*\]\s*$', '', cur_clean)
-            if cur_clean and not all(ch in '│┃▼ \t' for ch in cur_clean):
-                merged_items.append(cur_clean)
-            c_i += 1
+        clean_col = []
+        for it in raw_items:
+            c = clean_tree_text(it)
+            if not c or all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in c):
+                continue
+            # Merge isolated emoji badge into previous item
+            if re.match(r'^[⚠️🎯\s\[\]]+$', c):
+                if clean_col:
+                    clean_col[-1] += ' ' + c.strip('[] ')
+                continue
+            # Merge English parenthetical subtitle into previous item
+            if re.match(r'^\([a-zA-Z0-9\s\-–—/.,+:]+\)\s*[⚠️🎯]?$', c) and clean_col:
+                clean_col[-1] += ' ' + c
+                continue
+            clean_col.append(c)
 
-        if not merged_items:
+        if not clean_col:
             continue
 
-        b_title = merged_items[0]
-        branch_node = {'text': b_title, 'children': [], 'level': 1}
+        b_header = re.sub(r'\[([^\]]+)\]', r'\1', clean_col[0])
+        b_header = re.sub(r'^[🎯⚠️\[\]\s*#]+|[\[\]\s*#]+$', '', b_header).strip()
+        branch_node = {'text': b_header, 'children': [], 'level': 1}
 
-        curr_subnode = None
-        for item_clean in merged_items[1:]:
-            if not curr_subnode:
-                curr_subnode = {'text': item_clean, 'children': [], 'level': 2}
-                branch_node['children'].append(curr_subnode)
+        bullet_buffer = []
+        for it in clean_col[1:]:
+            it_clean = clean_tree_text(it)
+            it_clean = re.sub(r'\[([^\]]+)\]', r'\1', it_clean).strip()
+            
+            # Skip empty or lone emojis/brackets
+            if not it_clean or re.match(r'^[🎯⚠️\[\]\s*#\-–—•]+$', it_clean):
+                if any(ch in '🎯⚠️' for ch in it_clean) and branch_node['children']:
+                    emojis = ''.join(ch for ch in it_clean if ch in '🎯⚠️')
+                    branch_node['children'][-1]['text'] += ' ' + emojis
+                continue
+
+            sub_parts = [p.strip() for p in re.split(r'\s{3,}', it_clean) if p.strip()]
+            if len(sub_parts) >= 2:
+                if bullet_buffer:
+                    branch_node['children'].append({
+                        'text': ' • '.join(bullet_buffer),
+                        'children': [],
+                        'level': 2
+                    })
+                    bullet_buffer = []
+                sub_node = {'text': 'انشعاب تصمیم‌گیری بالینی:', 'children': [], 'level': 2}
+                for sp in sub_parts:
+                    sp_clean = re.sub(r'^[🎯⚠️\[\]\s*#]+|[\[\]\s*#]+$', '', sp).strip()
+                    if sp_clean:
+                        sub_node['children'].append({'text': sp_clean, 'children': [], 'level': 3})
+                if sub_node['children']:
+                    branch_node['children'].append(sub_node)
+            elif it_clean.startswith('•') or it_clean.startswith('-'):
+                bullet_buffer.append(it_clean.lstrip('•- '))
             else:
-                curr_subnode['children'].append({'text': item_clean, 'children': [], 'level': 3})
+                if bullet_buffer:
+                    branch_node['children'].append({
+                        'text': 'علائم و یافته‌ها: ' + ' • '.join(bullet_buffer),
+                        'children': [],
+                        'level': 2
+                    })
+                    bullet_buffer = []
+                branch_node['children'].append({'text': it_clean, 'children': [], 'level': 2})
+
+        if bullet_buffer:
+            branch_node['children'].append({
+                'text': 'علائم و یافته‌ها: ' + ' • '.join(bullet_buffer),
+                'children': [],
+                'level': 2
+            })
 
         root_node['children'].append(branch_node)
 
@@ -516,7 +589,7 @@ def parse_tree_into_hierarchy(lines):
 
     # 1. Check for horizontal split-box diagrams first
     if any(('┌' in l or '┬' in l or '┴' in l) and ('─' in l or '━' in l) for l in lines):
-        split_res = parse_split_box_into_hierarchy(lines)
+        split_res = parse_split_diagram_robust(lines)
         if split_res and len(split_res.get('children', [])) >= 2:
             return split_res
 
@@ -542,6 +615,15 @@ def parse_tree_into_hierarchy(lines):
         else:
             indent = len(raw_line) - len(raw_line.lstrip())
         clean_text = clean_tree_text(raw_line)
+        
+        # Merge lone emojis/brackets into preceding node
+        if re.match(r'^[🎯⚠️\[\]\s*#\-–—•]+$', clean_text):
+            if any(ch in '🎯⚠️' for ch in clean_text) and parsed_items:
+                emojis = ''.join(ch for ch in clean_text if ch in '🎯⚠️')
+                last_indent, last_txt = parsed_items[-1]
+                parsed_items[-1] = (last_indent, last_txt + ' ' + emojis)
+            continue
+            
         if clean_text:
             parsed_items.append((indent, clean_text))
 
@@ -580,7 +662,6 @@ def render_approach2_clean_tree(lines, title):
     """
     tree = parse_tree_into_hierarchy(lines)
     if not tree or not tree.get('children'):
-        # Fallback to single card if no children
         body_text = ' '.join(clean_tree_text(l) for l in lines[1:] if clean_tree_text(l))
         return f"""
 <div class="clinical-flowchart-card animated-diagram ctree-diagram" data-flowchart="true">
@@ -603,7 +684,6 @@ def render_approach2_clean_tree(lines, title):
     
     for idx, n1 in enumerate(level1_nodes):
         n1_text = n1['text']
-        # Determine theme color
         col = 'rose' if any(w in n1_text for w in ['اورژانس', 'خطر', 'حاد', 'شوک', 'مرگ', 'ناپایدار', 'قرمز']) else (
               'emerald' if any(w in n1_text for w in ['کم‌خطر', 'پایدار', 'نرمال', 'موفق']) else
               'amber' if any(w in n1_text for w in ['متوسط', 'احتیاط', 'مشکوک']) else
@@ -614,7 +694,6 @@ def render_approach2_clean_tree(lines, title):
         if n1.get('children'):
             for n2 in n1['children']:
                 n2_text = n2['text']
-                # Check for arrow
                 if '⬅️' in n2_text:
                     parts = n2_text.split('⬅️', 1)
                     sub_title = transform_inline_elements(parts[0].strip())
@@ -623,7 +702,6 @@ def render_approach2_clean_tree(lines, title):
                 else:
                     sub_html = f'<span class="ctree-text">{transform_inline_elements(n2_text)}</span>'
                 
-                # Check for grandchildren (Level 3)
                 l3_html = []
                 if n2.get('children'):
                     for n3 in n2['children']:
@@ -669,7 +747,7 @@ def render_approach2_clean_tree(lines, title):
 """
 
 # =========================================================================
-# APPROACH 1: MODERN HIERARCHICAL MEDICAL TREE (7% of diagrams - Major Decision Forks)
+# APPROACH 1: MODERN HIERARCHICAL MEDICAL TREE (7% of diagrams)
 # =========================================================================
 def parse_convergent_pathway(lines, title):
     """Renders multiple stimuli/pathways converging into a final single action."""
@@ -829,43 +907,24 @@ def render_approach1_visual_tree(lines, title, raw_text):
     if 'شوک خونریزی‌دهنده شدید' in title or 'شوک خونریزی‌دهنده شدید' in raw_text:
         return parse_protocol_flow(lines, title)
 
-    # General 2-way decision split
-    split_indices = [idx for idx, l in enumerate(lines) if any(ch in l for ch in ['┌', '┴', '┬', '┼']) and ('─' in l or '━' in l)]
+    # General decision split
+    tree = parse_tree_into_hierarchy(lines)
+    children = tree.get('children', []) if tree else []
     
-    col1_items = []
-    col2_items = []
-
-    if split_indices:
-        main_split_idx = split_indices[0]
-        for l in lines[main_split_idx+1:]:
-            s = l.strip()
-            if not s or (all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in s) and len(s) < 8):
-                continue
-            parts = [p.strip() for p in re.split(r'\s{3,}', s) if p.strip()]
-            parts = [p for p in parts if not all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in p)]
-            if len(parts) >= 2:
-                c1 = clean_tree_text(parts[0])
-                c2 = clean_tree_text(parts[1])
-                if c1: col1_items.append(c1)
-                if c2: col2_items.append(c2)
-            elif len(parts) == 1:
-                cleaned = clean_tree_text(parts[0])
-                if cleaned: col2_items.append(cleaned)
+    if len(children) >= 2:
+        c1_node = children[0]
+        c2_node = children[1]
+        col1_title = c1_node['text']
+        col1_body = [c['text'] for c in c1_node.get('children', [])]
+        col2_title = c2_node['text']
+        col2_body = [c['text'] for c in c2_node.get('children', [])]
     else:
-        # Fallback split
-        tree = parse_tree_into_hierarchy(lines)
-        if tree and len(tree.get('children', [])) >= 2:
-            c1_node = tree['children'][0]
-            c2_node = tree['children'][1]
-            col1_items = [c1_node['text']] + [c['text'] for c in c1_node.get('children', [])]
-            col2_items = [c2_node['text']] + [c['text'] for c in c2_node.get('children', [])]
+        col1_title = "شاخه اورژانس و بحرانی"
+        col1_body = [clean_tree_text(l) for l in lines[1:4] if clean_tree_text(l)]
+        col2_title = "شاخه پایدار و تشخیصی"
+        col2_body = [clean_tree_text(l) for l in lines[4:] if clean_tree_text(l)]
 
-    col1_title = col1_items[0] if col1_items else "مسیر درمانی اول"
-    col1_body = col1_items[1:] if len(col1_items) > 1 else col1_items
     col1_bullets = ''.join(f'<li>{transform_inline_elements(it)}</li>' for it in col1_body)
-
-    col2_title = col2_items[0] if col2_items else "مسیر درمانی دوم"
-    col2_body = col2_items[1:] if len(col2_items) > 1 else col2_items
     col2_bullets = ''.join(f'<li>{transform_inline_elements(it)}</li>' for it in col2_body)
 
     return f"""
@@ -981,323 +1040,137 @@ def parse_ascii_diagram(diagram_body):
     if not title:
         title = "الگوریتم تصمیم‌گیری بالینی لارنس"
 
-    raw_lower = diagram_body.lower()
-    
     # 1. Approach 1 (7% of cases)
-    is_app1 = any(kw in diagram_body for kw in APPROACH_1_KEYWORDS)
-    if is_app1:
+    if any(kw in diagram_body for kw in APPROACH_1_KEYWORDS):
         return render_approach1_visual_tree(lines, title, diagram_body)
 
     # 2. Approach 3 (3% of cases)
-    is_app3 = any(kw in diagram_body for kw in APPROACH_3_KEYWORDS)
-    if is_app3:
+    if any(kw in diagram_body for kw in APPROACH_3_KEYWORDS):
         return render_approach3_nested_cards(lines, title, diagram_body)
 
     # 3. Approach 2 (90% of cases - The Default Standard)
     return render_approach2_clean_tree(lines, title)
 
 def normalize_list_indentation(text):
-    """
-    Normalizes 2-space indented list items to 4-space indented items
-    so Python-Markdown correctly generates nested sub-lists (<ol> / <ul>).
-    Preserves 4-space files (like Liver and Spleen) without double-indenting.
-    """
+    """Normalizes 2-space or 4-space markdown sub-bullets for the standard python-markdown processor."""
     lines = text.splitlines()
-    has_2_space = False
-    in_code = False
-    for l in lines:
-        if l.strip().startswith('```'):
-            in_code = not in_code
-            continue
-        if in_code:
-            continue
-        if re.match(r'^[ ]{2,3}(?:[\*\-\+]|[\d\u06F0-\u06F9]+\.)\s+', l):
-            has_2_space = True
-            break
-
-    if not has_2_space:
-        return text
-
     out = []
-    in_code = False
     for l in lines:
-        if l.strip().startswith('```'):
-            in_code = not in_code
-            out.append(l)
-            continue
-        if in_code:
-            out.append(l)
-            continue
-
-        # Match indented list marker (2-space, 4-space, 6-space)
-        m = re.match(r'^([ ]+)([\*\-\+]|[\d\u06F0-\u06F9]+\.)\s+(.*)$', l)
+        m = re.match(r'^([ \t]+)([*+-]|\d+\.)\s+(.*)$', l)
         if m:
-            spaces = len(m.group(1))
-            marker = m.group(2)
-            rest = m.group(3)
-            # Normalize 2-3 to 4, 4-5 to 8, 6-7 to 12
-            new_spaces = 4 if spaces in [2, 3] else (8 if spaces in [4, 5] else (12 if spaces in [6, 7] else (spaces // 2) * 4))
-            out.append(' ' * new_spaces + marker + ' ' + rest)
+            lead_ws = m.group(1).replace('\t', '    ')
+            bullet = m.group(2)
+            content = m.group(3)
+            num_spaces = len(lead_ws)
+            level = max(1, (num_spaces + 1) // 2)
+            norm_ws = '    ' * level
+            out.append(f"{norm_ws}{bullet} {content}")
         else:
-            # Check for indented continuation line (non-empty, non-tag, leading spaces)
-            m_cont = re.match(r'^([ ]{2,7})([^\s\*\-\+].*)$', l)
-            if m_cont and not l.strip().startswith('|') and not l.strip().startswith('#') and not l.strip().startswith('>'):
-                sp = len(m_cont.group(1))
-                new_sp = 4 if sp in [2, 3] else (8 if sp in [4, 5] else sp)
-                out.append(' ' * new_sp + m_cont.group(2))
-            else:
-                out.append(l)
+            out.append(l)
     return '\n'.join(out)
 
-def style_nested_lists(html_content):
-    """
-    Enhances nested HTML lists so that parent <li> items get distinct header styling
-    and nested <ol>/<ul> get vertical guide lines and clean indentation.
-    """
-    pattern = re.compile(r'<li>\s*(.+?)\s*(<(?:ol|ul)(?: class="[^"]*")?>[\s\S]*?</(?:ol|ul)>)\s*</li>', re.DOTALL)
+def format_tables_with_rtl(html_content):
+    """Ensures all markdown-generated tables have dir='rtl' and full-width responsive classes."""
+    html_content = re.sub(r'<table>', r'<div class="table-responsive"><table class="data-table clinical-table" dir="rtl">', html_content)
+    html_content = re.sub(r'</table>', r'</table></div>', html_content)
+    return html_content
+
+def parse_callouts(text):
+    """Converts blockquote callouts (> [!NOTE] / > [!WARNING] / etc.) into rich widgets."""
+    pattern = re.compile(r'(?:^>[ \t]*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ \t]*(.*?)\n)((?:^>.*$\n?)+)', re.MULTILINE | re.IGNORECASE)
 
     def repl(m):
-        parent_raw = m.group(1).strip()
-        parent_raw = re.sub(r'^<p>\s*|\s*</p>$', '', parent_raw)
-        sublist_raw = m.group(2).strip()
+        kind = m.group(1).upper()
+        title = m.group(2).strip()
+        body_lines = m.group(3).splitlines()
+        clean_body = []
+        for bl in body_lines:
+            bl_clean = re.sub(r'^>[ \t]?', '', bl)
+            clean_body.append(bl_clean)
+        body_md = '\n'.join(clean_body)
+        body_html = markdown.markdown(body_md, extensions=['extra'])
+        body_html = transform_inline_elements(body_html)
 
-        if sublist_raw.startswith('<ol'):
-            sublist_clean = re.sub(r'^<ol(?:\s+class="[^"]*")?>', '<ol class="nested-sublist nested-num-list">', sublist_raw)
-        else:
-            sublist_clean = re.sub(r'^<ul(?:\s+class="[^"]*")?>', '<ul class="nested-sublist nested-bullet-list">', sublist_raw)
+        badge_titles = {
+            'NOTE': ('نکته بالینی لارنس', 'info'),
+            'TIP': ('مروارید تشخیصی (Clinical Pearl)', 'tip'),
+            'IMPORTANT': ('نکته کلیدی و الزامی', 'important'),
+            'WARNING': ('هشدار و کنترااندیکاسیون قطعی', 'warning'),
+            'CAUTION': ('تله امتحانی و خطای خطرناک', 'danger')
+        }
+        fallback_title, callout_type = badge_titles.get(kind, ('نکته بالینی', 'info'))
+        final_title = title if title else fallback_title
 
-        icon = '📋' if any(w in parent_raw for w in ['پنل', 'تست', 'معیار', 'آزمایش', 'بررسی']) else (
-               '🔍' if any(w in parent_raw for w in ['علائم', 'نشانه', 'تظاهر', 'یافته']) else (
-               '⚡' if any(w in parent_raw for w in ['اقدام', 'درمان', 'مدیریت', 'مداخله']) else (
-               '⚠️' if any(w in parent_raw for w in ['علل', 'اتیولوژی', 'فاکتور', 'ریسک', 'خطر']) else '📌')))
-
-        return f'<li class="list-parent-group"><div class="list-parent-header"><span class="list-parent-icon">{icon}</span> <span class="list-parent-title">{parent_raw}</span></div>{sublist_clean}</li>'
-
-    prev = ""
-    curr = html_content
-    while prev != curr:
-        prev = curr
-        curr = pattern.sub(repl, curr)
-    return curr
-
-# =========================================================================
-# SECTION MARKDOWN PARSER
-# =========================================================================
-def parse_section_markdown(markdown_text):
-    """
-    Parses section markdown text into rich HTML with:
-    - Interactive Multi-Modal Clinical Trees (Approach 2: 90%, Approach 1: 7%, Approach 3: 3%)
-    - Clinical Stepper Cards (#### گام ۱ to گام ۵) with dynamic color themes
-    - Comparison Tables with strict RTL alignment and zebra striping
-    - High-Yield Night-Before-Exam Cards (.high-yield-exam-card)
-    - Hierarchical Parent-Child Lists with clean vertical guidelines
-    - Verbatim preservation of every medical fact and detail
-    """
-    # Normalize 2-space indented nested lists to 4-space so Python-Markdown parses child <ol>/<ul> properly
-    markdown_text = normalize_list_indentation(markdown_text)
-
-    # Clean leading 4-space indent on blockquotes so python-markdown doesn't convert them to <pre><code>
-    lines = [re.sub(r'^\s{2,}>', '>', l) for l in markdown_text.splitlines()]
-    html_chunks = []
-    i = 0
-    total_lines = len(lines)
-
-    step_theme_map = {
-        "1": "indigo",   # گام ۱
-        "2": "rose",     # گام ۲
-        "3": "amber",    # گام ۳
-        "4": "cyan",     # گام ۴
-        "5": "emerald",  # گام ۵
-    }
-
-    while i < total_lines:
-        line = lines[i]
-        line_s = line.strip()
-
-        # 1. Skip empty lines or pure dividers
-        if not line_s or line_s == '---':
-            i += 1
-            continue
-
-        # 2. Check for Code Block / Flowchart (``` ... ```)
-        if line_s.startswith('```'):
-            code_block_lines = []
-            i += 1
-            while i < total_lines and not lines[i].strip().startswith('```'):
-                code_block_lines.append(lines[i])
-                i += 1
-            if i < total_lines and lines[i].strip().startswith('```'):
-                i += 1
-            
-            diagram_body = '\n'.join(code_block_lines)
-            if diagram_body.strip():
-                flowchart_html = parse_ascii_diagram(diagram_body)
-                html_chunks.append(flowchart_html)
-            continue
-
-        # 3. Check for High-Yield Blockquote
-        if line_s.startswith('>') and ('مرور شب امتحان' in line_s or (i + 1 < total_lines and 'مرور شب امتحان' in lines[i+1])):
-            block_lines = []
-            while i < total_lines and lines[i].strip().startswith('>'):
-                block_lines.append(lines[i])
-                i += 1
-            html_chunks.append(parse_high_yield_card(block_lines))
-            continue
-
-        # 4. Check for Clinical Stepper Heading (e.g., #### گام ۱: ...)
-        step_match = re.match(r'^####\s*گام\s*([\d\u06F0-\u06F9]+):\s*(.*)$', line_s)
-        if step_match:
-            step_num = step_match.group(1)
-            step_title = clean_page_numbers(step_match.group(2).strip())
-            step_theme = step_theme_map.get(str(step_num), "indigo")
-            i += 1
-            step_content_lines = []
-            while i < total_lines:
-                curr_s = lines[i].strip()
-                if curr_s.startswith('###') or curr_s.startswith('##') or re.match(r'^####\s*گام\s*[\d\u06F0-\u06F9]+:', curr_s) or curr_s.startswith('>') or curr_s == '---' or curr_s.startswith('```'):
-                    break
-                step_content_lines.append(lines[i])
-                i += 1
-
-            step_md = '\n'.join(step_content_lines)
-            step_md = transform_inline_elements(step_md)
-            step_body_html = markdown.markdown(step_md, extensions=['tables', 'nl2br'])
-            
-            # Enforce RTL and clean table wrappers inside stepper
-            step_body_html = re.sub(r' align="left"', ' align="right"', step_body_html)
-            step_body_html = re.sub(r'style="text-align:\s*left;?"', 'style="text-align: right;"', step_body_html)
-            step_body_html = re.sub(
-                r'<table>',
-                r'<div class="table-container" dir="rtl"><table class="table-medical responsive-table" dir="rtl">',
-                step_body_html
-            )
-            step_body_html = re.sub(r'</table>', r'</table></div>', step_body_html)
-
-            # Convert list items with theory/trap into styled items
-            step_body_html = re.sub(
-                r'<li>(.*?(?:badge-theory|pearl-micro-badge).*?)</li>',
-                r'<li class="exam-pearl-item" data-exam-point="theory">\1</li>',
-                step_body_html
-            )
-            step_body_html = re.sub(
-                r'<li>(.*?(?:badge-trap|trap-micro-badge).*?)</li>',
-                r'<li class="exam-trap-item" data-exam-point="trap">\1</li>',
-                step_body_html
-            )
-            step_body_html = style_nested_lists(step_body_html)
-
-            stepper_card = f"""
-<div class="clinical-stepper-card step-card step-{step_num} step-theme-{step_theme}" data-step="{step_num}">
-  <div class="step-card-header">
-    <div class="step-badge-pill step-badge-{step_theme}">گام {step_num} بالینی</div>
-    <h4 class="step-card-title">{step_title}</h4>
+        return f"""
+<div class="callout callout-{callout_type} callout-pro">
+  <div class="callout-header">
+    <span class="callout-icon" aria-hidden="true"></span>
+    <h4 class="callout-title">{final_title}</h4>
   </div>
-  <div class="step-card-body">
-    {step_body_html}
+  <div class="callout-body">
+    {body_html}
   </div>
 </div>
 """
-            html_chunks.append(stepper_card)
-            continue
+    return pattern.sub(repl, text)
 
-        # 5. Check for Markdown Table (| ... |)
-        if line_s.startswith('|') and '|' in line_s[1:]:
-            table_lines = []
-            while i < total_lines and lines[i].strip().startswith('|'):
-                table_lines.append(lines[i])
-                i += 1
-            table_md = '\n'.join(table_lines)
-            table_md = transform_inline_elements(table_md)
-            table_html = markdown.markdown(table_md, extensions=['tables'])
-
-            table_html = re.sub(r' align="left"', ' align="right"', table_html)
-            table_html = re.sub(r'style="text-align:\s*left;?"', 'style="text-align: right;"', table_html)
-            table_html = re.sub(r' align="center"', ' align="center"', table_html)
-
-            table_html = re.sub(
-                r'<td>(.*?(?:badge-theory|pearl-micro-badge).*?)</td>',
-                r'<td class="table-cell-pearl">\1</td>',
-                table_html
-            )
-            table_html = re.sub(
-                r'<td>(.*?(?:badge-trap|trap-micro-badge).*?)</td>',
-                r'<td class="table-cell-trap">\1</td>',
-                table_html
-            )
-
-            table_html = re.sub(
-                r'<table>',
-                r'<div class="table-container" dir="rtl"><table class="table-medical responsive-table" dir="rtl">',
-                table_html
-            )
-            table_html = re.sub(r'</table>', r'</table></div>', table_html)
-            html_chunks.append(table_html)
-            continue
-
-        # 6. Check for Subheadings (### and ####)
-        if line_s.startswith('### '):
-            h_text = clean_page_numbers(line_s[4:].strip())
-            h_text = transform_inline_elements(h_text)
-            html_chunks.append(f'''
-<div class="medical-subheading-banner level1-banner">
-  <div class="banner-accent-bar" aria-hidden="true"></div>
-  <h3 class="medical-subheading-level1">{h_text}</h3>
+def parse_steppers(text):
+    """Parses sequential multi-step encounters into interactive steppers."""
+    pattern = re.compile(r'###\s*(گام\s*[\d\u06F0-\u06F9]+|مرحله\s*[\d\u06F0-\u06F9]+|فاز\s*[\d\u06F0-\u06F9]+):\s*(.*?)\n([\s\S]*?)(?=(?:###\s*(?:گام|مرحله|فاز)|##|\Z))')
+    
+    def repl(m):
+        step_badge = m.group(1).strip()
+        step_title = m.group(2).strip()
+        step_body_md = m.group(3).strip()
+        step_html = markdown.markdown(normalize_list_indentation(step_body_md), extensions=['extra'])
+        step_html = transform_inline_elements(step_html)
+        step_num = re.sub(r'[^\d\u06F0-\u06F9]', '', step_badge) or '۱'
+        
+        return f"""
+<div class="stepper-item clinical-step">
+  <div class="step-badge-col">
+    <span class="step-num-bubble">{step_num}</span>
+    <span class="step-connector-line"></span>
+  </div>
+  <div class="step-content-card">
+    <div class="step-card-header">
+      <span class="step-tag-pill">{step_badge}</span>
+      <h4 class="step-title-text">{step_title}</h4>
+    </div>
+    <div class="step-card-body">
+      {step_html}
+    </div>
+  </div>
 </div>
-''')
-            i += 1
-            continue
+"""
+    return pattern.sub(repl, text)
 
-        if line_s.startswith('#### '):
-            h_text = clean_page_numbers(line_s[5:].strip())
-            h_text = transform_inline_elements(h_text)
-            html_chunks.append(f'''
-<div class="medical-subheading-banner level2-banner">
-  <h4 class="medical-subheading-level2">{h_text}</h4>
-</div>
-''')
-            i += 1
-            continue
+def parse_section_markdown(section_md):
+    """Parses and renders markdown content into rich semantic HTML with multi-modal diagrams."""
+    parts = re.split(r'(```(?:text|markdown)?\s*\n[\s\S]*?```)', section_md)
+    html_chunks = []
 
-        # 7. Accumulate standard markdown blocks
-        std_lines = []
-        while i < total_lines:
-            curr_s = lines[i].strip()
-            if not curr_s or curr_s == '---':
-                i += 1
-                break
-            if std_lines and (
-                curr_s.startswith('#') or 
-                curr_s.startswith('|') or 
-                curr_s.startswith('>') or 
-                curr_s.startswith('```') or
-                re.match(r'^####\s*گام\s*[\d\u06F0-\u06F9]+:', curr_s)
-            ):
-                break
-            std_lines.append(lines[i])
-            i += 1
-
-        if std_lines:
-            chunk_md = '\n'.join(std_lines)
-            chunk_md = transform_inline_elements(chunk_md)
-            chunk_md = re.sub(
-                r'(\*\s*\*\*گام\s*([\d\u06F0-\u06F9]+)(.*?)\*\*:?)',
-                r'* <span class="step-num-pill">گام \2</span> <strong>\2 \3</strong>',
-                chunk_md
-            )
-            chunk_html = markdown.markdown(chunk_md, extensions=['tables'])
-
-            chunk_html = re.sub(
-                r'<li>(.*?(?:badge-theory|pearl-micro-badge).*?)</li>',
-                r'<li class="exam-pearl-item" data-exam-point="theory">\1</li>',
-                chunk_html
-            )
-            chunk_html = re.sub(
-                r'<li>(.*?(?:badge-trap|trap-micro-badge).*?)</li>',
-                r'<li class="exam-trap-item" data-exam-point="trap">\1</li>',
-                chunk_html
-            )
-            chunk_html = style_nested_lists(chunk_html)
-
+    for part in parts:
+        if part.startswith('```'):
+            code_content = re.sub(r'^```(?:text|markdown)?\s*\n', '', part)
+            code_content = re.sub(r'\n```$', '', code_content)
+            
+            is_ascii = any(ch in code_content for ch in ['┌', '├', '└', '├──', '└──', '─', '━', '│', '╔', '╗', '╚', '╝', '║', '═'])
+            if is_ascii:
+                html_chunks.append(parse_ascii_diagram(code_content))
+            else:
+                body_clean = markdown.markdown(normalize_list_indentation(code_content), extensions=['extra'])
+                body_clean = transform_inline_elements(body_clean)
+                html_chunks.append(f'<div class="clinical-quote-card">{body_clean}</div>')
+        else:
+            txt = part
+            txt = parse_callouts(txt)
+            txt = parse_steppers(txt)
+            txt = normalize_list_indentation(txt)
+            
+            chunk_html = markdown.markdown(txt, extensions=['extra', 'tables'])
+            chunk_html = format_tables_with_rtl(chunk_html)
+            chunk_html = transform_inline_elements(chunk_html)
             html_chunks.append(chunk_html)
 
     return '\n'.join(html_chunks)
@@ -1387,6 +1260,42 @@ def generate_chapter_mindmap(chapter_id, chapter_title, sections):
 </div>
 """
 
+def extract_section_title(first_line, chunk_lines, part_num):
+    """Extracts a descriptive, rich section title without bare numbering or page references."""
+    raw = first_line.lstrip('#').strip()
+    raw = re.sub(r'^[^\w\s]+\s*', '', raw)
+    raw = clean_page_numbers(raw).strip()
+    
+    if '—' in raw and 'بخش' in raw:
+        after_bakhsh = raw.split('بخش')[-1].strip()
+        after_bakhsh = re.sub(r'^[\d\u06F0-\u06F9]+[:\s\-—]*', '', after_bakhsh).strip()
+        if not after_bakhsh or after_bakhsh in ['و پایانی', 'پایانی']:
+            for l in chunk_lines[1:12]:
+                ls = l.strip()
+                if (ls.startswith('## ') and not ls.startswith('## بخش')) or ls.startswith('### '):
+                    sub = ls.lstrip('#').strip()
+                    sub = re.sub(r'^(?:مبحث\s+[\w\d\u06F0-\u06F9]+|[\d\u06F0-\u06F9]+)[\.\:؛\-—\s]*', '', sub).strip()
+                    sub = clean_page_numbers(sub)
+                    return f'بخش {part_num}: {sub}'
+            return f'بخش {part_num}'
+        else:
+            return f'بخش {part_num}: {after_bakhsh}'
+    elif re.match(r'^بخش\s*[\d\u06F0-\u06F9]+[:\s\-—]*$', raw):
+        for l in chunk_lines[1:12]:
+            ls = l.strip()
+            if ls.startswith('### ') or (ls.startswith('## ') and not ls.startswith('## بخش')):
+                sub = ls.lstrip('#').strip()
+                sub = re.sub(r'^(?:مبحث\s+[\w\d\u06F0-\u06F9]+|[\d\u06F0-\u06F9]+)[\.\:؛\-—\s]*', '', sub).strip()
+                sub = clean_page_numbers(sub)
+                return f'بخش {part_num}: {sub}'
+        return f'بخش {part_num}'
+    else:
+        m = re.match(r'^بخش\s*[\d\u06F0-\u06F9]+[:\s\-—]*(.*)$', raw)
+        if m:
+            topic = m.group(1).strip()
+            return f'بخش {part_num}: {topic}' if topic else f'بخش {part_num}'
+        return raw
+
 def build_single_chapter(config, base_dir):
     """Processes a single Surgery markdown file into structured chapter record."""
     input_path = os.path.join(base_dir, 'chapters', 'Surgery', config['filename'])
@@ -1409,12 +1318,8 @@ def build_single_chapter(config, base_dir):
 
     sanitized_text = '\n'.join(filtered_lines)
 
-    # Detect Section Splits:
-    p_a = list(re.finditer(r'^##\s*بخش\s+([\d\u06F0-\u06F9]+)(?:[:\s\-—(].*|\s*)$', sanitized_text, re.MULTILINE))
-    p_b = list(re.finditer(r'^#\s*بخش\s+([\d\u06F0-\u06F9]+)(?:[:\s\-—(].*|\s*)$', sanitized_text, re.MULTILINE))
-    p_c = list(re.finditer(r'^#\s*فصل\s*[\d\u06F0-\u06F9]+.*?بخش\s+([\d\u06F0-\u06F9]+).*$', sanitized_text, re.MULTILINE))
-
-    matches = p_a or p_b or p_c
+    # Detect Section Splits across all chapters
+    matches = list(re.finditer(r'^#{1,3}\s*[^#\n]*?بخش\s+([\d\u06F0-\u06F9]+)(?:[:\s\-—(].*|\s*)$', sanitized_text, re.MULTILINE))
     if not matches:
         print(f"Warning: No sections found in {config['filename']}!")
         return None, stripped_meta_lines
@@ -1432,17 +1337,8 @@ def build_single_chapter(config, base_dir):
         chunk_lines = chunk.splitlines()
         first_line = chunk_lines[0].strip()
         part_num = i + 1
-        raw_part_title = first_line.lstrip('#').strip()
-        clean_part_title = clean_page_numbers(raw_part_title)
-
-        # If title is just bare "بخش X", resolve from first ### subheading
-        if re.match(r'^بخش\s*[\d\u06F0-\u06F9]+:?$', clean_part_title.strip()):
-            for l in chunk_lines[1:12]:
-                l_s = l.strip()
-                if l_s.startswith('### '):
-                    sub = clean_page_numbers(l_s.lstrip('#').strip())
-                    clean_part_title = f"بخش {part_num}: {sub}"
-                    break
+        
+        clean_part_title = extract_section_title(first_line, chunk_lines, part_num)
 
         body_md = '\n'.join(chunk_lines[1:])
         content_html = parse_section_markdown(body_md)
@@ -1486,7 +1382,7 @@ def build_single_chapter(config, base_dir):
 def main():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     print("=================================================================")
-    print("MEDICALISM ALBORZ - GENERAL SURGERY 14-CHAPTER COMPREHENSIVE BUILDER")
+    print("MEDICALISM ALBORZ - GENERAL SURGERY 22-CHAPTER COMPREHENSIVE BUILDER")
     print("Multi-modal Tree Distribution: 90% Approach 2 | 7% Approach 1 | 3% Approach 3")
     print("=================================================================")
 
@@ -1511,7 +1407,7 @@ def main():
     os.makedirs(os.path.dirname(registry_js_path), exist_ok=True)
 
     js_content = f"""/**
- * MEDICAL STUDY WEBAPP - GENERAL SURGERY COURSE REGISTRY (14 COMPREHENSIVE CHAPTERS)
+ * MEDICAL STUDY WEBAPP - GENERAL SURGERY COURSE REGISTRY (22 COMPREHENSIVE CHAPTERS)
  * Course: جراحی جنرال (رفرنس لارنس - Lawrence's Essentials of General Surgery)
  * Total Chapters: {len(all_chapters)}
  * Total Sections: {sum(len(c['sections']) for c in all_chapters)}
@@ -1522,7 +1418,7 @@ window.SURGERY_REGISTRY = {json.dumps(all_chapters, ensure_ascii=False, indent=2
 """
     with open(registry_js_path, 'w', encoding='utf-8') as f:
         f.write(js_content)
-    print(f"\nSUCCESS: Wrote 14-chapter JavaScript registry to: {registry_js_path}")
+    print(f"\nSUCCESS: Wrote 22-chapter JavaScript registry to: {registry_js_path}")
 
     # 2. Write JSON registry file
     registry_json_path = os.path.join(base_dir, 'chapters', 'Surgery', 'surgery_registry.json')
