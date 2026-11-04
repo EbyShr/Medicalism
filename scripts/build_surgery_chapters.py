@@ -277,7 +277,7 @@ def transform_inline_elements(text):
         tooltip = f'نکته تئوری: {inner}' if len(inner) > 10 else 'نکته تئوری امتحانی'
         return f'{punct} <span class="badge-theory pearl-micro-badge" data-exam-point="theory" title="{tooltip}"><span class="badge-icon" aria-hidden="true">🎯</span><span class="badge-text sr-only">نکته تئوری</span></span>'
 
-    text = re.sub(r'`?\[🎯\s*([^\]]+)\]`?\s*([\.،؛:!؟\?]?)', repl_theory, text)
+    text = re.sub(r'`?\[🎯[ \t]*([^\]]+)\]`?[ \t]*([\.،؛:!؟\?]?)', repl_theory, text)
 
     # 2. Flexible Inline Trap badge
     def repl_trap(m):
@@ -291,7 +291,7 @@ def transform_inline_elements(text):
         tooltip = f'تله امتحانی: {inner}' if len(inner) > 10 else 'تله و دام امتحانی'
         return f'{punct} <span class="badge-trap trap-micro-badge" data-exam-point="trap" title="{tooltip}"><span class="badge-icon" aria-hidden="true">⚠️</span><span class="trap-label-mini">{label}</span><span class="badge-text sr-only">{inner}</span></span>'
 
-    text = re.sub(r'`?\[⚠️\s*([^\]]+)\]`?\s*([\.،؛:!؟\?]?)', repl_trap, text)
+    text = re.sub(r'`?\[⚠️[ \t]*([^\]]+)\]`?[ \t]*([\.،؛:!؟\?]?)', repl_trap, text)
     
     # 3. Inline math expressions ($...$)
     text = re.sub(r'\$([^\$\n]+)\$', format_math_expr, text)
@@ -305,7 +305,7 @@ def transform_inline_elements(text):
     def repl_latin_tag(m):
         term = m.group(1).strip()
         if re.search(r'^[A-Za-z0-9\s\-_/:\.,\+]+$', term) and len(term) >= 2 and not term.isdigit():
-            return f'(<span class="med-latin-tag" dir="ltr">{term}</span>)'
+            return f'<span class="med-latin-wrap" dir="ltr">(<span class="med-latin-tag">{term}</span>)</span>'
         return m.group(0)
 
     text = re.sub(r'\(([A-Za-z0-9\s\-_/:\.,\+]+)\)', repl_latin_tag, text)
@@ -996,6 +996,90 @@ def parse_ascii_diagram(diagram_body):
     # 3. Approach 2 (90% of cases - The Default Standard)
     return render_approach2_clean_tree(lines, title)
 
+def normalize_list_indentation(text):
+    """
+    Normalizes 2-space indented list items to 4-space indented items
+    so Python-Markdown correctly generates nested sub-lists (<ol> / <ul>).
+    Preserves 4-space files (like Liver and Spleen) without double-indenting.
+    """
+    lines = text.splitlines()
+    has_2_space = False
+    in_code = False
+    for l in lines:
+        if l.strip().startswith('```'):
+            in_code = not in_code
+            continue
+        if in_code:
+            continue
+        if re.match(r'^[ ]{2,3}(?:[\*\-\+]|[\d\u06F0-\u06F9]+\.)\s+', l):
+            has_2_space = True
+            break
+
+    if not has_2_space:
+        return text
+
+    out = []
+    in_code = False
+    for l in lines:
+        if l.strip().startswith('```'):
+            in_code = not in_code
+            out.append(l)
+            continue
+        if in_code:
+            out.append(l)
+            continue
+
+        # Match indented list marker (2-space, 4-space, 6-space)
+        m = re.match(r'^([ ]+)([\*\-\+]|[\d\u06F0-\u06F9]+\.)\s+(.*)$', l)
+        if m:
+            spaces = len(m.group(1))
+            marker = m.group(2)
+            rest = m.group(3)
+            # Normalize 2-3 to 4, 4-5 to 8, 6-7 to 12
+            new_spaces = 4 if spaces in [2, 3] else (8 if spaces in [4, 5] else (12 if spaces in [6, 7] else (spaces // 2) * 4))
+            out.append(' ' * new_spaces + marker + ' ' + rest)
+        else:
+            # Check for indented continuation line (non-empty, non-tag, leading spaces)
+            m_cont = re.match(r'^([ ]{2,7})([^\s\*\-\+].*)$', l)
+            if m_cont and not l.strip().startswith('|') and not l.strip().startswith('#') and not l.strip().startswith('>'):
+                sp = len(m_cont.group(1))
+                new_sp = 4 if sp in [2, 3] else (8 if sp in [4, 5] else sp)
+                out.append(' ' * new_sp + m_cont.group(2))
+            else:
+                out.append(l)
+    return '\n'.join(out)
+
+def style_nested_lists(html_content):
+    """
+    Enhances nested HTML lists so that parent <li> items get distinct header styling
+    and nested <ol>/<ul> get vertical guide lines and clean indentation.
+    """
+    pattern = re.compile(r'<li>\s*(.+?)\s*(<(?:ol|ul)(?: class="[^"]*")?>[\s\S]*?</(?:ol|ul)>)\s*</li>', re.DOTALL)
+
+    def repl(m):
+        parent_raw = m.group(1).strip()
+        parent_raw = re.sub(r'^<p>\s*|\s*</p>$', '', parent_raw)
+        sublist_raw = m.group(2).strip()
+
+        if sublist_raw.startswith('<ol'):
+            sublist_clean = re.sub(r'^<ol(?:\s+class="[^"]*")?>', '<ol class="nested-sublist nested-num-list">', sublist_raw)
+        else:
+            sublist_clean = re.sub(r'^<ul(?:\s+class="[^"]*")?>', '<ul class="nested-sublist nested-bullet-list">', sublist_raw)
+
+        icon = '📋' if any(w in parent_raw for w in ['پنل', 'تست', 'معیار', 'آزمایش', 'بررسی']) else (
+               '🔍' if any(w in parent_raw for w in ['علائم', 'نشانه', 'تظاهر', 'یافته']) else (
+               '⚡' if any(w in parent_raw for w in ['اقدام', 'درمان', 'مدیریت', 'مداخله']) else (
+               '⚠️' if any(w in parent_raw for w in ['علل', 'اتیولوژی', 'فاکتور', 'ریسک', 'خطر']) else '📌')))
+
+        return f'<li class="list-parent-group"><div class="list-parent-header"><span class="list-parent-icon">{icon}</span> <span class="list-parent-title">{parent_raw}</span></div>{sublist_clean}</li>'
+
+    prev = ""
+    curr = html_content
+    while prev != curr:
+        prev = curr
+        curr = pattern.sub(repl, curr)
+    return curr
+
 # =========================================================================
 # SECTION MARKDOWN PARSER
 # =========================================================================
@@ -1006,8 +1090,12 @@ def parse_section_markdown(markdown_text):
     - Clinical Stepper Cards (#### گام ۱ to گام ۵) with dynamic color themes
     - Comparison Tables with strict RTL alignment and zebra striping
     - High-Yield Night-Before-Exam Cards (.high-yield-exam-card)
+    - Hierarchical Parent-Child Lists with clean vertical guidelines
     - Verbatim preservation of every medical fact and detail
     """
+    # Normalize 2-space indented nested lists to 4-space so Python-Markdown parses child <ol>/<ul> properly
+    markdown_text = normalize_list_indentation(markdown_text)
+
     # Clean leading 4-space indent on blockquotes so python-markdown doesn't convert them to <pre><code>
     lines = [re.sub(r'^\s{2,}>', '>', l) for l in markdown_text.splitlines()]
     html_chunks = []
@@ -1096,6 +1184,7 @@ def parse_section_markdown(markdown_text):
                 r'<li class="exam-trap-item" data-exam-point="trap">\1</li>',
                 step_body_html
             )
+            step_body_html = style_nested_lists(step_body_html)
 
             stepper_card = f"""
 <div class="clinical-stepper-card step-card step-{step_num} step-theme-{step_theme}" data-step="{step_num}">
@@ -1207,6 +1296,7 @@ def parse_section_markdown(markdown_text):
                 r'<li class="exam-trap-item" data-exam-point="trap">\1</li>',
                 chunk_html
             )
+            chunk_html = style_nested_lists(chunk_html)
 
             html_chunks.append(chunk_html)
 

@@ -3777,3 +3777,128 @@
   color: #e11d48;
   font-weight: 800;
 }
+
+
+/* =========================================================================
+   Hierarchical Parent-Child Lists (.list-parent-group & .nested-sublist)
+   ========================================================================= */
+
+.list-parent-group {
+  list-style: none !important;
+  margin-block: 16px 12px !important;
+  padding: 0 !important;
+}
+
+.list-parent-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(2, 132, 199, 0.08);
+  border-inline-start: 4px solid var(--color-cyan, #0284c7);
+  padding: 6px 14px;
+  border-radius: var(--radius-md, 6px);
+  margin-bottom: 8px;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+}
+
+[data-theme="dark"] .list-parent-header {
+  background: rgba(2, 132, 199, 0.16);
+  border-inline-start-color: #38bdf8;
+  color: #f1f5f9;
+}
+
+.list-parent-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.list-parent-title {
+  font-weight: 700;
+}
+
+/* Sub-list indented with a vertical guide line */
+ol.nested-sublist,
+ul.nested-sublist {
+  padding-inline-start: 28px !important;
+  margin-block: 6px 14px !important;
+  border-inline-start: 2.5px solid rgba(2, 132, 199, 0.25);
+  margin-inline-start: 14px !important;
+  list-style-position: outside !important;
+}
+
+[data-theme="dark"] ol.nested-sublist,
+[data-theme="dark"] ul.nested-sublist {
+  border-inline-start-color: rgba(56, 189, 248, 0.3);
+}
+
+ol.nested-sublist > li,
+ul.nested-sublist > li {
+  margin-block: 6px !important;
+  line-height: 1.85 !important;
+  color: var(--text-secondary, #334155);
+}
+
+[data-theme="dark"] ol.nested-sublist > li,
+[data-theme="dark"] ul.nested-sublist > li {
+  color: #cbd5e1;
+}
+
+ol.nested-num-list {
+  list-style-type: decimal !important;
+}
+
+ul.nested-bullet-list {
+  list-style-type: disc !important;
+}
+
+/* Deeper Level 3 Sub-sub-list */
+.nested-sublist ol.nested-sublist,
+.nested-sublist ul.nested-sublist {
+  padding-inline-start: 22px !important;
+  margin-inline-start: 10px !important;
+  border-inline-start: 2px dashed rgba(99, 102, 241, 0.25);
+}
+
+/* Exam pearl and trap items inside nested lists preserve numbering/bullets */
+ol.nested-sublist > li.exam-pearl-item,
+ol.nested-sublist > li.exam-trap-item,
+ol > li.exam-pearl-item,
+ol > li.exam-trap-item {
+  list-style: decimal !important;
+  list-style-position: outside !important;
+  margin-inline-start: 22px !important;
+  background: rgba(13, 148, 136, 0.08) !important;
+  border-inline-start: 3px solid #0d9488 !important;
+  padding: 6px 12px !important;
+  margin-block: 6px !important;
+  border-radius: var(--radius-sm, 4px) !important;
+}
+
+[data-theme="dark"] ol.nested-sublist > li.exam-pearl-item,
+[data-theme="dark"] ol > li.exam-pearl-item {
+  background: rgba(13, 148, 136, 0.16) !important;
+  border-inline-start-color: #2dd4bf !important;
+}
+
+ul.nested-sublist > li.exam-pearl-item,
+ul.nested-sublist > li.exam-trap-item,
+ul.nested-bullet-list > li.exam-pearl-item,
+ul.nested-bullet-list > li.exam-trap-item {
+  list-style: disc !important;
+  list-style-position: outside !important;
+  margin-inline-start: 18px !important;
+  background: rgba(13, 148, 136, 0.08) !important;
+  border-inline-start: 3px solid #0d9488 !important;
+  padding: 6px 12px !important;
+  margin-block: 6px !important;
+  border-radius: var(--radius-sm, 4px) !important;
+}
+
+/* Latin tag wrapper to prevent line-wrapping orphan parentheses */
+.med-latin-wrap {
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+}
