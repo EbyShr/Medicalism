@@ -4203,3 +4203,315 @@ ul.nested-bullet-list > li.exam-trap-item {
 [data-theme="light"] .ctree-action-text {
   color: #1e293b !important;
 }
+
+
+/* ==========================================================================
+   CLINICAL STEPPERS & SEQUENTIAL PROTOCOL TIMELINES (.stepper-item)
+   Fixes floating numbers, provides horizontal card timeline with connected line
+   ========================================================================== */
+
+.stepper-item.clinical-step {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  gap: 16px !important;
+  margin-block: 22px !important;
+  position: relative !important;
+}
+
+.step-badge-col {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: 38px !important;
+  flex-shrink: 0 !important;
+}
+
+.step-num-bubble {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.35) !important;
+  border: 2px solid #ffffff !important;
+  z-index: 2 !important;
+  flex-shrink: 0 !important;
+}
+
+[data-theme="dark"] .step-num-bubble {
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%) !important;
+  color: #0f172a !important;
+  border-color: #1e293b !important;
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4) !important;
+}
+
+.step-connector-line {
+  width: 3px !important;
+  flex-grow: 1 !important;
+  min-height: 24px !important;
+  background: linear-gradient(to bottom, #0284c7 0%, rgba(2, 132, 199, 0.15) 100%) !important;
+  margin-block: 4px !important;
+  border-radius: 2px !important;
+}
+
+[data-theme="dark"] .step-connector-line {
+  background: linear-gradient(to bottom, #38bdf8 0%, rgba(56, 189, 248, 0.15) 100%) !important;
+}
+
+.step-content-card {
+  flex: 1 !important;
+  min-width: 0 !important;
+  background: rgba(2, 132, 199, 0.03) !important;
+  border: 1px solid rgba(2, 132, 199, 0.22) !important;
+  border-radius: var(--radius-lg, 12px) !important;
+  padding: 16px 20px !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+  transition: all var(--transition-fast, 0.2s ease) !important;
+}
+
+[data-theme="dark"] .step-content-card {
+  background: rgba(30, 41, 59, 0.7) !important;
+  border-color: rgba(56, 189, 248, 0.25) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+.step-card-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-block-end: 12px !important;
+  border-block-end: 1px dashed rgba(2, 132, 199, 0.2) !important;
+  padding-block-end: 10px !important;
+}
+
+[data-theme="dark"] .step-card-header {
+  border-block-end-color: rgba(56, 189, 248, 0.2) !important;
+}
+
+.step-tag-pill {
+  background: rgba(2, 132, 199, 0.12) !important;
+  color: #0284c7 !important;
+  font-weight: 800 !important;
+  font-size: 0.82rem !important;
+  padding: 3px 12px !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(2, 132, 199, 0.3) !important;
+  letter-spacing: 0.02em !important;
+  white-space: nowrap !important;
+}
+
+[data-theme="dark"] .step-tag-pill {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+}
+
+.step-title-text {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  font-size: 1.1rem !important;
+  font-weight: 800 !important;
+  color: var(--text-primary, #0f172a) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  line-height: 1.5 !important;
+}
+
+[data-theme="dark"] .step-title-text {
+  color: #f8fafc !important;
+}
+
+.step-card-body {
+  font-size: 0.95rem !important;
+  line-height: 1.85 !important;
+  color: var(--text-primary, #1e293b) !important;
+}
+
+[data-theme="dark"] .step-card-body {
+  color: #e2e8f0 !important;
+}
+
+/* ==========================================================================
+   VIBRANT MEDICAL TEXT COLORIZATION & VISUAL HIERARCHY
+   Transforms black-and-white plain text into engaging, vivid study content
+   ========================================================================== */
+
+/* 1. Parent Topic Bullets in Lists */
+.clinical-part-card ul > li:has(> ul),
+.clinical-part-card ul > li:has(> ol) {
+  margin-block-start: 22px !important;
+  margin-block-end: 14px !important;
+  font-size: 1.05rem !important;
+  line-height: 1.6 !important;
+}
+
+.part-foundations ul > li:has(> ul) > strong:first-child,
+.part-foundations ul > li:has(> ol) > strong:first-child {
+  color: #0284c7 !important;
+  font-size: 1.1rem !important;
+  font-weight: 800 !important;
+  display: inline-block;
+  margin-block-end: 6px;
+}
+[data-theme="dark"] .part-foundations ul > li:has(> ul) > strong:first-child,
+[data-theme="dark"] .part-foundations ul > li:has(> ol) > strong:first-child {
+  color: #38bdf8 !important;
+}
+
+.part-workflow ul > li:has(> ul) > strong:first-child,
+.part-workflow ul > li:has(> ol) > strong:first-child {
+  color: #4f46e5 !important;
+  font-size: 1.1rem !important;
+  font-weight: 800 !important;
+  display: inline-block;
+  margin-block-end: 6px;
+}
+[data-theme="dark"] .part-workflow ul > li:has(> ul) > strong:first-child,
+[data-theme="dark"] .part-workflow ul > li:has(> ol) > strong:first-child {
+  color: #818cf8 !important;
+}
+
+.part-tables ul > li:has(> ul) > strong:first-child,
+.part-tables ul > li:has(> ol) > strong:first-child {
+  color: #059669 !important;
+  font-size: 1.1rem !important;
+  font-weight: 800 !important;
+}
+[data-theme="dark"] .part-tables ul > li:has(> ul) > strong:first-child,
+[data-theme="dark"] .part-tables ul > li:has(> ol) > strong:first-child {
+  color: #34d399 !important;
+}
+
+.high-yield-exam-card ul > li:has(> ul) > strong:first-child,
+.high-yield-exam-card ul > li:has(> ol) > strong:first-child {
+  color: #e11d48 !important;
+  font-size: 1.1rem !important;
+  font-weight: 800 !important;
+}
+[data-theme="dark"] .high-yield-exam-card ul > li:has(> ul) > strong:first-child,
+[data-theme="dark"] .high-yield-exam-card ul > li:has(> ol) > strong:first-child {
+  color: #fb7185 !important;
+}
+
+/* 2. Sub-bullet Lead Terms (e.g. داروهای محرک: / مکانیسم سلولی: / سیر زمانی:) */
+.clinical-part-card li > strong:first-child,
+.clinical-part-card p > strong:first-child {
+  color: #0284c7;
+  font-weight: 800;
+}
+[data-theme="dark"] .clinical-part-card li > strong:first-child,
+[data-theme="dark"] .clinical-part-card p > strong:first-child {
+  color: #38bdf8;
+}
+
+.part-workflow li > strong:first-child,
+.part-workflow p > strong:first-child {
+  color: #4f46e5 !important;
+}
+[data-theme="dark"] .part-workflow li > strong:first-child,
+[data-theme="dark"] .part-workflow p > strong:first-child {
+  color: #818cf8 !important;
+}
+
+.part-tables li > strong:first-child,
+.part-tables p > strong:first-child {
+  color: #059669 !important;
+}
+[data-theme="dark"] .part-tables li > strong:first-child,
+[data-theme="dark"] .part-tables p > strong:first-child {
+  color: #34d399 !important;
+}
+
+.high-yield-exam-card li > strong:first-child,
+.high-yield-exam-card p > strong:first-child {
+  color: #e11d48 !important;
+}
+[data-theme="dark"] .high-yield-exam-card li > strong:first-child,
+[data-theme="dark"] .high-yield-exam-card p > strong:first-child {
+  color: #fb7185 !important;
+}
+
+/* 3. Subtle Medical Highlighter on Key Bold Facts, Numbers & Dosages */
+.clinical-part-card strong:not(:first-child),
+.high-yield-exam-card strong:not(:first-child) {
+  font-weight: 800;
+  color: #0f172a;
+  background: linear-gradient(180deg, transparent 65%, rgba(2, 132, 199, 0.16) 65%);
+  padding: 0 4px;
+  border-radius: 3px;
+}
+[data-theme="dark"] .clinical-part-card strong:not(:first-child),
+[data-theme="dark"] .high-yield-exam-card strong:not(:first-child) {
+  color: #f8fafc;
+  background: linear-gradient(180deg, transparent 60%, rgba(56, 189, 248, 0.24) 60%);
+}
+
+/* 4. Elegant Nested Sub-list Tree Guide Lines */
+.clinical-part-card ul > li > ul,
+.clinical-part-card ul > li > ol {
+  margin-block: 10px 14px !important;
+  padding-inline-start: 22px !important;
+  border-inline-start: 2.5px solid rgba(2, 132, 199, 0.25) !important;
+  margin-inline-start: 10px !important;
+  list-style-type: circle !important;
+}
+[data-theme="dark"] .clinical-part-card ul > li > ul,
+[data-theme="dark"] .clinical-part-card ul > li > ol {
+  border-inline-start-color: rgba(56, 189, 248, 0.3) !important;
+}
+
+.clinical-part-card li {
+  margin-block-end: 8px !important;
+  line-height: 1.85 !important;
+  color: #334155;
+}
+[data-theme="dark"] .clinical-part-card li {
+  color: #cbd5e1;
+}
+
+/* Themed Bullet Markers */
+.part-foundations ul > li::marker { color: #0284c7 !important; }
+.part-workflow ul > li::marker { color: #6366f1 !important; }
+.part-tables ul > li::marker { color: #059669 !important; }
+.high-yield-exam-card ul > li::marker { color: #e11d48 !important; }
+.part-questions ul > li::marker { color: #d97706 !important; }
+
+/* 5. English Medical Term Pills */
+.term-en.badge-pill-subtle {
+  display: inline-block;
+  padding: 1px 7px;
+  font-size: 0.88em;
+  font-weight: 600;
+  border-radius: 6px;
+  background: rgba(99, 102, 241, 0.08);
+  color: #4338ca;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  margin-inline: 3px;
+  white-space: nowrap;
+  direction: ltr;
+}
+[data-theme="dark"] .term-en.badge-pill-subtle {
+  background: rgba(129, 140, 248, 0.16);
+  color: #c7d2fe;
+  border-color: rgba(129, 140, 248, 0.35);
+}
+
+/* 6. Medical Measurements & Formulas */
+.med-measure {
+  display: inline-block;
+  font-weight: 700;
+  color: #0284c7;
+  direction: ltr;
+  padding: 0 4px;
+}
+[data-theme="dark"] .med-measure {
+  color: #38bdf8;
+}

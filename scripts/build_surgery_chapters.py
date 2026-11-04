@@ -333,11 +333,13 @@ def format_math_expr(match):
     """Formats LaTeX math into clean, human-readable medical markup without code boxes."""
     raw = match.group(1).strip()
     s = raw
+    s = s.replace(r'\rightarrow', ' ⬅️ ').replace(r'\to', ' ⬅️ ').replace(r'\Rightarrow', ' ⬅️ ')
+    s = s.replace(r'\leftarrow', ' ➡️ ').replace(r'\Leftarrow', ' ➡️ ')
     s = re.sub(r'\\text\{([^}]+)\}', r'\1', s)
     s = re.sub(r'\\mathrm\{([^}]+)\}', r'\1', s)
     s = s.replace(r'\text{-}', '–').replace(r'\text{–}', '–')
-    s = re.sub(r'\^\\circ\s*F', '°F', s)
-    s = re.sub(r'\^\\circ\s*C', '°C', s)
+    s = re.sub(r'\^\\circ\s*(?:\\text\{)?([CF])\}?', r'°\1', s)
+    s = re.sub(r'\^\\circ', '°', s)
     s = s.replace(r'kg/m^2', 'kg/m²')
     s = s.replace(r'/m^2', '/m²')
     s = s.replace(r'^2', '²')
@@ -356,7 +358,12 @@ def format_math_expr(match):
     s = re.sub(r'HbA_\{?1c\}?', '###HBA1C###', s)
     s = s.replace('<', '&lt;').replace('>', '&gt;')
     s = s.replace('###HBA1C###', 'HbA<sub>1c</sub>')
+    s = re.sub(r'_\{([^}]+)\}', r'<sub>\1</sub>', s)
+    s = re.sub(r'_([a-zA-Z0-9]+)', r'<sub>\1</sub>', s)
+    s = re.sub(r'\^\{([^}]+)\}', r'<sup>\1</sup>', s)
     s = re.sub(r'\s+', ' ', s).strip()
+    if s in ['⬅️', '➡️', '⬇️', '⬆️']:
+        return f' {s} '
     return f'<span class="med-measure" dir="ltr">{s}</span>'
 
 def transform_inline_elements(text):
@@ -412,6 +419,10 @@ def transform_inline_elements(text):
     # 7. Decision pill badges (YES/NO, positive/negative)
     text = re.sub(r'\[(بله|مثبت|\+|Yes|Positive)\]', r'<span class="badge-decision badge-yes">\1</span>', text, flags=re.IGNORECASE)
     text = re.sub(r'\[(خیر|منفی|\-|No|Negative)\]', r'<span class="badge-decision badge-no">\1</span>', text, flags=re.IGNORECASE)
+
+    # 8. Clean up unwanted <code> tags surrounding badges and double arrow spans
+    text = re.sub(r'<code>\s*(<span class="(?:badge-trap|badge-theory)[^"]*">[\s\S]*?</span>)\s*</code>', r'\1', text)
+    text = re.sub(r'<span class="stepper-arrow-indicator">\s*<span class="stepper-arrow-indicator">([^<]+)</span>\s*</span>', r'<span class="stepper-arrow-indicator">\1</span>', text)
 
     return text
 
@@ -1119,7 +1130,7 @@ def parse_callouts(text):
 
 def parse_steppers(text):
     """Parses sequential multi-step encounters into interactive steppers."""
-    pattern = re.compile(r'###\s*(گام\s*[\d\u06F0-\u06F9]+|مرحله\s*[\d\u06F0-\u06F9]+|فاز\s*[\d\u06F0-\u06F9]+):\s*(.*?)\n([\s\S]*?)(?=(?:###\s*(?:گام|مرحله|فاز)|##|\Z))')
+    pattern = re.compile(r'(?m)^#{3,4}\s*(گام\s*[\d\u06F0-\u06F9]+|مرحله\s*[\d\u06F0-\u06F9]+|فاز\s*[\d\u06F0-\u06F9]+)[:\s\-—]*(.*?)\n([\s\S]*?)(?=(?:^#{3,4}\s*(?:گام|مرحله|فاز)|^###|^##|\Z))')
     
     def repl(m):
         step_badge = m.group(1).strip()
