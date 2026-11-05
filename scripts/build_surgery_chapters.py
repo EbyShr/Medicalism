@@ -473,6 +473,24 @@ def transform_inline_elements(text):
 
     text = re.sub(r'([\s\(\[\{،؛:])\(([A-Za-z0-9\s\-\+\/\.\,\%\:\&]+)\)', repl_paren, text)
 
+    # Inline sequential numbering (e.g. ۱) ... ۲) ... ۳) in continuous text paragraphs)
+    def repl_seq(m):
+        lead = m.group(1) or ''
+        num = m.group(2)
+        return f'{lead}<span class="inline-seq-num">{num}</span>'
+
+    text = re.sub(r'(^|[\s،,؛:و])([\u06F1-\u06F9]|10|[1-9])\)(?=\s)', repl_seq, text)
+
+    # BiDi protection for bold English terms to prevent line wrapping & punctuation reversals
+    def repl_bold_en(m):
+        lead = m.group(1) or ''
+        inner = m.group(2).strip()
+        if not re.search(r'[\u0600-\u06FF]', inner) and len(inner) >= 2:
+            return f'{lead}<strong dir="ltr" class="term-en-bold">{inner}</strong>'
+        return m.group(0)
+
+    text = re.sub(r'(^|[\s\(،؛:\[])\*\*([A-Za-z0-9\s\-\+\/\.\,\%\:\&\'\"]+)\*\*', repl_bold_en, text)
+
     # 6. Lead bold keywords
     text = re.sub(r'^[ \t]*\*\*(تعریف|اتیولوژی|پاتوفیزیولوژی|تظاهرات بالینی|علائم بالینی|تشخیص|درمان|عوارض|اندیکاسیون|کنترااندیکاسیون|مدیریت|پیش‌آگهی|نکته کلیدی|رویکرد بالینی|تفسیر|معیارها|پایش)\*\*:', 
                   r'<span class="lead-term-label label-\1">\1:</span>', text, flags=re.MULTILINE)
@@ -484,6 +502,10 @@ def transform_inline_elements(text):
     # 8. Clean up unwanted <code> tags surrounding badges and double arrow spans
     text = re.sub(r'<code>\s*(<span class="(?:badge-trap|badge-theory)[^"]*">[\s\S]*?</span>)\s*</code>', r'\1', text)
     text = re.sub(r'<span class="stepper-arrow-indicator">\s*<span class="stepper-arrow-indicator">([^<]+)</span>\s*</span>', r'<span class="stepper-arrow-indicator">\1</span>', text)
+
+    # 9. Clean up any remaining unparsed **bold** anywhere in trees or cards, and strip stray orphaned asterisks
+    text = re.sub(r'\*\*([^\*\n]+)\*\*', r'<strong>\1</strong>', text)
+    text = text.replace('**', '')
 
     return text
 
@@ -549,7 +571,36 @@ def parse_split_diagram_robust(lines):
         else:
             conns = [len(split_line) // 2]
 
-    bounds = [0] + [c + 2 for c in conns] + [9999]
+    # Refine cut points by checking shared whitespace gaps across lines below split
+    refined_conns = []
+    for c in conns:
+        g_starts = []
+        g_ends = []
+        for l in lines[split_idx+1:]:
+            if not l.strip() or all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in l):
+                continue
+            runs = [(m.start(), m.end()) for m in re.finditer(r' {2,}', l)]
+            best = None
+            min_d = 999
+            for s, e in runs:
+                d = abs((s + e)//2 - c)
+                if d < min_d:
+                    min_d = d
+                    best = (s, e)
+            if best and min_d < 35:
+                g_starts.append(best[0])
+                g_ends.append(best[1])
+        if g_starts and g_ends:
+            max_s = max(g_starts)
+            min_e = min(g_ends)
+            if max_s < min_e:
+                refined_conns.append((max_s + min_e) // 2)
+            else:
+                refined_conns.append(c + 2)
+        else:
+            refined_conns.append(c + 2)
+
+    bounds = [0] + refined_conns + [9999]
     num_cols = len(bounds) - 1
 
     col_raw_lines = [[] for _ in range(num_cols)]
@@ -598,8 +649,25 @@ def parse_split_diagram_robust(lines):
         b_header = re.sub(r'^[🎯⚠️\[\]\s*#]+|[\[\]\s*#]+$', '', b_header).strip()
         branch_node = {'text': b_header, 'children': [], 'level': 1}
 
+        # Check for subtitle / clinical impact (e.g. (ادم سلول‌های مغزی و CNS))
+        col_idx = 1
+        if col_idx < len(clean_col) and re.match(r'^\s*\(.*?\)\s*$', clean_col[col_idx]):
+            branch_node['children'].append({'text': clean_col[col_idx].strip(), 'children': [], 'level': 2})
+            col_idx += 1
+
+        rem_items = clean_col[col_idx:]
+        # Check if remaining items form two multi-part lines (categories + descriptions)
+        if len(rem_items) == 2:
+            parts_a = [p.strip() for p in re.split(r'\s{2,}', rem_items[0]) if p.strip()]
+            parts_b = [p.strip(' ()') for p in re.split(r'\s{2,}|\)\s*(?=\()', rem_items[1]) if p.strip(' ()')]
+            if len(parts_a) >= 2 and len(parts_a) == len(parts_b):
+                for a, b in zip(parts_a, parts_b):
+                    branch_node['children'].append({'text': f'{a} ⬅️ {b}', 'children': [], 'level': 2})
+                root_node['children'].append(branch_node)
+                continue
+
         bullet_buffer = []
-        for it in clean_col[1:]:
+        for it in rem_items:
             it_clean = clean_tree_text(it)
             it_clean = re.sub(r'\[([^\]]+)\]', r'\1', it_clean).strip()
             
@@ -610,7 +678,7 @@ def parse_split_diagram_robust(lines):
                     branch_node['children'][-1]['text'] += ' ' + emojis
                 continue
 
-            sub_parts = [p.strip() for p in re.split(r'\s{3,}', it_clean) if p.strip()]
+            sub_parts = [p.strip() for p in re.split(r'\s{2,}|\)\s*(?=\()', it_clean) if p.strip()]
             if len(sub_parts) >= 2:
                 if bullet_buffer:
                     branch_node['children'].append({
@@ -765,7 +833,11 @@ def render_approach2_clean_tree(lines, title):
         if n1.get('children'):
             for n2 in n1['children']:
                 n2_text = n2['text']
-                if '⬅️' in n2_text:
+                if re.match(r'^\s*\(.*?\)\s*$', n2_text):
+                    sub_html = f'<div class="ctree-subtitle">{transform_inline_elements(n2_text)}</div>'
+                    children_html.append(f'<div class="ctree-subrow-wrap">{sub_html}</div>')
+                    continue
+                elif '⬅️' in n2_text:
                     parts = n2_text.split('⬅️', 1)
                     sub_title = transform_inline_elements(parts[0].strip())
                     sub_action = transform_inline_elements(parts[1].strip())
@@ -804,6 +876,9 @@ def render_approach2_clean_tree(lines, title):
         </div>
         """)
         
+    is_split = (len(level1_nodes) == 2)
+    wrap_class = "ctree-split-grid" if is_split else "ctree-nodes-stack"
+
     return f"""
 <div class="clinical-flowchart-card animated-diagram ctree-diagram" data-flowchart="true">
   <div class="flowchart-header">
@@ -815,7 +890,9 @@ def render_approach2_clean_tree(lines, title):
       <span>🩺</span>
       <span>{root_text}</span>
     </div>
-    {''.join(nodes_html)}
+    <div class="{wrap_class}">
+      {''.join(nodes_html)}
+    </div>
   </div>
 </div>
 """
@@ -1126,28 +1203,81 @@ def parse_ascii_diagram(diagram_body):
     return render_approach2_clean_tree(lines, title)
 
 def normalize_list_indentation(text):
-    """Normalizes 2-space or 4-space markdown sub-bullets for the standard python-markdown processor."""
+    """
+    Normalizes markdown list indentation to Python-Markdown's strict 4-space tab stops.
+    Prevents sub-lists under ordered items (1.) or bullet items (*) from collapsing
+    into single lines or becoming indented code blocks (<pre><code>).
+    """
     lines = text.splitlines()
     out = []
+    indent_stack = [0]
+    in_code = False
+    
     for l in lines:
-        m = re.match(r'^([ \t]+)([*+-]|\d+\.)\s+(.*)$', l)
+        if l.strip().startswith('```'):
+            in_code = not in_code
+            out.append(l)
+            continue
+        if in_code:
+            out.append(l)
+            continue
+            
+        if re.match(r'^(?:#{1,4}\s|---|___|\*\*\*)', l.strip()):
+            indent_stack = [0]
+            out.append(l)
+            continue
+
+        m = re.match(r'^([ \t]*)([*+-]|\d+\.|\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9\u06F0+\.)\s+(.*)$', l)
         if m:
             lead_ws = m.group(1).replace('\t', '    ')
             bullet = m.group(2)
             content = m.group(3)
-            num_spaces = len(lead_ws)
-            level = max(1, (num_spaces + 1) // 2)
-            norm_ws = '    ' * level
-            out.append(f"{norm_ws}{bullet} {content}")
+            raw_len = len(lead_ws)
+            
+            if raw_len == 0:
+                indent_stack = [0]
+                out.append(f'{bullet} {content}')
+            else:
+                if raw_len > indent_stack[-1]:
+                    indent_stack.append(raw_len)
+                else:
+                    while len(indent_stack) > 1 and raw_len < indent_stack[-1] - 1:
+                        indent_stack.pop()
+                level = max(1, len(indent_stack) - 1)
+                norm_ws = '    ' * level
+                out.append(f'{norm_ws}{bullet} {content}')
         else:
-            out.append(l)
+            if not l.strip():
+                out.append(l)
+            else:
+                if '@@@FORMULATOKEN' in l or '@@@DIAGRAMTOKEN' in l:
+                    out.append(l)
+                elif not l.startswith(' ') and not l.startswith('\t'):
+                    indent_stack = [0]
+                    out.append(l)
+                else:
+                    out.append(l)
     return '\n'.join(out)
 
 def format_tables_with_rtl(html_content):
-    """Ensures all markdown-generated tables have dir='rtl' and full-width responsive classes."""
+    """Ensures all markdown-generated tables have dir='rtl' and full-width responsive classes, integrating table captions."""
     html_content = re.sub(r'style="text-align:\s*left;?"', 'style="text-align: right;"', html_content)
     html_content = re.sub(r'<table>', r'<div class="table-responsive"><table class="data-table clinical-table" dir="rtl">', html_content)
     html_content = re.sub(r'</table>', r'</table></div>', html_content)
+
+    # Integrate table caption headers (<h4 id="...">جدول...</h4>) directly into clinical table wrapper
+    def repl_table_cap(m):
+        cap_text = m.group(1).strip()
+        tbl_content = m.group(2)
+        return f'''<div class="clinical-table-wrapper">
+  <div class="table-caption-bar">
+    <span class="table-caption-icon">📊</span>
+    <span class="table-caption-text">{cap_text}</span>
+  </div>
+  {tbl_content}
+</div>'''
+
+    html_content = re.sub(r'<h[34][^>]*>(جدول[\s\S]*?)</h[34]>\s*(<div class="table-responsive">[\s\S]*?</div>)', repl_table_cap, html_content)
     return html_content
 
 def parse_callouts(text):
@@ -1221,14 +1351,18 @@ def parse_steppers(text):
     return pattern.sub(repl, text)
 
 def render_part_body(body_md):
-    """Renders markdown content within a part card, nesting diagrams directly inside their parent steppers and cards."""
+    """Renders markdown content within a part card, nesting diagrams and formulas directly inside their parent steppers and cards."""
     bt3 = chr(96) * 3
     
-    # 1. Format display math ($$...$$) first into rich formula boxes
+    # 1. Format display math ($$...$$) first into token placeholders so they don't break list structure
+    formula_blocks = []
     def repl_display_math(m):
         raw_formula = m.group(1).strip()
         rendered_formula = render_latex_to_html(raw_formula)
-        return f'\n\n<div class="med-formula-box" dir="ltr">{rendered_formula}</div>\n\n'
+        box_html = f'<div class="med-formula-box" dir="ltr">{rendered_formula}</div>'
+        idx = len(formula_blocks)
+        formula_blocks.append(box_html)
+        return f'\n\n@@@FORMULATOKEN{idx}@@@\n\n'
 
     body_md = re.sub(r'\$\$([\s\S]*?)\$\$', repl_display_math, body_md)
 
@@ -1264,7 +1398,7 @@ def render_part_body(body_md):
     chunk_html = format_tables_with_rtl(chunk_html)
     chunk_html = transform_inline_elements(chunk_html)
 
-    # 5. Restore diagram placeholders inside their container
+    # 5. Restore diagram and formula placeholders inside their container
     for i, block_html in enumerate(code_blocks):
         token = f'@@@DIAGRAMTOKEN{i}@@@'
         chunk_html = chunk_html.replace(f'<p>{token}</p>', block_html)
@@ -1272,11 +1406,19 @@ def render_part_body(body_md):
         chunk_html = chunk_html.replace(f'{token}</p>', block_html)
         chunk_html = chunk_html.replace(token, block_html)
 
+    for i, f_html in enumerate(formula_blocks):
+        token = f'@@@FORMULATOKEN{i}@@@'
+        chunk_html = chunk_html.replace(f'<p>{token}</p>', f_html)
+        chunk_html = chunk_html.replace(f'<p>{token}', f_html)
+        chunk_html = chunk_html.replace(f'{token}</p>', f_html)
+        chunk_html = chunk_html.replace(token, f_html)
+
     # 6. Unwrap any accidental <pre><code> blocks created by 4-space indentations
     def repl_pre(m):
         content = m.group(1).strip()
-        if re.search(r'^\s*[*•\-\d]', content) or '<span class="med-measure"' in content or '<strong>' in content:
-            clean = content.replace('<code>', '').replace('</code>', '')
+        if re.search(r'^\s*[*•\-\d]', content) or '<span class="med-measure"' in content or '<strong>' in content or '**' in content:
+            clean = markdown.markdown(content, extensions=['extra'])
+            clean = transform_inline_elements(clean)
             return f'<div class="clinical-callout-card" style="margin-block: 10px;">{clean}</div>'
         return m.group(0)
 
