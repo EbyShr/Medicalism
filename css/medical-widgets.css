@@ -4614,3 +4614,30 @@ sub {
   list-style: none !important;
   list-style-type: none !important;
 }
+
+
+/* Seamless Diagram Embedding Inside Stepper Step Cards */
+.step-card-body .clinical-flowchart-card {
+  margin-block: 14px 18px !important;
+  background: var(--bg-surface-secondary);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="dark"] .step-card-body .clinical-flowchart-card {
+  background: rgba(30, 41, 59, 0.4);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.step-card-body .clinical-flowchart-card .flowchart-header {
+  margin-block-end: 12px;
+  padding-block-end: 10px;
+}
+
+/* Eliminate stray vertical pipe | on flowchart and step titles */
+.flowchart-title,
+.step-title-text {
+  border-inline-start: none !important;
+  padding-inline-start: 0 !important;
+}

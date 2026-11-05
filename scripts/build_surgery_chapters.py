@@ -1221,48 +1221,58 @@ def parse_steppers(text):
     return pattern.sub(repl, text)
 
 def render_part_body(body_md):
-    """Renders markdown content within a part card, strictly preserving code diagrams."""
+    """Renders markdown content within a part card, nesting diagrams directly inside their parent steppers and cards."""
     bt3 = chr(96) * 3
-    code_pattern = re.compile(r'(?m)(^' + bt3 + r'[^\n]*\n[\s\S]*?\n' + bt3 + r'[ \t]*$)')
-    parts = code_pattern.split(body_md)
-    html_chunks = []
-
-    for part in parts:
-        if part.strip().startswith(bt3):
-            code_content = re.sub(r'^' + bt3 + r'[^\n]*\n', '', part.strip())
-            code_content = re.sub(r'\n' + bt3 + r'$', '', code_content)
-            
-            is_ascii = any(ch in code_content for ch in ['┌', '├', '└', '├──', '└──', '─', '━', '│', '╔', '╗', '╚', '╝', '║', '═'])
-            if is_ascii:
-                html_chunks.append(parse_ascii_diagram(code_content))
-            else:
-                body_clean = markdown.markdown(normalize_list_indentation(code_content), extensions=['extra'])
-                body_clean = transform_inline_elements(body_clean)
-                html_chunks.append(f'<div class="clinical-quote-card">{body_clean}</div>')
-        else:
-            txt = part
-            if not txt.strip():
-                continue
-            
-            # Format display math ($$...$$) before markdown parsing into rich medical formula boxes
-            def repl_display_math(m):
-                raw_formula = m.group(1).strip()
-                rendered_formula = render_latex_to_html(raw_formula)
-                return f'\n\n<div class="med-formula-box" dir="ltr">{rendered_formula}</div>\n\n'
-
-            txt = re.sub(r'\$\$([\s\S]*?)\$\$', repl_display_math, txt)
-            txt = parse_callouts(txt)
-            txt = parse_steppers(txt)
-            txt = normalize_list_indentation(txt)
-            
-            chunk_html = markdown.markdown(txt, extensions=['extra', 'tables'])
-            chunk_html = format_tables_with_rtl(chunk_html)
-            chunk_html = transform_inline_elements(chunk_html)
-            html_chunks.append(chunk_html)
-
-    full_html = '\n'.join(html_chunks)
     
-    # Unwrap any accidental <pre><code> blocks created by 4-space markdown indentations
+    # 1. Format display math ($$...$$) first into rich formula boxes
+    def repl_display_math(m):
+        raw_formula = m.group(1).strip()
+        rendered_formula = render_latex_to_html(raw_formula)
+        return f'\n\n<div class="med-formula-box" dir="ltr">{rendered_formula}</div>\n\n'
+
+    body_md = re.sub(r'\$\$([\s\S]*?)\$\$', repl_display_math, body_md)
+
+    # 2. Extract code diagrams into tokens so they remain intact inside their enclosing step/block
+    code_blocks = []
+    def repl_code_block(m):
+        full_block = m.group(0)
+        code_content = re.sub(r'^' + bt3 + r'[^\n]*\n', '', full_block.strip())
+        code_content = re.sub(r'\n' + bt3 + r'$', '', code_content)
+        
+        is_ascii = any(ch in code_content for ch in ['┌', '├', '└', '├──', '└──', '─', '━', '│', '╔', '╗', '╚', '╝', '║', '═'])
+        if is_ascii:
+            rendered = parse_ascii_diagram(code_content)
+        else:
+            body_clean = markdown.markdown(normalize_list_indentation(code_content), extensions=['extra'])
+            body_clean = transform_inline_elements(body_clean)
+            rendered = f'<div class="clinical-quote-card">{body_clean}</div>'
+            
+        idx = len(code_blocks)
+        code_blocks.append(rendered)
+        return f'\n\n@@@DIAGRAMTOKEN{idx}@@@\n\n'
+
+    code_pattern = re.compile(r'(?m)^' + bt3 + r'[^\n]*\n[\s\S]*?\n' + bt3 + r'[ \t]*$')
+    body_md = code_pattern.sub(repl_code_block, body_md)
+
+    # 3. Parse callouts and steppers on the unified markdown body
+    body_md = parse_callouts(body_md)
+    body_md = parse_steppers(body_md)
+    body_md = normalize_list_indentation(body_md)
+
+    # 4. Render main markdown into HTML
+    chunk_html = markdown.markdown(body_md, extensions=['extra', 'tables'])
+    chunk_html = format_tables_with_rtl(chunk_html)
+    chunk_html = transform_inline_elements(chunk_html)
+
+    # 5. Restore diagram placeholders inside their container
+    for i, block_html in enumerate(code_blocks):
+        token = f'@@@DIAGRAMTOKEN{i}@@@'
+        chunk_html = chunk_html.replace(f'<p>{token}</p>', block_html)
+        chunk_html = chunk_html.replace(f'<p>{token}', block_html)
+        chunk_html = chunk_html.replace(f'{token}</p>', block_html)
+        chunk_html = chunk_html.replace(token, block_html)
+
+    # 6. Unwrap any accidental <pre><code> blocks created by 4-space indentations
     def repl_pre(m):
         content = m.group(1).strip()
         if re.search(r'^\s*[*•\-\d]', content) or '<span class="med-measure"' in content or '<strong>' in content:
@@ -1270,8 +1280,8 @@ def render_part_body(body_md):
             return f'<div class="clinical-callout-card" style="margin-block: 10px;">{clean}</div>'
         return m.group(0)
 
-    full_html = re.sub(r'<pre><code>([\s\S]*?)</code></pre>', repl_pre, full_html)
-    return full_html
+    chunk_html = re.sub(r'<pre><code>([\s\S]*?)</code></pre>', repl_pre, chunk_html)
+    return chunk_html
 
 def parse_section_markdown(section_md):
     """
