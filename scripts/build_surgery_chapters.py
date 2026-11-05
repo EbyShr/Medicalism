@@ -431,6 +431,8 @@ def render_latex_to_html(raw):
 def format_math_expr(match):
     """Formats inline LaTeX math ($...$) into clean, human-readable medical markup."""
     raw = match.group(1).strip()
+    if raw in [r'\longrightarrow', r'\rightarrow', r'\to', r'\implies', '-->', '->']:
+        return ' ⬅️ '
     rendered = render_latex_to_html(raw)
     if rendered in ['⬅️', '➡️', '⬇️', '⬆️', '⇄']:
         return f' {rendered} '
@@ -462,10 +464,10 @@ def transform_inline_elements(text):
     # 3. Inline math expressions ($...$)
     text = re.sub(r'\$([^\$\n]+)\$', format_math_expr, text)
 
-    # Unescaped LaTeX arrows & symbols in raw text
-    text = re.sub(r'\\longrightarrow|\\rightarrow|\\to(?=\s)', ' ➡️ ', text)
+    # Unescaped LaTeX arrows & symbols in raw Persian text (RTL flow: forward direction is leftward ⬅️)
+    text = re.sub(r'\\longrightarrow|\\rightarrow|\\to(?=\s)', ' ⬅️ ', text)
     text = re.sub(r'\\longleftrightarrow|\\leftrightarrow', ' ⇄ ', text)
-    text = re.sub(r'\\implies', ' ➡️ ', text)
+    text = re.sub(r'\\implies', ' ⬅️ ', text)
     text = re.sub(r'\\uparrow', ' ↑ ', text)
     text = re.sub(r'\\downarrow', ' ↓ ', text)
     text = re.sub(r'\\(?:text|mathrm|mathbf|textbf)\{([^}]+)\}', r'\1', text)
@@ -655,8 +657,8 @@ def parse_split_diagram_robust(lines):
         s = raw_l.strip()
         if not s or all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in s):
             continue
-        l_bound = re.sub(r'\]\s*\[([⚠️🎯][^\]]*)\]', r' \1]', raw_l)
-        l_bound = re.sub(r'\)\s*\[([⚠️🎯][^\]]*)\]', r') \1', l_bound)
+        l_bound = re.sub(r'\][ \t]{0,3}\[([⚠️🎯][^\]]*)\]', r' \1]', raw_l)
+        l_bound = re.sub(r'\)[ \t]{0,3}\[([⚠️🎯][^\]]*)\]', r') \1', l_bound)
 
         for col_i in range(num_cols):
             b_start = bounds[col_i]
@@ -1008,7 +1010,7 @@ def render_approach2_clean_tree(lines, title):
 def is_progression_chain(raw):
     """Detects whether an expression represents a multi-step clinical progression sequence."""
     arrows = re.findall(r'\\longrightarrow|\\rightarrow|\\to(?=\s)|➡️|⬅️', raw)
-    keywords = ['wave', 'depression', 'prolongation', 'arrest', 'nausea', 'lethargy', 'dtr', 'death', 'coma', 'hypotension', 'bradycardia', 'ischemia', 'infarction', 'stenosis', 'reflux']
+    keywords = ['wave', 'depression', 'prolongation', 'arrest', 'nausea', 'lethargy', 'dtr', 'death', 'coma', 'hypotension', 'bradycardia', 'ischemia', 'infarction', 'stenosis', 'reflux', 'tensile', 'lag phase', 'normal skin']
     has_kw = any(k in raw.lower() for k in keywords)
     return len(arrows) >= 2 and has_kw
 
@@ -1446,6 +1448,132 @@ def render_approach3_nested_cards(lines, title, raw_text):
 </div>
 """
 
+def is_lethal_triad_diagram(lines):
+    """Detects the 3-corner traumatic lethal triad feedback cycle."""
+    text = '\n'.join(lines)
+    return ('اسیدوز' in text or 'Acidosis' in text) and \
+           ('هیپوترمی' in text or 'Hypothermia' in text) and \
+           ('کوآگولوپاتی' in text or 'Coagulopathy' in text)
+
+def render_lethal_triad_diagram(lines, title="مثلث کشنده تروما (The Lethal Triad)"):
+    """
+    Renders the 3-corner traumatic lethal triad vicious cycle as a specialized,
+    responsive medical feedback component.
+    """
+    return f'''<div class="lethal-triad-card" data-component="lethal-triad">
+  <div class="triad-header">
+    <span class="triad-title-badge">🚨 {title}</span>
+    <span class="triad-sub-badge">پاتوفیزیولوژی چرخه معیوب مرگبار خونریزی حاد (Trauma Lethal Triad)</span>
+  </div>
+  <div class="triad-grid">
+    <div class="triad-top-wrapper">
+      <div class="triad-node node-acidosis">
+        <div class="triad-node-icon">🔺</div>
+        <div class="triad-node-title">اسیدوز متابولیک (Acidosis)</div>
+        <div class="triad-node-val">pH &lt; 7.35</div>
+        <div class="triad-node-desc">افت عملکرد فاکتورهای انعقادی و مهار آنزیمی</div>
+      </div>
+    </div>
+    <div class="triad-node node-hypothermia">
+      <div class="triad-node-icon">❄️</div>
+      <div class="triad-node-title">هیپوترمی (Hypothermia)</div>
+      <div class="triad-node-val">Core Temp &lt; 35°C</div>
+      <div class="triad-node-desc">اختلال عملکرد پلاکت و کاهش کینتیک سنتز فیبرین</div>
+    </div>
+    <div class="triad-center-cycle">
+      <div class="cycle-spinner">🔄</div>
+      <div class="cycle-label">چرخه بازخورد مثبت</div>
+      <div class="cycle-sub">تشدید سه‌جانبه متقابل</div>
+    </div>
+    <div class="triad-node node-coagulopathy">
+      <div class="triad-node-icon">🩸</div>
+      <div class="triad-node-title">کوآگولوپاتی (Coagulopathy)</div>
+      <div class="triad-node-val">اختلال فاکتورها و پلاکت‌ها</div>
+      <div class="triad-node-desc">خونریزی مداوم و تشدید شوک و هیپوترمی</div>
+    </div>
+  </div>
+  <div class="triad-footer-alert">
+    <span class="alert-icon">⚡</span>
+    <span><strong>کلید شکستن چرخه مرگ:</strong> کنترل سریع منبع خونریزی مکانیکی + گرم کردن فعال بیمار و مایعات تزریقی (وارمر) + احیای متوازن بر پایه خون ۱:۱:۱ با حداقل کریستالوئید و اصلاح کلسیم.</span>
+  </div>
+</div>'''
+
+def is_vertical_timeline_diagram(code_content):
+    """Detects sequential chronological flows separated by vertical arrows (⬇️)."""
+    lines = [l.strip() for l in code_content.strip().splitlines() if l.strip()]
+    if not lines:
+        return False
+    # If it's a tree with ├──, └──, ┌, etc. let the tree parser handle it
+    if any(ch in code_content for ch in ['├──', '└──', '┌', '┐', '┤', '├', '┬', '┴']):
+        return False
+    down_arrows = sum(1 for l in lines if re.search(r'^(?:⬇️|⬇|▼)+$', l))
+    return down_arrows >= 1 and len(lines) >= 3
+
+def render_vertical_timeline_diagram(code_content, title="توالی مراحل بالینی و کرونولوژیک"):
+    """
+    Renders vertical chronological flows (separated by ⬇️) into a sleek,
+    responsive clinical timeline stepper component.
+    """
+    raw_lines = [l.strip() for l in code_content.strip().splitlines() if l.strip()]
+    step_chunks = []
+    curr = []
+    for l in raw_lines:
+        if re.search(r'^(?:⬇️|⬇|▼)+$', l):
+            if curr:
+                step_chunks.append(' '.join(curr))
+                curr = []
+        else:
+            curr.append(l)
+    if curr:
+        step_chunks.append(' '.join(curr))
+
+    steps_html = []
+    for idx, chunk in enumerate(step_chunks):
+        time_badge = ""
+        m_time = re.search(r'(\[(?:ساعت|روز|ماه|هفته|فاز|دقیقه)[^\]]*\]|\(ساعت\s*[\d\u06F0-\u06F9]+\))', chunk)
+        if m_time:
+            time_badge = m_time.group(1).strip('[]() ')
+            chunk_body = chunk.replace(m_time.group(0), '').strip()
+        elif re.match(r'^(گام\s*[\d\u06F0-\u06F9]+|مرحله\s*[\d\u06F0-\u06F9]+)[:\-]\s*(.*)$', chunk):
+            m_step = re.match(r'^(گام\s*[\d\u06F0-\u06F9]+|مرحله\s*[\d\u06F0-\u06F9]+)[:\-]\s*(.*)$', chunk)
+            time_badge = m_step.group(1)
+            chunk_body = m_step.group(2)
+        elif re.match(r'^\[(.*?)\]$', chunk):
+            time_badge = "اقدام / تشخیص"
+            chunk_body = chunk.strip('[] ')
+        else:
+            time_badge = "نقطه شروع / تریگر" if idx == 0 else f"مرحله {idx + 1}"
+            chunk_body = chunk
+
+        chunk_body = re.sub(r'^[⬅️➡️\s\-–—:]+', '', chunk_body).strip()
+        transformed = transform_inline_elements(chunk_body)
+
+        is_last = (idx == len(step_chunks) - 1)
+        step_cls = "timeline-step step-terminal" if is_last else "timeline-step"
+
+        steps_html.append(f'''    <div class="{step_cls}">
+      <div class="timeline-marker-col">
+        <div class="timeline-node-circle">{idx + 1}</div>
+        {'<div class="timeline-connector-line"></div>' if not is_last else ''}
+      </div>
+      <div class="timeline-content-card">
+        <div class="timeline-step-meta">
+          <span class="timeline-time-badge">{time_badge}</span>
+        </div>
+        <div class="timeline-step-body">{transformed}</div>
+      </div>
+    </div>''')
+
+    all_steps = '\n'.join(steps_html)
+    return f'''<div class="clinical-timeline-stepper" data-component="timeline-stepper">
+  <div class="timeline-header">
+    <span class="timeline-header-badge">⏱️ {title}</span>
+  </div>
+  <div class="timeline-steps-container">
+{all_steps}
+  </div>
+</div>'''
+
 # =========================================================================
 # MASTER DISPATCHER: ENFORCING 90% / 7% / 3% RATIO
 # =========================================================================
@@ -1465,7 +1593,11 @@ def parse_ascii_diagram(diagram_body):
     if not title:
         title = "الگوریتم تصمیم‌گیری بالینی لارنس"
 
-    # 0. Check for Fork-Join (Convergent Diamond) Diagrams (e.g. Hyperkalemia)
+    # 0a. Check for Lethal Triad Feedback Cycle
+    if is_lethal_triad_diagram(lines):
+        return render_lethal_triad_diagram(lines, title)
+
+    # 0b. Check for Fork-Join (Convergent Diamond) Diagrams (e.g. Hyperkalemia)
     if is_fork_join_diagram(lines):
         fj_res = render_fork_join_diagram(lines, title)
         if fj_res:
@@ -1667,8 +1799,15 @@ def render_part_body(body_md):
         code_content = re.sub(r'^' + bt3 + r'[^\n]*\n', '', full_block.strip())
         code_content = re.sub(r'\n' + bt3 + r'$', '', code_content)
         
+        lines = [l.strip() for l in code_content.strip().splitlines() if l.strip()]
         is_ascii = any(ch in code_content for ch in ['┌', '├', '└', '├──', '└──', '─', '━', '│', '╔', '╗', '╚', '╝', '║', '═'])
-        if is_ascii:
+        if is_lethal_triad_diagram(lines):
+            rendered = render_lethal_triad_diagram(lines, "مثلث کشنده تروما (The Lethal Triad)")
+        elif is_vertical_timeline_diagram(code_content):
+            first_l = lines[0] if lines else ""
+            diag_title = clean_diagram_title(first_l) or "توالی مراحل بالینی و کرونولوژیک"
+            rendered = render_vertical_timeline_diagram(code_content, diag_title)
+        elif is_ascii:
             rendered = parse_ascii_diagram(code_content)
         else:
             body_clean = markdown.markdown(normalize_list_indentation(code_content), extensions=['extra'])

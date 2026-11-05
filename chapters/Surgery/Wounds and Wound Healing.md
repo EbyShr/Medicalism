@@ -73,10 +73,7 @@
 | **ماه اول (Day 30)** | **۵۰٪ (50%)** | ساخت کلاژن به اوج نزدیک شده و ترمیم کششی تثبیت می‌شود |
 | **حداکثر نهایی اسکار (۶-۱۲ ماه)** | **حداکثر ۸۰٪ (80%)** | **هیچ زخمی هرگز به ۱۰۰٪ مقاومت اولیه پوست سالم بازنمی‌گردد** `[🎯 نکته تئوری]` |
 
-```
-Tensile Strength:
-Day 0-5 (Lag Phase) ➡️ Week 1 (5%) ➡️ Month 1 (50%) ➡️ Month 6-12 (Max 80% of normal skin)
-```
+$$\text{Tensile Strength: } \text{Day 0-5 (Lag Phase)} \longrightarrow \text{Week 1 (5%)} \longrightarrow \text{Month 1 (50%)} \longrightarrow \text{Month 6-12 (Max 80% of normal skin)}$$
 
 ---
 
