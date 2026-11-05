@@ -33,8 +33,8 @@ def build_exam_summary_html(md_path):
     ch_num_str = ch_num_match.group(1) if ch_num_match else ""
     tag_str = f"فصل {ch_num_str} جراحی لارنس" if ch_num_str else "جراحی لارنس"
 
-    # 2. Extract Tree Map
-    tree_match = re.search(r'## نقشه درختی ساختار فصل\s*\n(.*?)(?=\n---|\n## )', clean_md, re.DOTALL)
+    # 2. Extract Tree Map (supports both نقشه درختی and نقشه جامع)
+    tree_match = re.search(r'## نقشه (?:درختی|جامع) ساختار فصل\s*\n(.*?)(?=\n---|\n## )', clean_md, re.DOTALL)
     tree_html = ""
     if tree_match:
         tree_text = tree_match.group(1).strip()
@@ -74,8 +74,8 @@ def build_exam_summary_html(md_path):
                 </svg>
               </div>
               <div>
-                <h2 class="summary-tree-title">نقشه درختی ساختار فصل ({hero_title})</h2>
-                <span class="summary-tree-subtitle">ساختار درختی {len(branch_cards)} مبحث کلیدی و ارتباطات بالینی فصل {hero_title}</span>
+                <h2 class="summary-tree-title">نقشه ساختار فصل: {hero_title}</h2>
+                <span class="summary-tree-subtitle">ساختار درختی {len(branch_cards)} مبحث کلیدی و ارتباطات بالینی</span>
               </div>
             </div>
             <div class="summary-tree-grid">
@@ -126,7 +126,7 @@ def build_exam_summary_html(md_path):
             continue
         first_line = part.split('\n')[0].strip()
         # Skip Tree map and Master card sections
-        if 'نقشه درختی' in first_line or '⚡ جمع‌بندی' in first_line:
+        if 'ساختار فصل' in first_line or '⚡ جمع‌بندی' in first_line:
             continue
         
         lines = part.split('\n')
