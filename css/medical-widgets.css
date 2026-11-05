@@ -4768,3 +4768,488 @@ sub {
   background: rgba(56, 189, 248, 0.08);
   border-inline-start-color: #38bdf8;
 }
+
+/* ==========================================================================
+   1. CLINICAL PROGRESSION PIPELINES (ECG, Toxicity, Severity Chains)
+   Responsive Flex Pipeline with Forward Direction (➡️) & Outcome Badges
+   ========================================================================== */
+.clinical-progression-pipeline {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px 12px !important;
+  margin-block: 16px 20px !important;
+  padding: 14px 18px !important;
+  background: var(--bg-surface-secondary, #f8fafc) !important;
+  border: 1.5px solid var(--border-subtle, #e2e8f0) !important;
+  border-radius: var(--radius-lg, 12px) !important;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+[data-theme="dark"] .clinical-progression-pipeline {
+  background: rgba(30, 41, 59, 0.6) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.pipe-step {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 6px 14px !important;
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.2s ease !important;
+}
+
+[data-theme="dark"] .pipe-step {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+.pipe-step.step-highlight {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border-color: #f59e0b !important;
+  color: #b45309 !important;
+}
+
+[data-theme="dark"] .pipe-step.step-highlight {
+  background: rgba(245, 158, 11, 0.2) !important;
+  border-color: #fbbf24 !important;
+  color: #fbbf24 !important;
+}
+
+.pipe-step.step-terminal {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border-color: #ef4444 !important;
+  color: #b91c1c !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="dark"] .pipe-step.step-terminal {
+  background: rgba(239, 68, 68, 0.22) !important;
+  border-color: #f87171 !important;
+  color: #fca5a5 !important;
+}
+
+.pipe-arrow {
+  display: inline-flex !important;
+  align-items: center !important;
+  color: #64748b !important;
+  font-size: 1.1rem !important;
+  user-select: none !important;
+}
+
+[data-theme="dark"] .pipe-arrow {
+  color: #94a3b8 !important;
+}
+
+/* ==========================================================================
+   2. FORK-JOIN CONVERGENT FLOWCHARTS (.fork-join-card)
+   Diamond Protocols (Entry -> Split 2 Branches -> Bottom Shared Convergence)
+   ========================================================================== */
+.fork-join-card {
+  margin-block: 18px 24px !important;
+  padding: 16px 20px !important;
+  background: var(--bg-surface-secondary, #f8fafc) !important;
+  border: 1.5px solid var(--border-subtle, #cbd5e1) !important;
+  border-radius: var(--radius-lg, 12px) !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05) !important;
+}
+
+[data-theme="dark"] .fork-join-card {
+  background: rgba(30, 41, 59, 0.65) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.fj-canvas {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  margin-block-start: 12px !important;
+}
+
+.fj-entry-card {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.08), rgba(99, 102, 241, 0.08)) !important;
+  border: 1.5px solid #0284c7 !important;
+  border-radius: 10px !important;
+  padding: 12px 16px !important;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.1) !important;
+}
+
+[data-theme="dark"] .fj-entry-card {
+  background: rgba(2, 132, 199, 0.15) !important;
+  border-color: #38bdf8 !important;
+}
+
+.fj-entry-icon {
+  font-size: 1.3rem !important;
+  flex-shrink: 0 !important;
+}
+
+.fj-entry-text {
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  color: var(--text-primary, #0f172a) !important;
+}
+
+[data-theme="dark"] .fj-entry-text {
+  color: #f1f5f9 !important;
+}
+
+.fj-split-bridge,
+.fj-converge-bridge {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin-block: 2px !important;
+}
+
+.fj-split-arrow,
+.fj-converge-arrow {
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  background: #f1f5f9 !important;
+  padding: 2px 10px !important;
+  border-radius: 9999px !important;
+  border: 1px dashed #cbd5e1 !important;
+}
+
+[data-theme="dark"] .fj-split-arrow,
+[data-theme="dark"] .fj-converge-arrow {
+  background: #1e293b !important;
+  color: #94a3b8 !important;
+  border-color: #334155 !important;
+}
+
+.fj-branches-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 16px !important;
+}
+
+@media (max-width: 640px) {
+  .fj-branches-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.fj-branch-card {
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 10px !important;
+  padding: 12px 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="dark"] .fj-branch-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.fj-branch-card.branch-primary {
+  border-inline-start: 4px solid #10b981 !important;
+}
+
+.fj-branch-card.branch-secondary {
+  border-inline-start: 4px solid #ef4444 !important;
+}
+
+.fj-branch-header {
+  margin-block-end: 4px !important;
+}
+
+.fj-branch-body,
+.fj-conv-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+
+.fj-action-pill {
+  padding: 6px 10px !important;
+  background: rgba(2, 132, 199, 0.04) !important;
+  border: 1px solid rgba(2, 132, 199, 0.15) !important;
+  border-radius: 6px !important;
+  font-size: 0.9rem !important;
+  color: var(--text-primary, #0f172a) !important;
+  line-height: 1.5 !important;
+}
+
+[data-theme="dark"] .fj-action-pill {
+  background: rgba(56, 189, 248, 0.06) !important;
+  border-color: rgba(56, 189, 248, 0.2) !important;
+  color: #e2e8f0 !important;
+}
+
+.fj-convergence-card {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(2, 132, 199, 0.06)) !important;
+  border: 2px solid #10b981 !important;
+  border-radius: 10px !important;
+  padding: 14px 16px !important;
+  box-shadow: 0 3px 10px rgba(16, 185, 129, 0.12) !important;
+}
+
+[data-theme="dark"] .fj-convergence-card {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-color: #34d399 !important;
+}
+
+.fj-conv-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-block-end: 10px !important;
+}
+
+.fj-conv-title {
+  font-weight: 800 !important;
+  font-size: 0.98rem !important;
+  color: #065f46 !important;
+}
+
+[data-theme="dark"] .fj-conv-title {
+  color: #6ee7b7 !important;
+}
+
+/* ==========================================================================
+   3. SLEEK PEARL & TRAP TYPOGRAPHY (Zero Tag Clutter)
+   ========================================================================== */
+.pearl-highlight {
+  display: inline-flex !important;
+  align-items: center !important;
+  vertical-align: middle !important;
+  margin-inline: 4px !important;
+  cursor: help !important;
+}
+
+.pearl-micro-dot {
+  display: inline-block !important;
+  width: 8px !important;
+  height: 8px !important;
+  border-radius: 50% !important;
+  background: #0d9488 !important;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.25) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.pearl-highlight:hover .pearl-micro-dot {
+  transform: scale(1.3) !important;
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.4) !important;
+}
+
+[data-theme="dark"] .pearl-micro-dot {
+  background: #2dd4bf !important;
+  box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.3) !important;
+}
+
+.trap-highlight {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  vertical-align: middle !important;
+  padding: 1px 7px !important;
+  margin-inline: 4px !important;
+  border-radius: 9999px !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+  border: 1px solid rgba(239, 68, 68, 0.28) !important;
+  color: #dc2626 !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  cursor: help !important;
+  transition: all 0.2s ease !important;
+}
+
+.trap-highlight .trap-zap {
+  font-size: 0.75rem !important;
+  line-height: 1 !important;
+}
+
+.trap-highlight:hover {
+  background: rgba(239, 68, 68, 0.16) !important;
+  border-color: rgba(239, 68, 68, 0.5) !important;
+}
+
+[data-theme="dark"] .trap-highlight {
+  background: rgba(239, 68, 68, 0.16) !important;
+  border-color: rgba(248, 113, 113, 0.35) !important;
+  color: #f87171 !important;
+}
+
+/* ==========================================================================
+   4. THE 5 CLINICAL STEP COLOR THEMES (گام ۱ تا ۵)
+   ========================================================================== */
+/* Step 1: Royal Blue / Indigo (تظاهرات و معاینه) */
+.step-theme-blue .step-num-bubble {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35) !important;
+}
+.step-theme-blue .step-connector-line {
+  background: linear-gradient(to bottom, #2563eb 0%, rgba(37, 99, 235, 0.2) 100%) !important;
+}
+.step-theme-blue.clinical-step .step-content-card {
+  border-inline-start: 4px solid #2563eb !important;
+  background: #ffffff !important;
+  border: 1.5px solid rgba(37, 99, 235, 0.35) !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.06) !important;
+}
+.step-theme-blue .step-tag-pill {
+  background: rgba(37, 99, 235, 0.12) !important;
+  color: #2563eb !important;
+  border-color: rgba(37, 99, 235, 0.35) !important;
+}
+
+/* Step 2: Emergency Crimson / Rose (تریاژ و احیا) */
+.step-theme-rose .step-num-bubble {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.35) !important;
+}
+.step-theme-rose .step-connector-line {
+  background: linear-gradient(to bottom, #ef4444 0%, rgba(239, 68, 68, 0.2) 100%) !important;
+}
+.step-theme-rose.clinical-step .step-content-card {
+  border-inline-start: 4px solid #ef4444 !important;
+  background: #ffffff !important;
+  border: 1.5px solid rgba(239, 68, 68, 0.35) !important;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.06) !important;
+}
+.step-theme-rose .step-tag-pill {
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: #dc2626 !important;
+  border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+/* Step 3: Warm Amber / Gold (درخت تصمیم‌گیری تشخیصی) */
+.step-theme-amber .step-num-bubble {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.35) !important;
+}
+.step-theme-amber .step-connector-line {
+  background: linear-gradient(to bottom, #f59e0b 0%, rgba(245, 158, 11, 0.2) 100%) !important;
+}
+.step-theme-amber.clinical-step .step-content-card {
+  border-inline-start: 4px solid #f59e0b !important;
+  background: #ffffff !important;
+  border: 1.5px solid rgba(245, 158, 11, 0.35) !important;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.06) !important;
+}
+.step-theme-amber .step-tag-pill {
+  background: rgba(245, 158, 11, 0.12) !important;
+  color: #b45309 !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+}
+
+/* Step 4: Surgical Emerald Green (تصمیم‌گیری درمانی و جراحی) */
+.step-theme-emerald .step-num-bubble {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35) !important;
+}
+.step-theme-emerald .step-connector-line {
+  background: linear-gradient(to bottom, #10b981 0%, rgba(16, 185, 129, 0.2) 100%) !important;
+}
+.step-theme-emerald.clinical-step .step-content-card {
+  border-inline-start: 4px solid #10b981 !important;
+  background: #ffffff !important;
+  border: 1.5px solid rgba(16, 185, 129, 0.35) !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.06) !important;
+}
+.step-theme-emerald .step-tag-pill {
+  background: rgba(16, 185, 129, 0.12) !important;
+  color: #047857 !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+}
+
+/* Step 5: Deep Violet / Purple (مراقبت بعد از عمل و عوارض) */
+.step-theme-purple .step-num-bubble {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+  box-shadow: 0 4px 10px rgba(139, 92, 246, 0.35) !important;
+}
+.step-theme-purple .step-connector-line {
+  background: linear-gradient(to bottom, #8b5cf6 0%, rgba(139, 92, 246, 0.2) 100%) !important;
+}
+.step-theme-purple.clinical-step .step-content-card {
+  border-inline-start: 4px solid #8b5cf6 !important;
+  background: #ffffff !important;
+  border: 1.5px solid rgba(139, 92, 246, 0.35) !important;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.06) !important;
+}
+.step-theme-purple .step-tag-pill {
+  background: rgba(139, 92, 246, 0.12) !important;
+  color: #6d28d9 !important;
+  border-color: rgba(139, 92, 246, 0.35) !important;
+}
+
+/* Dark theme overrides for all 5 step themes */
+[data-theme="dark"] .step-theme-blue.clinical-step .step-content-card {
+  background: rgba(30, 41, 59, 0.75) !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+}
+[data-theme="dark"] .step-theme-rose.clinical-step .step-content-card {
+  background: rgba(30, 41, 59, 0.75) !important;
+  border-color: rgba(248, 113, 113, 0.35) !important;
+}
+[data-theme="dark"] .step-theme-amber.clinical-step .step-content-card {
+  background: rgba(30, 41, 59, 0.75) !important;
+  border-color: rgba(251, 191, 36, 0.35) !important;
+}
+[data-theme="dark"] .step-theme-emerald.clinical-step .step-content-card {
+  background: rgba(30, 41, 59, 0.75) !important;
+  border-color: rgba(52, 211, 153, 0.35) !important;
+}
+[data-theme="dark"] .step-theme-purple.clinical-step .step-content-card {
+  background: rgba(30, 41, 59, 0.75) !important;
+  border-color: rgba(167, 139, 250, 0.35) !important;
+}
+
+/* ==========================================================================
+   5. SEAMLESS EMBEDDED DIAGRAMS INSIDE STEPPERS & CARDS
+   ========================================================================== */
+.step-card-body .clinical-flowchart-card,
+.step-card-body .ctree-diagram {
+  margin-block: 14px 18px !important;
+  background: rgba(2, 132, 199, 0.03) !important;
+  border: 1.5px dashed rgba(2, 132, 199, 0.35) !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+[data-theme="dark"] .step-card-body .clinical-flowchart-card,
+[data-theme="dark"] .step-card-body .ctree-diagram {
+  background: rgba(15, 23, 42, 0.5) !important;
+  border-color: rgba(56, 189, 248, 0.3) !important;
+}
+
+/* Universal ordered list fix - eliminates double numbering in all clinical cards */
+ol {
+  list-style: none !important;
+}
+ol > li::marker {
+  content: "" !important;
+  display: none !important;
+}
+
+/* Medical vibrant accent for bold terms inside bullets */
+.clinical-part-card ul > li strong:not(.term-en-bold),
+.step-card-body ul > li strong:not(.term-en-bold) {
+  color: #0369a1 !important;
+}
+
+[data-theme="dark"] .clinical-part-card ul > li strong:not(.term-en-bold),
+[data-theme="dark"] .step-card-body ul > li strong:not(.term-en-bold) {
+  color: #38bdf8 !important;
+}

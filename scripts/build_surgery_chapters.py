@@ -357,11 +357,12 @@ def render_latex_to_html(raw):
     s = s.replace(r'\,', ' ').replace(r'\quad', '  ').replace(r'\qquad', '    ')
     s = s.replace(r'\%', '%').replace(r'\_', '_').replace(r'\&', '&')
     
-    # 2. Arrows & logic
+    # 2. Arrows & logic (in LTR formulas, forward direction is rightward)
     s = re.sub(r'\\xrightarrow\{([^}]+)\}', r' ──[\1]──> ', s)
-    s = s.replace(r'\longrightarrow', ' ⬅️ ').replace(r'\rightarrow', ' ⬅️ ').replace(r'\to', ' ⬅️ ')
+    s = s.replace(r'\longrightarrow', ' ➡️ ').replace(r'\rightarrow', ' ➡️ ').replace(r'\to', ' ➡️ ')
     s = s.replace(r'\longleftrightarrow', ' ⇄ ').replace(r'\leftrightarrow', ' ⇄ ')
-    s = s.replace(r'\implies', ' ⬅️ ')
+    s = s.replace(r'\implies', ' ➡️ ')
+    s = s.replace(r'\uparrow', ' ↑ ').replace(r'\downarrow', ' ↓ ')
     
     # 3. Greek & math symbols
     s = s.replace(r'\Delta', 'Δ').replace(r'\pi', 'π').replace(r'\eta', 'η').replace(r'\mu', 'µ')
@@ -423,43 +424,55 @@ def transform_inline_elements(text):
     Transforms inline badges, math, arrows, English medical terms,
     lead keywords, and decision pills with rich colors and zero broken variation selectors.
     """
-    # 1. Flexible Inline Theory badge
+    # 1. Flexible Inline Theory badge -> clean subtle pearl marker, zero tag clutter!
     def repl_theory(m):
         inner = m.group(1).strip() if m.group(1) else ""
         punct = m.group(2) or ''
         tooltip = f'نکته تئوری: {inner}' if len(inner) > 5 else 'نکته تئوری امتحانی'
-        return f'{punct} <span class="badge-theory pearl-micro-badge" data-exam-point="theory" title="{tooltip}"><span class="badge-icon" aria-hidden="true">🎯</span><span class="badge-text sr-only">نکته تئوری</span></span>'
+        return f'{punct} <span class="pearl-highlight badge-theory" data-tag="theory-pearl" data-exam-point="theory" title="{tooltip}"><span class="pearl-micro-dot"></span></span>'
 
-    text = re.sub(r'`?\[🎯[ \t]*(.*?)\]`?[ \t]*([\.،؛:!؟\?]?)', repl_theory, text)
+    text = re.sub(r'(?:<code>)?`?\[🎯[ \t]*(.*?)\]`?(?:</code>)?[ \t]*([\.،؛:!؟\?]?)', repl_theory, text)
 
-    # 2. Flexible Inline Trap badge
+    # 2. Flexible Inline Trap badge -> subtle alert icon, zero text clutter!
     def repl_trap(m):
         inner = m.group(1).strip() if m.group(1) else ""
         punct = m.group(2) or ''
-        label = "دام تستی"
-        if "بزرگ" in inner or "فوق‌العاده" in inner or "بسیار مهم" in inner:
-            label = "تله ماژور"
-        elif "خط قرمز" in inner or "Never Do" in inner:
-            label = "خط قرمز"
         tooltip = f'تله امتحانی: {inner}' if len(inner) > 5 else 'تله و دام امتحانی'
-        return f'{punct} <span class="badge-trap trap-micro-badge" data-exam-point="trap" title="{tooltip}"><span class="badge-icon" aria-hidden="true">⚠️</span><span class="trap-label-mini">{label}</span><span class="badge-text sr-only">{inner}</span></span>'
+        return f'{punct} <span class="trap-highlight badge-trap" data-tag="exam-trap" data-exam-point="trap" title="{tooltip}"><span class="trap-zap">⚡</span><span class="trap-label-text">تله امتحانی</span></span>'
 
-    text = re.sub(r'`?\[⚠️[ \t]*(.*?)\]`?[ \t]*([\.،؛:!؟\?]?)', repl_trap, text)
+    text = re.sub(r'(?:<code>)?`?\[⚠️[ \t]*(.*?)\]`?(?:</code>)?[ \t]*([\.،؛:!؟\?]?)', repl_trap, text)
     
     # 3. Inline math expressions ($...$)
     text = re.sub(r'\$([^\$\n]+)\$', format_math_expr, text)
 
-    # Unescaped LaTeX arrows in raw text
-    text = re.sub(r'\\longrightarrow|\\rightarrow|\\to(?=\s)', ' ⬅️ ', text)
+    # Unescaped LaTeX arrows & symbols in raw text
+    text = re.sub(r'\\longrightarrow|\\rightarrow|\\to(?=\s)', ' ➡️ ', text)
     text = re.sub(r'\\longleftrightarrow|\\leftrightarrow', ' ⇄ ', text)
-    text = re.sub(r'\\implies', ' ⬅️ ', text)
+    text = re.sub(r'\\implies', ' ➡️ ', text)
+    text = re.sub(r'\\uparrow', ' ↑ ', text)
+    text = re.sub(r'\\downarrow', ' ↓ ', text)
 
     # 4. Directional arrows (safe non-capturing alternation to protect multi-byte variation selectors)
     text = re.sub(r'(?:⬅️|➡️|⬇️|⬆️)', r'<span class="stepper-arrow-indicator">\g<0></span>', text)
 
-    # Plain text superscripts and subscripts (e.g. HCO3^- or kg/m^2 or Na^+ without dollar signs)
-    text = re.sub(r'([a-zA-Z0-9\)])\^([0-9\+\-\*]+)', r'\1<sup>\2</sup>', text)
-    text = re.sub(r'([a-zA-Z0-9\)])_([0-9]+)', r'\1<sub>\2</sub>', text)
+    # Medical ions, gases and chemical superscripts / subscripts
+    text = re.sub(r'\b(PaCO|PaO|PvCO|PvO|SaO|SpO|FiO|EtCO)2\b', r'\1<sub>2</sub>', text)
+    text = re.sub(r'\bCO2\b', 'CO<sub>2</sub>', text)
+    text = re.sub(r'\bH2O\b', 'H<sub>2</sub>O', text)
+    text = re.sub(r'\bH2CO3\b', 'H<sub>2</sub>CO<sub>3</sub>', text)
+    text = re.sub(r'\bHCO3\^?[-–—]?\b', 'HCO<sub>3</sub><sup>-</sup>', text)
+    text = re.sub(r'\bHCO_3\^?\{?[-–—]?\}?\b', 'HCO<sub>3</sub><sup>-</sup>', text)
+    text = re.sub(r'\bPO4\^?\{?3-?\}?\b', 'PO<sub>4</sub><sup>3-</sup>', text)
+    text = re.sub(r'\bNa\^?\+\b', 'Na<sup>+</sup>', text)
+    text = re.sub(r'\bK\^?\+\b', 'K<sup>+</sup>', text)
+    text = re.sub(r'\bCa\^?\{?2\+?\}?\b', 'Ca<sup>2+</sup>', text)
+    text = re.sub(r'\bMg\^?\{?2\+?\}?\b', 'Mg<sup>2+</sup>', text)
+    text = re.sub(r'\bH\^?\+\b', 'H<sup>+</sup>', text)
+    text = re.sub(r'\bCl\^?[-–—]\b', 'Cl<sup>-</sup>', text)
+
+    # Plain text superscripts and subscripts (e.g. kg/m^2 or general carets)
+    text = re.sub(r'([a-zA-Z0-9\)>])\^\{?([0-9\+\-\*]+)\}?', r'\1<sup>\2</sup>', text)
+    text = re.sub(r'([a-zA-Z0-9\)])_\{?([0-9]+)\}?', r'\1<sub>\2</sub>', text)
 
     # 5. English terms in parentheses: (Term) -> pill
     def repl_paren(m):
@@ -666,8 +679,39 @@ def parse_split_diagram_robust(lines):
                 root_node['children'].append(branch_node)
                 continue
 
+        # Multi-line column zipping for sub-splits (e.g. [خارج صفاقی] [داخل صفاقی])
+        grouped_items = []
+        k = 0
+        while k < len(rem_items):
+            it_k = rem_items[k]
+            parts_k = [p.strip() for p in re.split(r'\s{2,}', it_k) if p.strip()]
+            if len(parts_k) >= 2 and not it_k.strip().startswith('•') and not it_k.strip().startswith('-'):
+                sub_rows = [parts_k]
+                m = k + 1
+                while m < len(rem_items):
+                    it_m = rem_items[m]
+                    parts_m = [p.strip() for p in re.split(r'\s{2,}', it_m) if p.strip()]
+                    if len(parts_m) == len(parts_k) and not it_m.strip().startswith('•') and not it_m.strip().startswith('-'):
+                        sub_rows.append(parts_m)
+                        m += 1
+                    else:
+                        break
+                if len(sub_rows) >= 2:
+                    for col_sub_i in range(len(parts_k)):
+                        col_chain = ' '.join(r[col_sub_i] for r in sub_rows)
+                        m_brk = re.match(r'^\s*\[([^\]]+)\]\s*(.*)$', col_chain)
+                        if m_brk:
+                            col_clean = f"{m_brk.group(1)}: {m_brk.group(2)}".strip(' :')
+                        else:
+                            col_clean = re.sub(r'^[🎯⚠️\[\]\s*#]+|[\[\]\s*#]+$', '', col_chain).strip()
+                        grouped_items.append(col_clean)
+                    k = m
+                    continue
+            grouped_items.append(it_k)
+            k += 1
+
         bullet_buffer = []
-        for it in rem_items:
+        for it in grouped_items:
             it_clean = clean_tree_text(it)
             it_clean = re.sub(r'\[([^\]]+)\]', r'\1', it_clean).strip()
             
@@ -687,13 +731,10 @@ def parse_split_diagram_robust(lines):
                         'level': 2
                     })
                     bullet_buffer = []
-                sub_node = {'text': 'انشعاب تصمیم‌گیری بالینی:', 'children': [], 'level': 2}
                 for sp in sub_parts:
                     sp_clean = re.sub(r'^[🎯⚠️\[\]\s*#]+|[\[\]\s*#]+$', '', sp).strip()
                     if sp_clean:
-                        sub_node['children'].append({'text': sp_clean, 'children': [], 'level': 3})
-                if sub_node['children']:
-                    branch_node['children'].append(sub_node)
+                        branch_node['children'].append({'text': sp_clean, 'children': [], 'level': 2})
             elif it_clean.startswith('•') or it_clean.startswith('-'):
                 bullet_buffer.append(it_clean.lstrip('•- '))
             else:
@@ -896,6 +937,175 @@ def render_approach2_clean_tree(lines, title):
   </div>
 </div>
 """
+
+# =========================================================================
+# CLINICAL PROGRESSION PIPELINES & FORK-JOIN CONVERGENT DIAGRAMS
+# =========================================================================
+def is_progression_chain(raw):
+    """Detects whether an expression represents a multi-step clinical progression sequence."""
+    arrows = re.findall(r'\\longrightarrow|\\rightarrow|\\to(?=\s)|➡️|⬅️', raw)
+    keywords = ['wave', 'depression', 'prolongation', 'arrest', 'nausea', 'lethargy', 'dtr', 'death', 'coma', 'hypotension', 'bradycardia', 'ischemia', 'infarction', 'stenosis', 'reflux']
+    has_kw = any(k in raw.lower() for k in keywords)
+    return len(arrows) >= 2 and has_kw
+
+def render_progression_pipeline(raw):
+    """
+    Renders an arrow progression sequence as a responsive flex pipeline
+    with forward arrows (➡️) and distinct highlighting for terminal outcomes.
+    Zero text truncation or reversed direction.
+    """
+    parts = re.split(r'\\longrightarrow|\\rightarrow|\\to(?=\s)|➡️|⬅️', raw)
+    steps = []
+    for p in parts:
+        clean_p = p.strip()
+        if not clean_p:
+            continue
+        is_term = any(term in clean_p.lower() for term in ['arrest', 'death', 'coma', 'shock', 'failure'])
+        is_hl = r'\mathbf' in clean_p or 'dtr' in clean_p.lower()
+        rendered_p = render_latex_to_html(clean_p)
+        steps.append((rendered_p, is_term, is_hl))
+        
+    pipeline_items = []
+    for idx, (step_h, is_term, is_hl) in enumerate(steps):
+        classes = ['pipe-step']
+        if is_term:
+            classes.append('step-terminal')
+        if is_hl:
+            classes.append('step-highlight')
+        cls_str = ' '.join(classes)
+        pipeline_items.append(f'<span class="{cls_str}">{step_h}</span>')
+        if idx < len(steps) - 1:
+            pipeline_items.append('<span class="pipe-arrow">➡️</span>')
+            
+    items_html = '\n'.join(pipeline_items)
+    return f'<div class="clinical-progression-pipeline" dir="ltr">{items_html}</div>'
+
+def is_fork_join_diagram(lines):
+    """Detects convergent flowcharts with a fork (┌─┴─┐) and a join (└─┬─┘)."""
+    has_fork = any(('┌' in l or '┬' in l) and ('┴' in l or '─' in l) for l in lines)
+    has_join = any(('└' in l or '┘' in l) and ('┬' in l or '┴' in l) and ('─' in l or '━' in l) for l in lines[3:])
+    return has_fork and has_join
+
+def render_fork_join_diagram(lines, title="الگوریتم تصمیم‌گیری بالینی"):
+    """
+    Parses a fork-join diagram into:
+    1. Top entry question card
+    2. Side-by-side branch columns (e.g. Yes / No)
+    3. Joined convergence action card spanning 100% width at the bottom.
+    Zero text cutting or column bleeding.
+    """
+    fork_idx = -1
+    join_idx = -1
+    for i, l in enumerate(lines):
+        if fork_idx == -1 and ('┌' in l or '┬' in l) and ('┴' in l or '─' in l):
+            fork_idx = i
+        elif fork_idx != -1 and ('└' in l or '┘' in l) and ('┬' in l or '┴' in l) and ('─' in l or '━' in l):
+            join_idx = i
+            break
+            
+    if fork_idx == -1 or join_idx == -1:
+        return None
+
+    # Entry lines (before fork)
+    entry_lines = []
+    for l in lines[:fork_idx]:
+        c = clean_tree_text(l)
+        if c and not all(ch in '│┃▼ \t' for ch in c) and c != title:
+            entry_lines.append(c)
+    entry_text = ' '.join(entry_lines) if entry_lines else title
+
+    f_line = lines[fork_idx]
+    c_pos = f_line.find('┴')
+    if c_pos == -1:
+        c_pos = len(f_line) // 2
+
+    left_raw = []
+    right_raw = []
+    for l in lines[fork_idx+1:join_idx]:
+        if not l.strip() or all(ch in '│┃▼ \t' for ch in l):
+            continue
+        left_slice = l[:c_pos].strip()
+        right_slice = l[c_pos:].strip() if len(l) > c_pos else ""
+        if left_slice and not all(ch in '│┃▼ \t' for ch in left_slice):
+            left_raw.append(left_slice)
+        if right_slice and not all(ch in '│┃▼ \t' for ch in right_slice):
+            right_raw.append(right_slice)
+
+    def assemble_branch(raw_items, default_label):
+        label = default_label
+        items = []
+        for it in raw_items:
+            c = clean_tree_text(it)
+            c = re.sub(r'^[▼►◄▲\s]+', '', c).strip()
+            if not c:
+                continue
+            if 'بله' in c or 'Yes' in c:
+                label = 'بله'
+                c = re.sub(r'\[?(?:بله|Yes)\]?', '', c).strip()
+            elif 'خیر' in c or 'No' in c:
+                label = 'خیر'
+                c = re.sub(r'\[?(?:خیر|No)\]?', '', c).strip()
+            if c:
+                items.append(c)
+        return label, items
+
+    l_label, l_items = assemble_branch(left_raw, "مسیر اول")
+    r_label, r_items = assemble_branch(right_raw, "مسیر دوم")
+
+    converge_items = []
+    for l in lines[join_idx+1:]:
+        c = clean_tree_text(l)
+        c = re.sub(r'^[▼►◄▲\s]+', '', c).strip()
+        if c and not all(ch in '│┃▼ \t' for ch in c):
+            converge_items.append(c)
+
+    def format_item_list(items):
+        out = []
+        for it in items:
+            it_h = transform_inline_elements(it)
+            out.append(f'<div class="fj-action-pill">{it_h}</div>')
+        return '\n'.join(out)
+
+    entry_h = transform_inline_elements(entry_text)
+    l_content = format_item_list(l_items)
+    r_content = format_item_list(r_items)
+    conv_content = format_item_list(converge_items)
+
+    is_l_yes = ('بله' in l_label or 'Yes' in l_label)
+    l_badge_cls = 'badge-yes' if is_l_yes else 'badge-no'
+    r_badge_cls = 'badge-no' if is_l_yes else 'badge-yes'
+
+    html = f'''
+<div class="clinical-flowchart-card animated-diagram fork-join-card" data-flowchart="true">
+  <div class="flowchart-header">
+    <div class="flowchart-badge"><span class="flowchart-pulse-ring"></span> الگوریتم درختی بالینی لارنس</div>
+    <h4 class="flowchart-title">{title}</h4>
+  </div>
+  <div class="fj-canvas">
+    <div class="fj-entry-card">
+      <div class="fj-entry-icon">🩺</div>
+      <div class="fj-entry-text">{entry_h}</div>
+    </div>
+    <div class="fj-split-bridge"><span class="fj-split-arrow">⬇️ انشعاب تشخیصی</span></div>
+    <div class="fj-branches-grid">
+      <div class="fj-branch-card branch-primary">
+        <div class="fj-branch-header"><span class="badge-decision {l_badge_cls}">{l_label}</span></div>
+        <div class="fj-branch-body">{l_content}</div>
+      </div>
+      <div class="fj-branch-card branch-secondary">
+        <div class="fj-branch-header"><span class="badge-decision {r_badge_cls}">{r_label}</span></div>
+        <div class="fj-branch-body">{r_content}</div>
+      </div>
+    </div>
+    <div class="fj-converge-bridge"><span class="fj-converge-arrow">⬇️ اقدام نهایی مشترک</span></div>
+    <div class="fj-convergence-card">
+      <div class="fj-conv-header"><span class="fj-conv-icon">🎯</span> <span class="fj-conv-title">اقدام قطعی و گام مشترک پروتکل</span></div>
+      <div class="fj-conv-body">{conv_content}</div>
+    </div>
+  </div>
+</div>
+'''
+    return html
 
 # =========================================================================
 # APPROACH 1: MODERN HIERARCHICAL MEDICAL TREE (7% of diagrams)
@@ -1191,6 +1401,12 @@ def parse_ascii_diagram(diagram_body):
     if not title:
         title = "الگوریتم تصمیم‌گیری بالینی لارنس"
 
+    # 0. Check for Fork-Join (Convergent Diamond) Diagrams (e.g. Hyperkalemia)
+    if is_fork_join_diagram(lines):
+        fj_res = render_fork_join_diagram(lines, title)
+        if fj_res:
+            return fj_res
+
     # 1. Approach 1 (7% of cases)
     if any(kw in diagram_body for kw in APPROACH_1_KEYWORDS):
         return render_approach1_visual_tree(lines, title, diagram_body)
@@ -1265,6 +1481,10 @@ def format_tables_with_rtl(html_content):
     html_content = re.sub(r'<table>', r'<div class="table-responsive"><table class="data-table clinical-table" dir="rtl">', html_content)
     html_content = re.sub(r'</table>', r'</table></div>', html_content)
 
+    # Clean any unparsed markdown asterisks inside table cells
+    html_content = re.sub(r'\*\*([^\*\n]+)\*\*', r'<strong>\1</strong>', html_content)
+    html_content = html_content.replace('**', '')
+
     # Integrate table caption headers (<h4 id="...">جدول...</h4>) directly into clinical table wrapper
     def repl_table_cap(m):
         cap_text = m.group(1).strip()
@@ -1320,9 +1540,14 @@ def parse_callouts(text):
     return pattern.sub(repl, text)
 
 def parse_steppers(text):
-    """Parses sequential multi-step encounters into interactive steppers."""
+    """Parses sequential multi-step encounters into interactive steppers with vibrant 5-color thematic palettes."""
     pattern = re.compile(r'(?m)^#{3,4}\s*(گام\s*[\d\u06F0-\u06F9]+|مرحله\s*[\d\u06F0-\u06F9]+|فاز\s*[\d\u06F0-\u06F9]+)[:\s\-—]*(.*?)\n([\s\S]*?)(?=(?:^#{3,4}\s*(?:گام|مرحله|فاز)|^###|^##|\Z))')
     
+    theme_map = {
+        '۱': 'blue', '۲': 'rose', '۳': 'amber', '۴': 'emerald', '۵': 'purple',
+        '1': 'blue', '2': 'rose', '3': 'amber', '4': 'emerald', '5': 'purple'
+    }
+
     def repl(m):
         step_badge = m.group(1).strip()
         step_title = m.group(2).strip()
@@ -1330,9 +1555,10 @@ def parse_steppers(text):
         step_html = markdown.markdown(normalize_list_indentation(step_body_md), extensions=['extra'])
         step_html = transform_inline_elements(step_html)
         step_num = re.sub(r'[^\d\u06F0-\u06F9]', '', step_badge) or '۱'
+        theme = theme_map.get(step_num, 'blue')
         
         return f"""
-<div class="stepper-item clinical-step">
+<div class="stepper-item clinical-step step-theme-{theme}">
   <div class="step-badge-col">
     <span class="step-num-bubble">{step_num}</span>
     <span class="step-connector-line"></span>
@@ -1358,10 +1584,14 @@ def render_part_body(body_md):
     formula_blocks = []
     def repl_display_math(m):
         raw_formula = m.group(1).strip()
-        rendered_formula = render_latex_to_html(raw_formula)
-        box_html = f'<div class="med-formula-box" dir="ltr">{rendered_formula}</div>'
+        if is_progression_chain(raw_formula):
+            rendered_box = render_progression_pipeline(raw_formula)
+        else:
+            rendered_formula = render_latex_to_html(raw_formula)
+            rendered_formula = transform_inline_elements(rendered_formula)
+            rendered_box = f'<div class="med-formula-box" dir="ltr">{rendered_formula}</div>'
         idx = len(formula_blocks)
-        formula_blocks.append(box_html)
+        formula_blocks.append(rendered_box)
         return f'\n\n@@@FORMULATOKEN{idx}@@@\n\n'
 
     body_md = re.sub(r'\$\$([\s\S]*?)\$\$', repl_display_math, body_md)
@@ -1455,6 +1685,8 @@ def parse_section_markdown(section_md):
     for i, p in enumerate(part_matches):
         p_num = p.group(1) or str(i+1)
         p_title = p.group(2).strip()
+        p_title = re.sub(r'(?:<code>)?`?\[(?:🎯|⚠️)[^\]]*\]`?(?:</code>)?', '', p_title).strip()
+        p_title = transform_inline_elements(p_title)
         p_chunk = section_md[splits[i]:splits[i+1]]
         
         if any(w in p_title for w in ['مبانی', 'پاتوفیزیولوژی', 'اصول']):
