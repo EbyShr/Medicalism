@@ -1,22 +1,14 @@
-import os
-import re
-import sys
+import glob, sys, re, os
+sys.stdout.reconfigure(encoding='utf-8')
 
-if hasattr(sys.stdout, 'reconfigure'):
-    sys.stdout.reconfigure(encoding='utf-8')
-
-surgery_dir = os.path.join('chapters', 'Surgery')
-files = [f for f in sorted(os.listdir(surgery_dir)) if f.endswith('.md')]
-
-all_math = set()
-
-for f in files:
-    with open(os.path.join(surgery_dir, f), 'r', encoding='utf-8', errors='ignore') as fp:
-        c = fp.read()
-    matches = re.findall(r'\$([^\$\n]+)\$', c)
+formulas = []
+for f in sorted(glob.glob('chapters/Surgery/*.md')):
+    with open(f, 'r', encoding='utf-8') as fp:
+        txt = fp.read()
+    matches = re.findall(r'\$\$([\s\S]*?)\$\$', txt)
     for m in matches:
-        all_math.add(m.strip())
+        formulas.append((os.path.basename(f), m.strip()))
 
-print(f"Total distinct $...$ expressions: {len(all_math)}")
-for m in sorted(list(all_math))[:40]:
-    print(f"  ${m}$")
+print(f'Total display formulas ($$...$$): {len(formulas)}')
+for f, form in formulas:
+    print(f'=== {f}:\n{form}\n')

@@ -329,42 +329,94 @@ def clean_page_numbers(text):
     t = clean_heading_math(t)
     return t.strip()
 
-def format_math_expr(match):
-    """Formats LaTeX math into clean, human-readable medical markup without code boxes."""
-    raw = match.group(1).strip()
-    s = raw
-    s = s.replace(r'\rightarrow', ' ⬅️ ').replace(r'\to', ' ⬅️ ').replace(r'\Rightarrow', ' ⬅️ ')
-    s = s.replace(r'\leftarrow', ' ➡️ ').replace(r'\Leftarrow', ' ➡️ ')
+def extract_braced(s, start_idx):
+    if start_idx >= len(s) or s[start_idx] != '{':
+        return None, -1
+    depth = 0
+    for i in range(start_idx, len(s)):
+        if s[i] == '{':
+            depth += 1
+        elif s[i] == '}':
+            depth -= 1
+            if depth == 0:
+                return s[start_idx+1:i], i
+    return None, -1
+
+def render_latex_to_html(raw):
+    s = raw.strip()
+    # 0. Clean parentheses & left/right first (before \le!)
+    s = re.sub(r'\\left\s*([(\[\{])', r'\1', s)
+    s = re.sub(r'\\right\s*([)\]\}])', r'\1', s)
+    s = s.replace(r'\left.', '').replace(r'\right.', '')
+    
+    # 1. Clean wrappers
+    s = re.sub(r'\\mathbf\{([^}]+)\}', r'<strong>\1</strong>', s)
+    s = re.sub(r'\\textbf\{([^}]+)\}', r'<strong>\1</strong>', s)
     s = re.sub(r'\\text\{([^}]+)\}', r'\1', s)
     s = re.sub(r'\\mathrm\{([^}]+)\}', r'\1', s)
-    s = s.replace(r'\text{-}', '–').replace(r'\text{–}', '–')
-    s = re.sub(r'\^\\circ\s*(?:\\text\{)?([CF])\}?', r'°\1', s)
-    s = re.sub(r'\^\\circ', '°', s)
-    s = s.replace(r'kg/m^2', 'kg/m²')
-    s = s.replace(r'/m^2', '/m²')
-    s = s.replace(r'^2', '²')
-    s = s.replace(r'^3', '³')
-    s = s.replace(r'\%', '%')
-    s = s.replace(r'\_', '_')
-    s = s.replace(r'\mu', 'µ')
-    s = s.replace(r'\times', '×')
-    s = s.replace(r'\pm', '±')
-    s = s.replace(r'\ge', '≥').replace(r'\geq', '≥')
-    s = s.replace(r'\le', '≤').replace(r'\leq', '≤')
-    s = s.replace(r'\sim', '~')
-    s = s.replace(r'\approx', '≈')
-    s = s.replace(r'\ ', ' ')
-    s = re.sub(r'\\frac\{([^}]+)\}\{([^}]+)\}', r'(\1) / (\2)', s)
-    s = re.sub(r'HbA_\{?1c\}?', '###HBA1C###', s)
-    s = s.replace('<', '&lt;').replace('>', '&gt;')
-    s = s.replace('###HBA1C###', 'HbA<sub>1c</sub>')
-    s = re.sub(r'_\{([^}]+)\}', r'<sub>\1</sub>', s)
-    s = re.sub(r'_([a-zA-Z0-9]+)', r'<sub>\1</sub>', s)
+    s = s.replace(r'\,', ' ').replace(r'\quad', '  ').replace(r'\qquad', '    ')
+    s = s.replace(r'\%', '%').replace(r'\_', '_').replace(r'\&', '&')
+    
+    # 2. Arrows & logic
+    s = re.sub(r'\\xrightarrow\{([^}]+)\}', r' ──[\1]──> ', s)
+    s = s.replace(r'\longrightarrow', ' ⬅️ ').replace(r'\rightarrow', ' ⬅️ ').replace(r'\to', ' ⬅️ ')
+    s = s.replace(r'\longleftrightarrow', ' ⇄ ').replace(r'\leftrightarrow', ' ⇄ ')
+    s = s.replace(r'\implies', ' ⬅️ ')
+    
+    # 3. Greek & math symbols
+    s = s.replace(r'\Delta', 'Δ').replace(r'\pi', 'π').replace(r'\eta', 'η').replace(r'\mu', 'µ')
+    s = s.replace(r'\alpha', 'α').replace(r'\beta', 'β').replace(r'\gamma', 'γ')
+    s = s.replace(r'\times', ' × ').replace(r'\pm', ' ± ')
+    s = s.replace(r'\ge', ' ≥ ').replace(r'\geq', ' ≥ ')
+    s = s.replace(r'\le', ' ≤ ').replace(r'\leq', ' ≤ ')
+    s = s.replace(r'\approx', ' ≈ ').replace(r'\sim', ' ~ ')
+    
+    # 4. Fractions using balanced brace extractor
+    while True:
+        idx = s.find(r'\frac')
+        if idx == -1:
+            break
+        open_b1 = s.find('{', idx + 5)
+        if open_b1 == -1:
+            break
+        num, end_b1 = extract_braced(s, open_b1)
+        if num is None:
+            break
+        open_b2 = s.find('{', end_b1 + 1)
+        if open_b2 == -1:
+            break
+        den, end_b2 = extract_braced(s, open_b2)
+        if den is None:
+            break
+        num_h = render_latex_to_html(num)
+        den_h = render_latex_to_html(den)
+        frac_h = f'<span class="med-fraction"><span class="fraction-num">{num_h}</span><span class="fraction-den">{den_h}</span></span>'
+        s = s[:idx] + frac_h + s[end_b2+1:]
+        
+    # 5. Chemical ions & Superscripts / Subscripts
+    # Carets: ^{...} or ^+ or ^- or ^2 etc.
     s = re.sub(r'\^\{([^}]+)\}', r'<sup>\1</sup>', s)
-    s = re.sub(r'\s+', ' ', s).strip()
-    if s in ['⬅️', '➡️', '⬇️', '⬆️']:
-        return f' {s} '
-    return f'<span class="med-measure" dir="ltr">{s}</span>'
+    s = re.sub(r'\^([a-zA-Z0-9\+\-\*]+)', r'<sup>\1</sup>', s)
+    
+    # Subscripts: _{...} or _digit or _single_ident
+    s = re.sub(r'_\{([^}]+)\}', r'<sub>\1</sub>', s)
+    s = re.sub(r'_([0-9]+)', r'<sub>\1</sub>', s)
+    s = re.sub(r'_([a-zA-Z]{1,3})(?=[^a-zA-Z0-9]|$)', r'<sub>\1</sub>', s)
+    
+    # 6. Degrees
+    s = s.replace(r'<sup>\circ</sup>', '°').replace(r'^\circ', '°')
+    
+    # Normalize spaces
+    s = re.sub(r'[ \t]+', ' ', s).strip()
+    return s
+
+def format_math_expr(match):
+    """Formats inline LaTeX math ($...$) into clean, human-readable medical markup."""
+    raw = match.group(1).strip()
+    rendered = render_latex_to_html(raw)
+    if rendered in ['⬅️', '➡️', '⬇️', '⬆️', '⇄']:
+        return f' {rendered} '
+    return f'<span class="med-measure" dir="ltr">{rendered}</span>'
 
 def transform_inline_elements(text):
     """
@@ -397,8 +449,17 @@ def transform_inline_elements(text):
     # 3. Inline math expressions ($...$)
     text = re.sub(r'\$([^\$\n]+)\$', format_math_expr, text)
 
+    # Unescaped LaTeX arrows in raw text
+    text = re.sub(r'\\longrightarrow|\\rightarrow|\\to(?=\s)', ' ⬅️ ', text)
+    text = re.sub(r'\\longleftrightarrow|\\leftrightarrow', ' ⇄ ', text)
+    text = re.sub(r'\\implies', ' ⬅️ ', text)
+
     # 4. Directional arrows (safe non-capturing alternation to protect multi-byte variation selectors)
     text = re.sub(r'(?:⬅️|➡️|⬇️|⬆️)', r'<span class="stepper-arrow-indicator">\g<0></span>', text)
+
+    # Plain text superscripts and subscripts (e.g. HCO3^- or kg/m^2 or Na^+ without dollar signs)
+    text = re.sub(r'([a-zA-Z0-9\)])\^([0-9\+\-\*]+)', r'\1<sup>\2</sup>', text)
+    text = re.sub(r'([a-zA-Z0-9\)])_([0-9]+)', r'\1<sub>\2</sub>', text)
 
     # 5. English terms in parentheses: (Term) -> pill
     def repl_paren(m):
@@ -1182,6 +1243,14 @@ def render_part_body(body_md):
             txt = part
             if not txt.strip():
                 continue
+            
+            # Format display math ($$...$$) before markdown parsing into rich medical formula boxes
+            def repl_display_math(m):
+                raw_formula = m.group(1).strip()
+                rendered_formula = render_latex_to_html(raw_formula)
+                return f'\n\n<div class="med-formula-box" dir="ltr">{rendered_formula}</div>\n\n'
+
+            txt = re.sub(r'\$\$([\s\S]*?)\$\$', repl_display_math, txt)
             txt = parse_callouts(txt)
             txt = parse_steppers(txt)
             txt = normalize_list_indentation(txt)
@@ -1191,7 +1260,18 @@ def render_part_body(body_md):
             chunk_html = transform_inline_elements(chunk_html)
             html_chunks.append(chunk_html)
 
-    return '\n'.join(html_chunks)
+    full_html = '\n'.join(html_chunks)
+    
+    # Unwrap any accidental <pre><code> blocks created by 4-space markdown indentations
+    def repl_pre(m):
+        content = m.group(1).strip()
+        if re.search(r'^\s*[*•\-\d]', content) or '<span class="med-measure"' in content or '<strong>' in content:
+            clean = content.replace('<code>', '').replace('</code>', '')
+            return f'<div class="clinical-callout-card" style="margin-block: 10px;">{clean}</div>'
+        return m.group(0)
+
+    full_html = re.sub(r'<pre><code>([\s\S]*?)</code></pre>', repl_pre, full_html)
+    return full_html
 
 def parse_section_markdown(section_md):
     """
@@ -1247,7 +1327,10 @@ def parse_section_markdown(section_md):
             icon = '📝'
         else:
             theme = 'general'
-            badge = f'پارت {p_num}: {p_title[:30]}'
+            clean_sub_title = re.sub(r'\s*\([^)]*\)\s*', ' ', p_title).strip()
+            if len(clean_sub_title) > 35:
+                clean_sub_title = clean_sub_title[:32] + '...'
+            badge = f'پارت {p_num}: {clean_sub_title}' if clean_sub_title else f'پارت {p_num}'
             icon = '📌'
             
         chunk_lines = p_chunk.splitlines()
@@ -1420,6 +1503,8 @@ def build_single_chapter(config, base_dir):
             filtered_lines.append(line)
 
     sanitized_text = '\n'.join(filtered_lines)
+    # Strip repeating intra-chapter title lines (e.g. # فصل ۱۵: ...)
+    sanitized_text = re.sub(r'(?m)^#{1,3}\s*فصل\s+[\d\u06F0-\u06F9]+:(?!.*?بخش).*$', '', sanitized_text)
 
     # Detect Section Splits across all chapters
     matches = list(re.finditer(r'^#{1,3}\s*[^#\n]*?بخش\s+([\d\u06F0-\u06F9]+)(?:[:\s\-—(].*|\s*)$', sanitized_text, re.MULTILINE))

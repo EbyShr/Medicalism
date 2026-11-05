@@ -3868,7 +3868,8 @@ ol.nested-sublist > li.exam-pearl-item,
 ol.nested-sublist > li.exam-trap-item,
 ol > li.exam-pearl-item,
 ol > li.exam-trap-item {
-  list-style: decimal !important;
+  list-style: none !important;
+  list-style-type: none !important;
   list-style-position: outside !important;
   margin-inline-start: 22px !important;
   background: rgba(13, 148, 136, 0.08) !important;
@@ -4486,7 +4487,8 @@ ul.nested-bullet-list > li.exam-trap-item {
 
 /* 5. English Medical Term Pills */
 .term-en.badge-pill-subtle {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   padding: 1px 7px;
   font-size: 0.88em;
   font-weight: 600;
@@ -4494,9 +4496,11 @@ ul.nested-bullet-list > li.exam-trap-item {
   background: rgba(99, 102, 241, 0.08);
   color: #4338ca;
   border: 1px solid rgba(99, 102, 241, 0.2);
-  margin-inline: 3px;
+  margin-inline: 4px;
   white-space: nowrap;
   direction: ltr;
+  unicode-bidi: isolate;
+  vertical-align: middle;
 }
 [data-theme="dark"] .term-en.badge-pill-subtle {
   background: rgba(129, 140, 248, 0.16);
@@ -4514,4 +4518,99 @@ ul.nested-bullet-list > li.exam-trap-item {
 }
 [data-theme="dark"] .med-measure {
   color: #38bdf8;
+}
+
+
+/* ==========================================================================
+   MEDICAL MATH FORMULAS & SCIENTIFIC EQUATIONS
+   ========================================================================== */
+
+.med-formula-box {
+  margin-block: 18px;
+  padding: 14px 20px;
+  background: rgba(2, 132, 199, 0.04);
+  border: 1.5px solid rgba(2, 132, 199, 0.25);
+  border-radius: var(--radius-lg, 12px);
+  text-align: center;
+  direction: ltr !important;
+  font-family: var(--font-mono, 'Consolas', 'Segoe UI', monospace);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0369a1;
+  overflow-x: auto;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+[data-theme="dark"] .med-formula-box {
+  background: rgba(56, 189, 248, 0.07);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: #7dd3fc;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.med-fraction {
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: middle;
+  text-align: center;
+  padding: 0 4px;
+  font-size: 0.95em;
+  line-height: 1.15;
+}
+
+.fraction-num {
+  border-bottom: 1.5px solid currentColor;
+  padding-bottom: 2px;
+  display: block;
+}
+
+.fraction-den {
+  padding-top: 2px;
+  display: block;
+}
+
+.med-measure {
+  display: inline-block;
+  direction: ltr !important;
+  unicode-bidi: isolate;
+  font-family: inherit;
+  font-weight: 700;
+  color: #0284c7;
+  padding: 0 2px;
+}
+
+[data-theme="dark"] .med-measure {
+  color: #38bdf8;
+}
+
+/* Strict sub and sup baseline rendering */
+sup {
+  font-size: 0.72em;
+  vertical-align: super;
+  line-height: 0;
+  font-weight: 700;
+}
+
+sub {
+  font-size: 0.72em;
+  vertical-align: sub;
+  line-height: 0;
+  font-weight: 700;
+}
+
+/* Universal ordered list fix - eliminates double numbering in all clinical cards */
+.clinical-part-card ol,
+.study-section ol {
+  list-style: none !important;
+  list-style-type: none !important;
+}
+
+.clinical-part-card ol > li,
+.study-section ol > li {
+  list-style: none !important;
+  list-style-type: none !important;
 }
