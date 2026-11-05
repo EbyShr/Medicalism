@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Build High-Yield Exam Summary for Surgery Chapter 15: Biliary Tract
-Source: Biliary Tract.md
+Build High-Yield Exam Summary for Surgery Chapters (e.g. Chapter 15: Biliary Tract, Chapter 16: Pancreas)
+Source: <chapter>.md
 Output: Injects examSummaryHtml and summaryContent into js/data/surgery-registry.js and surgery_registry.json
 """
 
@@ -14,28 +14,37 @@ import markdown
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
 
-def build_biliary_summary_html(md_path):
+def build_exam_summary_html(md_path):
     with open(md_path, 'r', encoding='utf-8') as f:
         raw_md = f.read()
 
+    # 0. Clean (صفحات X تا Y) if present anywhere
+    clean_md = re.sub(r'\s*\(صفحات\s*[\d\u06F0-\u06F9]+\s*تا\s*[\d\u06F0-\u06F9]+\)', '', raw_md)
+
     # 1. Extract Main Title
-    title_match = re.search(r'^#\s*(.*?)$', raw_md, re.MULTILINE)
-    main_title = title_match.group(1).strip() if title_match else "فصل ۱۵: بیماری‌های مجاری صفراوی و کیسه صفرا (Biliary Tract)"
+    title_match = re.search(r'^#\s*(.*?)$', clean_md, re.MULTILINE)
+    full_title = title_match.group(1).strip() if title_match else "خلاصه جامع شب امتحان"
+    hero_title = re.sub(r'^فصل\s*[\d\u06F0-\u06F9]+[:\s\-]*', '', full_title).strip()
+    if not hero_title:
+        hero_title = full_title
+
+    # Extract chapter number
+    ch_num_match = re.search(r'فصل\s*([\d\u06F0-\u06F9]+)', full_title)
+    ch_num_str = ch_num_match.group(1) if ch_num_match else ""
+    tag_str = f"فصل {ch_num_str} جراحی لارنس" if ch_num_str else "جراحی لارنس"
 
     # 2. Extract Tree Map
-    tree_match = re.search(r'## نقشه درختی ساختار فصل\s*\n(.*?)(?=\n---|\n## )', raw_md, re.DOTALL)
+    tree_match = re.search(r'## نقشه درختی ساختار فصل\s*\n(.*?)(?=\n---|\n## )', clean_md, re.DOTALL)
     tree_html = ""
     if tree_match:
         tree_text = tree_match.group(1).strip()
         branches = re.findall(r'- \*\*(.*?)\*\*\s*\n((?:  - .*\n?)+)', tree_text)
         
         branch_cards = []
+        colors = ["#0284c7", "#6366f1", "#8b5cf6", "#e11d48", "#d97706", "#059669", "#0891b2"]
         for idx, (b_title, b_sub) in enumerate(branches):
             sub_items = [s.replace('  - ', '').strip() for s in b_sub.strip().split('\n') if s.strip()]
             sub_li_html = "".join([f"<li>{item}</li>" for item in sub_items])
-            
-            # Diverse colors for the 7 branches
-            colors = ["#0284c7", "#6366f1", "#8b5cf6", "#e11d48", "#d97706", "#059669", "#0891b2"]
             color = colors[idx % len(colors)]
             
             branch_cards.append(f"""
@@ -65,8 +74,8 @@ def build_biliary_summary_html(md_path):
                 </svg>
               </div>
               <div>
-                <h2 class="summary-tree-title">نقشه درختی ساختار فصل (Biliary Tree Architecture)</h2>
-                <span class="summary-tree-subtitle">ساختار درختی ۷ مبحث کلیدی و ارتباطات بالینی فصل مجاری صفراوی</span>
+                <h2 class="summary-tree-title">نقشه درختی ساختار فصل ({hero_title})</h2>
+                <span class="summary-tree-subtitle">ساختار درختی {len(branch_cards)} مبحث کلیدی و ارتباطات بالینی فصل {hero_title}</span>
               </div>
             </div>
             <div class="summary-tree-grid">
@@ -76,11 +85,11 @@ def build_biliary_summary_html(md_path):
         """
 
     # 3. Extract Master Card (⚡ جمع‌بندی ۱ دقیقه‌ای شب امتحان)
-    master_match = re.search(r'## ⚡ جمع‌بندی ۱ دقیقه‌ای شب امتحان \(کل فصل\)\s*\n(.*)', raw_md, re.DOTALL)
+    master_match = re.search(r'## ⚡ جمع‌بندی ۱ دقیقه‌ای شب امتحان \(کل فصل\)\s*\n(.*)', clean_md, re.DOTALL)
     master_html = ""
     if master_match:
         master_text = master_match.group(1).strip()
-        items = re.findall(r'- \*\*(.*?)\*\*(.*)', master_text)
+        items = re.findall(r'^- \*\*(.*?)\*\*(.*)$', master_text, re.MULTILINE)
         
         item_lis = []
         for title, desc in items:
@@ -99,7 +108,7 @@ def build_biliary_summary_html(md_path):
                 <span class="master-card-icon">⚡</span>
                 <h2 class="master-card-title">جمع‌بندی ۱ دقیقه‌ای شب امتحان (کل فصل)</h2>
               </div>
-              <span class="master-card-badge">مرور سریع ۱۳ نکته فوق طلایی</span>
+              <span class="master-card-badge">مرور سریع {len(item_lis)} نکته فوق طلایی</span>
             </div>
             <ul class="master-card-list">
               {"".join(item_lis)}
@@ -108,21 +117,19 @@ def build_biliary_summary_html(md_path):
         """
 
     # 4. Extract Intermediate Topic Sections
-    # Cut off text between after Tree section and before Master Card
-    tree_end_pos = raw_md.find('## آناتومی جراحی')
-    master_start_pos = raw_md.find('## ⚡ جمع‌بندی')
-    
-    middle_text = raw_md[tree_end_pos:master_start_pos].strip()
-    # Split by \n## 
-    topic_chunks = re.split(r'\n(?=## )', middle_text)
-    
+    parts = re.split(r'\n(?=## )', clean_md)
     topic_cards = []
-    for chunk in topic_chunks:
-        chunk = chunk.strip()
-        if not chunk or not chunk.startswith('## '):
+    
+    for part in parts:
+        part = part.strip()
+        if not part.startswith('## '):
+            continue
+        first_line = part.split('\n')[0].strip()
+        # Skip Tree map and Master card sections
+        if 'نقشه درختی' in first_line or '⚡ جمع‌بندی' in first_line:
             continue
         
-        lines = chunk.split('\n')
+        lines = part.split('\n')
         topic_title = lines[0].replace('## ', '').strip()
         topic_body_md = '\n'.join(lines[1:]).strip()
         
@@ -138,7 +145,7 @@ def build_biliary_summary_html(md_path):
         # Post-process table alignment: ensure direction rtl
         topic_html = topic_html.replace('style="text-align: left;"', 'style="text-align: right; direction: rtl;"')
         
-        # Post-process blockquotes: make sure they have icon
+        # Post-process blockquotes: make sure they have callout class
         def format_blockquote(match):
             bq_content = match.group(1).strip()
             return f"""<blockquote class="exam-trap-callout">{bq_content}</blockquote>"""
@@ -166,10 +173,10 @@ def build_biliary_summary_html(md_path):
       <header class="exam-summary-hero">
         <div class="summary-hero-badges">
           <span class="summary-hero-badge">⚡ خلاصه جامع شب امتحان</span>
-          <span class="summary-hero-tag">فصل ۱۵ جراحی لارنس</span>
+          <span class="summary-hero-tag">{tag_str}</span>
           <span class="summary-hero-time">⏱️ مرور سریع: ۱۵ دقیقه</span>
         </div>
-        <h1 class="summary-hero-title">بیماری‌های مجاری صفراوی و کیسه صفرا (Biliary Tract)</h1>
+        <h1 class="summary-hero-title">{hero_title}</h1>
         <p class="summary-hero-desc">خلاصه خط‌به‌خط و فوق‌فشرده نکات امتحانی، تعاریف طلایی، معیارهای تشخیصی و الگوریتم‌های درمانی مصوب دستیاری و پره‌انترنی (مطابق آخرین ویرایش رفرنس لارنس)</p>
         <div class="summary-hero-actions">
           <button type="button" class="btn-return-detailed" onclick="window.setChapterViewMode ? window.setChapterViewMode('detailed') : (window.StudyFeatures && window.StudyFeatures.applyExamCramMode(false, true))">
@@ -211,7 +218,10 @@ def build_biliary_summary_html(md_path):
     </div>
     """
 
-    return full_summary_html, raw_md
+    return full_summary_html, clean_md
+
+# Alias for backward compatibility
+build_biliary_summary_html = build_exam_summary_html
 
 def main():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -220,7 +230,7 @@ def main():
         md_path = os.path.join(base_dir, 'chapters', 'Surgery', 'summaries', 'Biliary Tract.md')
 
     print(f"Reading summary markdown from: {md_path}")
-    summary_html, raw_md = build_biliary_summary_html(md_path)
+    summary_html, raw_md = build_exam_summary_html(md_path)
     print(f"Generated summary HTML length: {len(summary_html)} bytes")
 
     # Update js/data/surgery-registry.js
@@ -228,7 +238,6 @@ def main():
     with open(registry_js_path, 'r', encoding='utf-8') as f:
         js_content = f.read()
 
-    # Extract JSON from js_content
     prefix = "window.SURGERY_REGISTRY = "
     idx = js_content.find(prefix)
     if idx != -1:
