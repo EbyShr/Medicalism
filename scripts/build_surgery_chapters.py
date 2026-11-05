@@ -349,9 +349,26 @@ def render_latex_to_html(raw):
     s = re.sub(r'\\right\s*([)\]\}])', r'\1', s)
     s = s.replace(r'\left.', '').replace(r'\right.', '')
     
-    # 1. Clean wrappers
-    s = re.sub(r'\\mathbf\{([^}]+)\}', r'<strong>\1</strong>', s)
-    s = re.sub(r'\\textbf\{([^}]+)\}', r'<strong>\1</strong>', s)
+    # 1. Clean wrappers (strip innermost \text and \mathrm first, then handle \mathbf/\textbf with balanced braces)
+    s = re.sub(r'\\text\{([^}]+)\}', r'\1', s)
+    s = re.sub(r'\\mathrm\{([^}]+)\}', r'\1', s)
+    for tag in [r'\mathbf', r'\textbf']:
+        while True:
+            idx = s.find(tag)
+            if idx == -1:
+                break
+            open_b = s.find('{', idx + len(tag))
+            if open_b == -1:
+                break
+            inner, end_b = extract_braced(s, open_b)
+            if inner is None:
+                break
+            inner_clean = re.sub(r'\\text\{([^}]+)\}', r'\1', inner)
+            inner_clean = re.sub(r'\\mathrm\{([^}]+)\}', r'\1', inner_clean)
+            inner_h = render_latex_to_html(inner_clean)
+            s = s[:idx] + f'<strong>{inner_h}</strong>' + s[end_b+1:]
+
+    # Fallback cleanup for any residual \text or \mathrm
     s = re.sub(r'\\text\{([^}]+)\}', r'\1', s)
     s = re.sub(r'\\mathrm\{([^}]+)\}', r'\1', s)
     s = s.replace(r'\,', ' ').replace(r'\quad', '  ').replace(r'\qquad', '    ')
@@ -451,6 +468,8 @@ def transform_inline_elements(text):
     text = re.sub(r'\\implies', ' ➡️ ', text)
     text = re.sub(r'\\uparrow', ' ↑ ', text)
     text = re.sub(r'\\downarrow', ' ↓ ', text)
+    text = re.sub(r'\\(?:text|mathrm|mathbf|textbf)\{([^}]+)\}', r'\1', text)
+    text = re.sub(r'\\left|\\right', '', text)
 
     # 4. Directional arrows (safe non-capturing alternation to protect multi-byte variation selectors)
     text = re.sub(r'(?:⬅️|➡️|⬇️|⬆️)', r'<span class="stepper-arrow-indicator">\g<0></span>', text)
@@ -570,50 +589,65 @@ def parse_split_diagram_robust(lines):
 
     # 2. Find column boundaries
     split_line = lines[split_idx]
-    conns = [m.start() for m in re.finditer(r'[┬┴┼]', split_line)]
-    if not conns:
-        if split_idx + 1 < len(lines):
-            arrows = [m.start() for m in re.finditer(r'[▼▼►◄▲]', lines[split_idx + 1])]
-            if len(arrows) >= 2:
-                conns = [(arrows[i] + arrows[i+1]) // 2 for i in range(len(arrows)-1)]
-    if not conns:
-        start_x = split_line.find('┌')
-        end_x = split_line.rfind('┐')
-        if start_x != -1 and end_x != -1 and end_x > start_x:
-            conns = [(start_x + end_x) // 2]
-        else:
-            conns = [len(split_line) // 2]
+    
+    # 2a. Look for explicit downward arrows below split
+    arrows = []
+    for l in lines[split_idx:split_idx+3]:
+        arr = [m.start() for m in re.finditer(r'[▼▼►◄▲]', l)]
+        if len(arr) >= 2:
+            arrows = arr
+            break
+            
+    # 2b. If no arrows, look for downward branch characters on split line
+    if not arrows:
+        targets = []
+        if '┌' in split_line: targets.append(split_line.find('┌'))
+        for m in re.finditer(r'[┬┼]', split_line):
+            targets.append(m.start())
+        if '┐' in split_line: targets.append(split_line.rfind('┐'))
+        if len(targets) >= 2:
+            arrows = sorted(list(set(targets)))
+            
+    # Fallback to connectors
+    if not arrows:
+        conns = [m.start() for m in re.finditer(r'[┬┴┼]', split_line)]
+        if conns:
+            arrows = conns
 
-    # Refine cut points by checking shared whitespace gaps across lines below split
-    refined_conns = []
-    for c in conns:
-        g_starts = []
-        g_ends = []
-        for l in lines[split_idx+1:]:
-            if not l.strip() or all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in l):
-                continue
-            runs = [(m.start(), m.end()) for m in re.finditer(r' {2,}', l)]
-            best = None
-            min_d = 999
-            for s, e in runs:
-                d = abs((s + e)//2 - c)
-                if d < min_d:
-                    min_d = d
-                    best = (s, e)
-            if best and min_d < 35:
-                g_starts.append(best[0])
-                g_ends.append(best[1])
-        if g_starts and g_ends:
-            max_s = max(g_starts)
-            min_e = min(g_ends)
-            if max_s < min_e:
-                refined_conns.append((max_s + min_e) // 2)
+    text_lines = [l for l in lines[split_idx+1:] if l.strip() and not all(ch in '┌┐└┘├┤┬┴┼─━│┃▼►◄▲ \t' for ch in l)]
+    
+    bounds = [0]
+    if arrows and len(arrows) >= 2:
+        for i in range(len(arrows) - 1):
+            t_left = arrows[i]
+            t_right = arrows[i+1]
+            gaps = []
+            for l in text_lines:
+                runs = [(m.start(), m.end()) for m in re.finditer(r' {2,}', l)]
+                mid_t = (t_left + t_right) / 2.0
+                best_run = None
+                min_dist = 999
+                for s, e in runs:
+                    r_mid = (s + e) / 2.0
+                    dist = abs(r_mid - mid_t)
+                    if s >= t_left - 5 and e <= t_right + 30 and dist < min_dist:
+                        min_dist = dist
+                        best_run = (s, e)
+                if best_run:
+                    gaps.append(best_run)
+            if gaps:
+                max_s = max(g[0] for g in gaps)
+                min_e = min(g[1] for g in gaps)
+                if max_s <= min_e:
+                    bounds.append((max_s + min_e) // 2)
+                else:
+                    bounds.append(max_s)
             else:
-                refined_conns.append(c + 2)
-        else:
-            refined_conns.append(c + 2)
-
-    bounds = [0] + refined_conns + [9999]
+                bounds.append((t_left + t_right) // 2)
+    else:
+        bounds.append(len(split_line) // 2)
+        
+    bounds.append(9999)
     num_cols = len(bounds) - 1
 
     col_raw_lines = [[] for _ in range(num_cols)]
@@ -668,10 +702,32 @@ def parse_split_diagram_robust(lines):
             branch_node['children'].append({'text': clean_col[col_idx].strip(), 'children': [], 'level': 2})
             col_idx += 1
 
-        rem_items = clean_col[col_idx:]
+        def split_row_parts(line):
+            line = re.sub(r'\)\s+(?=[\u0600-\u06FFa-zA-Z])', ')   ', line)
+            return [p.strip() for p in re.split(r'\s{2,}', line) if p.strip()]
+
+        # Stitch broken continuation lines ONLY for single-column text (never merge multi-column rows!)
+        stitched_items = []
+        for it in clean_col[col_idx:]:
+            parts_it = split_row_parts(it)
+            if stitched_items:
+                prev_parts = split_row_parts(stitched_items[-1])
+                if len(parts_it) < 2 and len(prev_parts) < 2 and (
+                    it.startswith('+') or 
+                    it.startswith('و ') or 
+                    it.startswith('یا ') or
+                    re.match(r'^\s*\(?(?:\d+\.?\d*%\s*[a-zA-Z0-9]+|\+)', it) or
+                    stitched_items[-1].endswith(':') or
+                    any(stitched_items[-1].endswith(k) for k in ['درمان قطعی:', 'سرم نرمال سالین', 'نیازمند مهار', ' و'])
+                ):
+                    stitched_items[-1] += ' ' + it
+                    continue
+            stitched_items.append(it)
+        rem_items = stitched_items
+
         # Check if remaining items form two multi-part lines (categories + descriptions)
         if len(rem_items) == 2:
-            parts_a = [p.strip() for p in re.split(r'\s{2,}', rem_items[0]) if p.strip()]
+            parts_a = split_row_parts(rem_items[0])
             parts_b = [p.strip(' ()') for p in re.split(r'\s{2,}|\)\s*(?=\()', rem_items[1]) if p.strip(' ()')]
             if len(parts_a) >= 2 and len(parts_a) == len(parts_b):
                 for a, b in zip(parts_a, parts_b):
@@ -684,13 +740,13 @@ def parse_split_diagram_robust(lines):
         k = 0
         while k < len(rem_items):
             it_k = rem_items[k]
-            parts_k = [p.strip() for p in re.split(r'\s{2,}', it_k) if p.strip()]
+            parts_k = split_row_parts(it_k)
             if len(parts_k) >= 2 and not it_k.strip().startswith('•') and not it_k.strip().startswith('-'):
                 sub_rows = [parts_k]
                 m = k + 1
                 while m < len(rem_items):
                     it_m = rem_items[m]
-                    parts_m = [p.strip() for p in re.split(r'\s{2,}', it_m) if p.strip()]
+                    parts_m = split_row_parts(it_m)
                     if len(parts_m) == len(parts_k) and not it_m.strip().startswith('•') and not it_m.strip().startswith('-'):
                         sub_rows.append(parts_m)
                         m += 1
@@ -703,7 +759,15 @@ def parse_split_diagram_robust(lines):
                         if m_brk:
                             col_clean = f"{m_brk.group(1)}: {m_brk.group(2)}".strip(' :')
                         else:
-                            col_clean = re.sub(r'^[🎯⚠️\[\]\s*#]+|[\[\]\s*#]+$', '', col_chain).strip()
+                            m_multi = re.match(r'^(.*?)\s*\((.*?)\)\s*\((.*?)\)$', col_chain)
+                            if m_multi:
+                                col_clean = f"{m_multi.group(1).strip()} ({m_multi.group(2).strip()}) ⬅️ {m_multi.group(3).strip()}"
+                            else:
+                                m_parens = re.match(r'^(.*?)\s*\((.*?)\)$', col_chain)
+                                if m_parens and not col_chain.startswith('('):
+                                    col_clean = f"{m_parens.group(1).strip()} ⬅️ {m_parens.group(2).strip()}"
+                                else:
+                                    col_clean = re.sub(r'^[🎯⚠️\[\]\s*#]+|[\[\]\s*#]+$', '', col_chain).strip()
                         grouped_items.append(col_clean)
                     k = m
                     continue
@@ -1541,7 +1605,7 @@ def parse_callouts(text):
 
 def parse_steppers(text):
     """Parses sequential multi-step encounters into interactive steppers with vibrant 5-color thematic palettes."""
-    pattern = re.compile(r'(?m)^#{3,4}\s*(گام\s*[\d\u06F0-\u06F9]+|مرحله\s*[\d\u06F0-\u06F9]+|فاز\s*[\d\u06F0-\u06F9]+)[:\s\-—]*(.*?)\n([\s\S]*?)(?=(?:^#{3,4}\s*(?:گام|مرحله|فاز)|^###|^##|\Z))')
+    pattern = re.compile(r'(?m)^#{3,5}\s*(گام\s*[\d\u06F0-\u06F9]+|مرحله\s*[\d\u06F0-\u06F9]+|فاز\s*[\d\u06F0-\u06F9]+)[:\s\-—]*(.*?)\n([\s\S]*?)(?=(?:^#{3,5}\s*(?:گام|مرحله|فاز)|^#{2,4}\s+[^\n]+|\Z))')
     
     theme_map = {
         '۱': 'blue', '۲': 'rose', '۳': 'amber', '۴': 'emerald', '۵': 'purple',
