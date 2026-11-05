@@ -12,10 +12,42 @@ window.ComponentRenderer = {
   renderChapter(chapter, container) {
     if (!chapter || !container) return;
 
+    const isExamActive = window.StudyFeatures && typeof window.StudyFeatures.isExamCramModeActive === 'function'
+      ? window.StudyFeatures.isExamCramModeActive()
+      : (localStorage.getItem('medicalism_exam_cram_mode') === 'true');
+
+    const hasExamSummary = Boolean(chapter.examSummaryHtml);
+
     let html = `
       <article class="chapter-article" id="${chapter.id}">
-        <!-- Chapter Hero Banner -->
-        <header class="chapter-hero">
+    `;
+
+    if (hasExamSummary) {
+      html += `
+        <!-- Chapter View Mode Switcher Bar -->
+        <div class="chapter-view-mode-bar" id="chapterViewModeBar">
+          <div class="view-mode-tabs" role="tablist">
+            <button type="button" class="view-mode-tab ${!isExamActive ? 'is-active' : ''}" id="btnTabDetailed" role="tab" aria-selected="${!isExamActive}" onclick="window.setChapterViewMode ? window.setChapterViewMode('detailed') : (window.StudyFeatures && window.StudyFeatures.applyExamCramMode(false, true))">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+              <span>📖 درسنامه کامل</span>
+            </button>
+            <button type="button" class="view-mode-tab ${isExamActive ? 'is-active' : ''}" id="btnTabSummary" role="tab" aria-selected="${isExamActive}" onclick="window.setChapterViewMode ? window.setChapterViewMode('exam') : (window.StudyFeatures && window.StudyFeatures.applyExamCramMode(true, true))">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              <span>⚡ حالت آزمون / شب امتحان</span>
+            </button>
+          </div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 700;">
+            ${isExamActive ? '⚡ در حال مطالعه خلاصه آزمونی و مرور سریع' : '📖 در حال مطالعه درسنامه جامع لارنس'}
+          </div>
+        </div>
+      `;
+    }
+
+    html += `
+        <!-- Detailed Chapter View Container -->
+        <div class="detailed-chapter-view" id="detailedChapterView" style="${hasExamSummary && isExamActive ? 'display: none;' : ''}">
+          <!-- Chapter Hero Banner -->
+          <header class="chapter-hero">
           <div class="chapter-meta-tag">
             ${chapter.isExam ? `
               <span style="background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); color: #ffffff; padding: 2px 10px; border-radius: var(--radius-full); font-weight: 800; box-shadow: 0 0 12px rgba(236, 72, 153, 0.45);">بخش ویژه کوئیز</span>
@@ -163,6 +195,19 @@ window.ComponentRenderer = {
             ` : '<div></div>'}
           </div>
         </footer>
+      `;
+    }
+
+    html += `
+        </div> <!-- /detailedChapterView -->
+    `;
+
+    if (hasExamSummary) {
+      html += `
+        <!-- High-Yield Clean Exam Summary View Container -->
+        <div class="exam-summary-view" id="examSummaryView" style="${isExamActive ? '' : 'display: none;'}">
+          ${chapter.examSummaryHtml}
+        </div>
       `;
     }
 

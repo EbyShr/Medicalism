@@ -2136,6 +2136,25 @@ def build_single_chapter(config, base_dir):
 
     mindmap_html = generate_chapter_mindmap(ch_id, config['title'], sections)
 
+    # Check for dedicated Exam Summary Markdown file
+    summary_candidates = [
+        os.path.join(base_dir, 'chapters', 'Surgery', 'summaries', config['filename']),
+        os.path.join(base_dir, config['filename'])
+    ]
+    exam_summary_html = None
+    summary_content = None
+    for sc in summary_candidates:
+        if os.path.exists(sc):
+            try:
+                # Local import or builder call
+                sys.path.insert(0, os.path.join(base_dir, 'scripts'))
+                import build_biliary_exam_summary
+                exam_summary_html, summary_content = build_biliary_exam_summary.build_biliary_summary_html(sc)
+                print(f"  ✓ Attached High-Yield Exam Summary from: {os.path.basename(sc)}")
+                break
+            except Exception as e:
+                print(f"  Warning: could not build summary for {config['filename']}: {e}")
+
     chapter_record = {
         "id": ch_id,
         "slug": config['id'].replace('surg-', ''),
@@ -2151,6 +2170,10 @@ def build_single_chapter(config, base_dir):
         "mindMapHtml": mindmap_html,
         "sections": sections
     }
+
+    if exam_summary_html:
+        chapter_record["examSummaryHtml"] = exam_summary_html
+        chapter_record["summaryContent"] = summary_content
 
     return chapter_record, stripped_meta_lines
 

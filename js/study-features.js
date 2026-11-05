@@ -1241,9 +1241,51 @@ window.StudyFeatures = {
     document.querySelectorAll('#examCramToggleBtn, #mobileExamCramToggleBtn').forEach(btn => {
       btn.classList.toggle('is-active', active);
       btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      btn.title = active ? '📖 بازگشت به درسنامه کامل' : '⚡ حالت آزمون / شب امتحان (مرور سریع)';
+      const label = btn.querySelector('.exam-cram-desktop-label');
+      if (label) {
+        label.textContent = active ? 'درسنامه کامل' : 'شب امتحان';
+      }
     });
 
     const contentArea = document.getElementById('chapterContentArea') || document.querySelector('.chapter-content');
+    const detailedView = document.getElementById('detailedChapterView');
+    const summaryView = document.getElementById('examSummaryView');
+
+    // TRUE VIEW-SWAP: If dedicated exam summary view is available in current chapter
+    if (detailedView && summaryView) {
+      detailedView.style.display = active ? 'none' : 'block';
+      summaryView.style.display = active ? 'block' : 'none';
+
+      // Update tabs on chapter-view-mode-bar if present
+      const tabDetailed = document.getElementById('btnTabDetailed');
+      const tabSummary = document.getElementById('btnTabSummary');
+      if (tabDetailed && tabSummary) {
+        tabDetailed.classList.toggle('is-active', !active);
+        tabDetailed.setAttribute('aria-selected', !active ? 'true' : 'false');
+        tabSummary.classList.toggle('is-active', active);
+        tabSummary.setAttribute('aria-selected', active ? 'true' : 'false');
+      }
+
+      // Hide generic banner because dedicated summary view has its own rich hero banner
+      const banner = document.getElementById('examCramBanner');
+      if (banner) banner.style.display = 'none';
+
+      if (active && contentArea) {
+        contentArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      if (notify && typeof window.showToast === 'function') {
+        window.showToast(
+          active
+            ? '⚡ حالت آزمون و مرور سریع شب امتحان فعال شد'
+            : '📖 حالت مطالعه کامل درسنامه فعال شد'
+        );
+      }
+      return;
+    }
+
+    // Fallback for chapters that do not yet have a dedicated examSummaryHtml
     let banner = document.getElementById('examCramBanner');
 
     if (active) {
@@ -1372,5 +1414,13 @@ window.toggleMindmapSection = function(btn) {
   const label = btn.querySelector('.mindmap-btn-text');
   if (label) {
     label.textContent = isCollapsed ? 'مشاهده نقشه' : 'جمع‌بندی نقشه';
+  }
+};
+
+
+// Global Helper for Chapter View Switching (Detailed vs Exam Summary)
+window.setChapterViewMode = function(mode) {
+  if (window.StudyFeatures && typeof window.StudyFeatures.applyExamCramMode === 'function') {
+    window.StudyFeatures.applyExamCramMode(mode === 'exam', true);
   }
 };

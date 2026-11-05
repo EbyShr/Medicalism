@@ -118,7 +118,7 @@
         </button>
 
         <!-- Exam Cram Mode Toggle Button -->
-        <button class="btn-exam-cram-toggle" id="examCramToggleBtn" title="⚡ حالت شب امتحان (مرور سریع)" aria-label="حالت شب امتحان (مرور سریع)" aria-pressed="false">
+        <button class="btn-exam-cram-toggle" id="examCramToggleBtn" title="⚡ حالت آزمون / شب امتحان" aria-label="حالت آزمون / شب امتحان" aria-pressed="false">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="cram-bolt-icon">
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
           </svg>
@@ -234,6 +234,19 @@
           <option value="shabnam">شبنم (Shabnam)</option>
           <option value="sahel">ساحل (Sahel)</option>
         </select>
+      </div>
+
+      <!-- Mobile Exam Cram Toggle Button -->
+      <div style="margin-block-end: var(--space-4);">
+        <button type="button" class="btn-exam-cram-toggle" id="mobileExamCramToggleBtn" style="width: 100%; height: auto; padding: 10px 14px; font-size: 13px; font-weight: 800; justify-content: space-between; border-radius: var(--radius-md);" title="⚡ حالت آزمون / شب امتحان" aria-label="حالت آزمون / شب امتحان" aria-pressed="false">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="cram-bolt-icon">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>⚡ حالت آزمون / شب امتحان</span>
+          </div>
+          <span style="font-size: 10.5px; background: #059669; color: #fff; padding: 2px 7px; border-radius: var(--radius-full);">مرور سریع</span>
+        </button>
       </div>
 
       <!-- Mobile Quiz Link -->
