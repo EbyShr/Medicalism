@@ -1621,15 +1621,15 @@
   align-items: center;
   gap: 6px;
   color: #ffffff;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 800;
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: var(--radius-full);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .trauma-topic-num-pill {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--text-muted);
 }
@@ -1645,7 +1645,7 @@
   line-height: 1.45;
 }
 
-/* Sub-Heading Banners (Theory, OSCE Algorithm, Organ Specific, etc.) */
+/* Sub-Heading Banners (Only for top-level thematic sections) */
 .trauma-subhead-banner {
   display: flex;
   align-items: center;
@@ -1689,122 +1689,117 @@
   white-space: nowrap;
 }
 
-/* Beautiful Unordered Bullet Micro-Cards */
+/* Beautiful Unordered Bullet Micro-Cards (ZERO FLOATING DOTS!) */
 .summary-topic-card ul {
-  list-style: none;
-  padding-inline-start: 0;
-  margin: 14px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  list-style: none !important;
+  padding-inline-start: 0 !important;
+  margin: 14px 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
 }
 
 .summary-topic-card ul > li {
-  position: relative;
-  padding: 12px 18px 12px 16px;
-  padding-inline-start: 32px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  font-size: 1.0rem;
-  line-height: 2.05;
-  color: var(--text-primary);
-  transition: all var(--transition-fast);
+  position: relative !important;
+  padding: 12px 18px !important;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-inline-start: 4px solid var(--topic-accent, #e11d48) !important;
+  border-radius: var(--radius-md) !important;
+  font-size: 1.0rem !important;
+  line-height: 2.05 !important;
+  color: var(--text-primary) !important;
+  transition: all var(--transition-fast) !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* STRICTLY NO FLOATING PSEUDO-ELEMENT DOTS */
+.summary-topic-card ul > li::before,
+.summary-topic-card ul ul > li::before,
+.summary-topic-card ol ul > li::before {
+  display: none !important;
+  content: none !important;
 }
 
 [data-theme="dark"] .summary-topic-card ul > li {
-  background: rgba(30, 41, 59, 0.45);
+  background: rgba(30, 41, 59, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .summary-topic-card ul > li:hover {
-  border-color: var(--border-default);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-}
-
-.summary-topic-card ul > li::before {
-  content: "";
-  position: absolute;
-  inset-inline-start: 14px;
-  top: 21px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--topic-accent, #e11d48);
-  box-shadow: 0 0 6px var(--topic-accent, #e11d48);
+  border-color: var(--border-default) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05) !important;
+  transform: translateX(-2px);
 }
 
 .summary-topic-card ul > li strong {
-  color: var(--text-primary);
-  font-weight: 800;
+  color: var(--text-primary) !important;
+  font-weight: 800 !important;
 }
 
 /* Nested Sub-Lists inside Bullet Cards */
 .summary-topic-card ul ul,
 .summary-topic-card ol ul {
-  margin-block-start: 10px;
-  padding-inline-start: 8px;
-  gap: 8px;
+  margin-block-start: 10px !important;
+  padding-inline-start: 6px !important;
+  gap: 8px !important;
 }
 
 .summary-topic-card ul ul > li,
 .summary-topic-card ol ul > li {
-  background: var(--bg-body-secondary);
-  border: 1px dashed var(--border-subtle);
-  font-size: 0.96rem;
-  line-height: 1.95;
-  padding: 8px 14px 8px 24px;
+  background: var(--bg-body-secondary) !important;
+  border: 1px dashed var(--border-subtle) !important;
+  border-inline-start: 3px solid var(--topic-accent, #e11d48) !important;
+  font-size: 0.96rem !important;
+  line-height: 1.95 !important;
+  padding: 10px 14px !important;
 }
 
-.summary-topic-card ul ul > li::before,
-.summary-topic-card ol ul > li::before {
-  width: 6px;
-  height: 6px;
-  top: 18px;
-  inset-inline-start: 10px;
-  background: var(--text-muted);
-  box-shadow: none;
+[data-theme="dark"] .summary-topic-card ul ul > li,
+[data-theme="dark"] .summary-topic-card ol ul > li {
+  background: rgba(15, 23, 42, 0.5) !important;
 }
 
 /* Step-by-Step Clinical Management Stepper Cards */
 .summary-topic-card ol {
-  list-style: none;
-  counter-reset: trauma-step;
-  padding-inline-start: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin: 18px 0;
+  list-style: none !important;
+  counter-reset: trauma-step !important;
+  padding-inline-start: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  margin: 18px 0 !important;
 }
 
 .summary-topic-card ol > li {
-  counter-increment: trauma-step;
-  position: relative;
-  background: linear-gradient(135deg, var(--bg-body-secondary) 0%, var(--bg-surface) 100%);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 16px 20px 16px 16px;
-  border-inline-start: 5px solid var(--topic-accent, #e11d48);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-  font-size: 1.0rem;
-  line-height: 2.05;
+  counter-increment: trauma-step !important;
+  position: relative !important;
+  background: linear-gradient(135deg, var(--bg-body-secondary) 0%, var(--bg-surface) 100%) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 18px 22px !important;
+  border-inline-start: 6px solid var(--topic-accent, #e11d48) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02) !important;
+  font-size: 1.0rem !important;
+  line-height: 2.05 !important;
 }
 
 [data-theme="dark"] .summary-topic-card ol > li {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.7) 100%);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.7) 100%) !important;
 }
 
 .summary-topic-card ol > li::before {
   content: "گام " counter(trauma-step);
   display: inline-block;
   background: var(--topic-accent, #e11d48);
-  color: #ffffff;
-  font-size: 0.8rem;
+  color: #ffffff !important;
+  font-size: 0.82rem;
   font-weight: 800;
-  padding: 3px 12px;
+  padding: 4px 14px;
   border-radius: var(--radius-full);
   margin-inline-end: 12px;
   vertical-align: middle;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
 }
 
 /* Emergency Trap Callouts */
@@ -1864,14 +1859,14 @@
   margin: 0;
 }
 
-/* Modern Clinical Tables */
+/* Modern Clinical Tables - CRYSTAL CLEAR HEADERS */
 .trauma-table-wrapper {
-  margin-block: 24px;
+  margin-block: 26px;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
 }
 
 .table-card-header {
@@ -1905,20 +1900,38 @@
   margin: 0;
 }
 
-.trauma-table-wrapper table th {
-  background: var(--bg-surface-secondary, rgba(0, 0, 0, 0.03));
-  color: var(--text-primary);
-  font-weight: 800;
-  font-size: 0.92rem;
-  padding: 14px 16px;
-  border-block-end: 2px solid var(--border-default);
-  text-align: right;
-  direction: rtl;
+/* HIGH-CONTRAST HEADER - DARK SLATE WITH PURE WHITE TEXT */
+.trauma-table-wrapper table thead,
+.exam-summary-view .trauma-table-wrapper table thead {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+.trauma-table-wrapper table thead th,
+.exam-summary-view .trauma-table-wrapper table thead th,
+.exam-summary-view table thead th {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  font-size: 0.94rem !important;
+  padding: 14px 18px !important;
+  border: none !important;
+  border-block-end: 2px solid #334155 !important;
+  text-align: right !important;
+  direction: rtl !important;
+  white-space: nowrap !important;
+}
+
+[data-theme="dark"] .trauma-table-wrapper table thead th,
+[data-theme="dark"] .exam-summary-view .trauma-table-wrapper table thead th,
+[data-theme="dark"] .exam-summary-view table thead th {
+  background: linear-gradient(135deg, #020617 0%, #0f172a 100%) !important;
+  color: #38bdf8 !important;
+  border-block-end-color: #1e293b !important;
 }
 
 .trauma-table-wrapper table td {
-  padding: 13px 16px;
-  font-size: 0.95rem;
+  padding: 14px 18px;
+  font-size: 0.96rem;
   line-height: 1.9;
   border-block-end: 1px solid var(--border-subtle);
   text-align: right;
@@ -1926,7 +1939,7 @@
 }
 
 .trauma-table-wrapper table tbody tr:nth-child(even) {
-  background: rgba(0, 0, 0, 0.015);
+  background: rgba(0, 0, 0, 0.02);
 }
 
 [data-theme="dark"] .trauma-table-wrapper table tbody tr:nth-child(even) {
@@ -1941,9 +1954,26 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
-/* Master Card Item Spacing & Comfort */
+/* Myotomes Table (Table 4): Both Action Columns (1 & 4) Highlighted */
+.myotomes-table-wrapper table td:first-child,
+.myotomes-table-wrapper table td:nth-child(4) {
+  font-weight: 900 !important;
+  color: #0284c7 !important;
+  background-color: rgba(2, 132, 199, 0.09) !important;
+  border-inline-end: 2px solid rgba(2, 132, 199, 0.25) !important;
+}
+
+[data-theme="dark"] .myotomes-table-wrapper table td:first-child,
+[data-theme="dark"] .myotomes-table-wrapper table td:nth-child(4) {
+  color: #38bdf8 !important;
+  background-color: rgba(56, 189, 248, 0.14) !important;
+  border-inline-end-color: rgba(56, 189, 248, 0.35) !important;
+}
+
+/* Master Card Item Spacing & Comfort (at bottom of summary) */
 .summary-master-card {
   padding: var(--space-6) var(--space-6);
+  margin-block-start: var(--space-6);
   margin-block-end: var(--space-6);
 }
 

@@ -4,8 +4,12 @@ Enhanced High-Yield Exam Summary Builder for Surgery Chapter 7: Trauma
 Features:
 - Fixes dense unbroken paragraph bug by ensuring blank lines before lists and subheadings
 - Thematic color identities for all 8 topics
-- Rich clinical component cards (Theory box, Stepper box, Trap callout, Clinical table card)
-- Topic quick-jump navigation bar
+- Zero floating pseudo-element dots (pure border-accent cards)
+- Clean clinical tables with high-contrast crystal-clear headers
+- All table rows preserved inside tables (Table 7, 8, 9)
+- Table 4 (Myotomes) dual action columns highlighted (Upper & Lower)
+- Removed top quick-jump nav bar per user request
+- Placed 1-minute golden master card at the very END of the summary per user request
 - Injects updated examSummaryHtml and summaryContent into js/data/surgery-registry.js and surgery_registry.json
 """
 
@@ -79,21 +83,77 @@ TOPIC_CONFIGS = [
     }
 ]
 
+TOP_LEVEL_SUBHEADS = [
+    ('پاتوفیزیولوژی و نکات طلایی تئوری', '🧬', 'پاتوفیزیولوژی و نکات طلایی تئوری', 'نکات پایه و تئوری', 'trauma-theory-box'),
+    ('مسیر مدیریت گام‌به‌گام بیمار', '🩺', 'مسیر مدیریت گام‌به‌گام بالینی (کیس‌محور و OSCE)', 'الگوریتم تصمیم‌گیری', 'trauma-stepper-box'),
+    ('سندرم‌های نخاعی ناقص و مسیر تشخیصی', '🦴', 'سندرم‌های نخاعی ناقص و مسیر تشخیصی', 'نورولوژی تروما', 'trauma-spine-box'),
+    ('توراکوتومی احیایی در اورژانس', '🫁', 'توراکوتومی احیایی در اورژانس (EDT) و REBOA', 'مداخلات اورژانس', 'trauma-chest-box'),
+    ('مدیریت اختصاصی ارگان‌های داخل شکمی', '🛡️', 'مدیریت اختصاصی ارگان‌های داخل شکمی', 'رویکرد به احشا', 'trauma-organ-box'),
+    ('جراحی کنترل آسیب', '⚡', 'جراحی کنترل آسیب (Damage Control) و ACS', 'پروتکل فازیک', 'trauma-dcs-box'),
+    ('آسیب‌های ادراری-تناسلی تحتانی', '💧', 'آسیب‌های ادراری-تناسلی تحتانی (مثانه و پیشابراه)', 'اورولوژی تروما', 'trauma-gu-box'),
+    ('ترومای نافذ گردن', '🎯', 'ترومای نافذ گردن (نواحی سیاه‌سفید I تا III)', 'رویکرد عروقی و هوایی', 'trauma-neck-box'),
+    ('ترومای اندام، سندرم کمپارتمان و رابدومیولیز', '🩹', 'ترومای اندام، سندرم کمپارتمان و رابدومیولیز', 'ارتوپدی و تروما', 'trauma-extremity-box')
+]
+
+def clean_trauma_tables(text):
+    # Fix Table 4 headers (clarify upper vs lower extremity actions)
+    text = re.sub(
+        r'\| عملکرد حرکتی \| گروه عضلانی \| سگمان نخاعی \| عملکرد حرکتی \| گروه عضلانی \| سگمان نخاعی \|',
+        r'| عملکرد حرکتی (اندام فوقانی) | عضلات درگیر | سگمان نخاعی | عملکرد حرکتی (اندام تحتانی) | عضلات درگیر | سگمان نخاعی |',
+        text
+    )
+
+    # Fix Table 7: remove empty lines between rows
+    def fix_t7(m):
+        header = m.group(1)
+        body = m.group(2)
+        clean_body = re.sub(r'\n\s*\n\s*\|', r'\n|', body)
+        return header + clean_body
+
+    text = re.sub(r'(###\s+جدول\s+۷:[^\n]+.*?\n)(\|.*?)(?=\n\n\*\*|\n\n###|\n## |$)', fix_t7, text, flags=re.DOTALL)
+
+    # Fix Table 8: remove empty lines, ensure 3 full columns for all 3 mechanisms
+    def fix_t8(m):
+        header = m.group(1)
+        clean_body = """| مکانیسم شکستگی | ویژگی بیومکانیکی و بالینی | اصول مدیریت خونریزی لگنی |
+| :--- | :--- | :--- |
+| **فشردگی جانبی (Lateral Compression - LC)** | **شایع‌ترین و پایدارترین نوع** (کمترین احتمال پارگی لیگامان‌های ساکروایلیاک). | **۱. منشأ خونریزی:** ۹۰٪ از **شبکه وریدی پره‌ساکرال** و لبه‌های استخوان؛ **۱۰٪ شریانی**.<br>**۲. پایدارسازی مکانیکی حجم لگن:** بستن ملافه یا **Pelvic Binder** (بهترین اثر در شکستگی AP) یا فیکساتور خارجی ارتوپدی.<br>**۳. خط قرمز:** **باز کردن جراحی رتروپریتوئن ممنوع است** (اثر تامپوناد را از بین می‌برد؛ در صورت لاپاراتومی برای طحال، هماتوم لگن به صورت جداگانه پک می‌شود).<br>**۴. خونریزی شریانی فعال (Extravasation در CT):** **آنژیوامبولیزاسیون با کاتتر (درمان انتخابی)**. |
+| **فشردگی قدامی-خلفی (AP Compression)** | ایجاد شکستگی **کتاب باز (Open-book)**؛ باز شدن سمفیز پوبیس و بال‌های ایلیاک با آسیب متغیر لیگامان ساکروایلیاک. | بستن فوری Pelvic Binder یا ملافه دور تروکانتر بزرگ جهت کاهش حجم لگن و مهار خونریزی وریدی؛ در صورت ناپایداری مستمر، آنژیوامبولیزاسیون فوری. |
+| **برش عمودی (Vertical Shear)** | **نادرترین و ناپایدارترین نوع**؛ جدا شدن همی‌پلویس از ستون فقرات با آسیب شدید عروقی و احشایی. | ناپایدارترین مکانیسم با مورتالیتی بالا؛ نیازمند فیکساسیون اسکلتی اورژانس، احیای پرحجم خون و ارزیابی تهاجمی عروقی/احشایی. |"""
+        return header + "\n" + clean_body + "\n"
+
+    text = re.sub(r'(###\s+جدول\s+۸:[^\n]+.*?\n)(\|.*?)(?=\n\n\*\*|\n\n###|\n## |$)', fix_t8, text, flags=re.DOTALL)
+
+    # Fix Table 9: remove empty lines between rows
+    def fix_t9(m):
+        header = m.group(1)
+        body = m.group(2)
+        clean_body = re.sub(r'\n\s*\n\s*\|', r'\n|', body)
+        return header + clean_body
+
+    text = re.sub(r'(###\s+جدول\s+۹:[^\n]+.*?\n)(\|.*?)(?=\n\n\*\*|\n\n###|\n## |$)', fix_t9, text, flags=re.DOTALL)
+
+    return text
+
 def preprocess_markdown(raw_text):
     text = re.sub(r'\s*\(صفحات\s*[\d\u06F0-\u06F9]+\s*تا\s*[\d\u06F0-\u06F9]+\)', '', raw_text)
+    
+    # Clean tables first
+    text = clean_trauma_tables(text)
+
     # Ensure double newlines before lists
     text = re.sub(r'([^\n])\n([ \t]*[-*]\s+)', r'\1\n\n\2', text)
     text = re.sub(r'([^\n])\n([ \t]*\d+\.\s+)', r'\1\n\n\2', text)
     # Ensure double newlines after subheadings
     text = re.sub(r'(\*\*[^*]+:\*\*)\n([^\n])', r'\1\n\n\2', text)
-    # Ensure double newlines before blockquotes
-    text = re.sub(r'([^\n])\n(>\s+)', r'\1\n\n\2', text)
-    # Ensure double newlines after blockquotes
-    text = re.sub(r'(>[^\n]+)\n([^\n>])', r'\1\n\n\2', text)
+    # Ensure double newlines before blockquotes (line must start with >)
+    text = re.sub(r'(?m)([^\n])\n(>[ \t]+)', r'\1\n\n\2', text)
+    # Ensure double newlines after blockquotes (line starting with > followed by non-> line)
+    text = re.sub(r'(?m)(^>[^\n]*)\n([^>\n])', r'\1\n\n\2', text)
     # Ensure double newlines before table headings
     text = re.sub(r'([^\n])\n(###\s+جدول)', r'\1\n\n\2', text)
-    # Ensure double newlines before table start |
-    text = re.sub(r'([^\n|])\n(\|)', r'\1\n\n\2', text)
+    # Ensure double newlines before table start | (only if previous line was not a pipe row)
+    text = re.sub(r'(?m)^([^|\n].*)\n(\|.*)$', r'\1\n\n\2', text)
     return text
 
 def transform_topic_body_html(html, color):
@@ -120,8 +180,13 @@ def transform_topic_body_html(html, color):
         h3_title = m.group(1).strip()
         table_html = m.group(2).strip()
         table_html = table_html.replace('style="text-align: left;"', 'style="text-align: right; direction: rtl;"')
+        
+        # Check if this is Table 4 (Myotomes)
+        is_myotomes = 'عصب‌دهی' in h3_title or 'Myotomes' in h3_title or 'جدول ۴' in h3_title
+        extra_class = " myotomes-table-wrapper" if is_myotomes else ""
+
         return f"""
-        <div class="trauma-table-wrapper">
+        <div class="trauma-table-wrapper{extra_class}">
           <div class="table-card-header">
             <span class="table-icon">📊</span>
             <h4 class="table-card-title">{h3_title}</h4>
@@ -135,21 +200,10 @@ def transform_topic_body_html(html, color):
     html = re.sub(r'(?<!<div class="exam-table-responsive">)(<table.*?>.*?</table>)', r'<div class="exam-table-responsive">\1</div>', html, flags=re.DOTALL)
 
     # 3. Transform Sub-headings like <p><strong>عنوان:</strong></p> into stylish section banners
-    subheading_icons = {
-        'پاتوفیزیولوژی': ('🧬', 'پاتوفیزیولوژی و نکات طلایی تئوری', 'نکات پایه و تئوری', 'trauma-theory-box'),
-        'مسیر مدیریت': ('🩺', 'مسیر مدیریت گام‌به‌گام بیمار (کیس‌محور و OSCE)', 'الگوریتم تصمیم‌گیری', 'trauma-stepper-box'),
-        'سندرم‌های نخاعی': ('🦴', 'سندرم‌های نخاعی ناقص و مسیر تشخیصی', 'نورولوژی تروما', 'trauma-spine-box'),
-        'توراکوتومی': ('🫁', 'توراکوتومی احیایی در اورژانس (EDT) و REBOA', 'مداخلات اورژانس', 'trauma-chest-box'),
-        'مدیریت اختصاصی ارگان': ('🛡️', 'مدیریت اختصاصی ارگان‌های داخل شکمی', 'رویکرد به احشا', 'trauma-organ-box'),
-        'جراحی کنترل آسیب': ('⚡', 'جراحی کنترل آسیب (Damage Control) و ACS', 'پروتکل فازیک', 'trauma-dcs-box'),
-        'آسیب‌های ادراری': ('💧', 'آسیب‌های ادراری-تناسلی تحتانی (مثانه و پیشابراه)', 'اورولوژی تروما', 'trauma-gu-box'),
-        'ترومای نافذ گردن': ('🎯', 'ترومای نافذ گردن (نواحی سیاه‌سفید I تا III)', 'رویکرد عروقی و هوایی', 'trauma-neck-box'),
-        'ترومای اندام': ('🩹', 'ترومای اندام، سندرم کمپارتمان و رابدومیولیز', 'ارتوپدی و تروما', 'trauma-extremity-box'),
-    }
-
+    # STRICT MATCHING: Only top-level subheadings, NEVER nested bullet bold titles!
     def format_subhead(m):
         raw_text = m.group(1).strip()
-        for key, (icon, clean_title, tag, box_cls) in subheading_icons.items():
+        for key, icon, clean_title, tag, box_cls in TOP_LEVEL_SUBHEADS:
             if key in raw_text:
                 return f"""
                 <div class="trauma-subhead-banner {box_cls}" style="border-inline-start-color: {color};">
@@ -160,15 +214,8 @@ def transform_topic_body_html(html, color):
                   <span class="subhead-tag" style="background: {color}1a; color: {color};">{tag}</span>
                 </div>
                 """
-        clean_text = raw_text.replace(':', '').strip()
-        return f"""
-        <div class="trauma-subhead-banner" style="border-inline-start-color: {color};">
-          <div class="subhead-main">
-            <span class="subhead-icon">📌</span>
-            <h4 class="subhead-title">{clean_text}</h4>
-          </div>
-        </div>
-        """
+        # If not a recognized top-level heading, leave it as normal paragraph bold text!
+        return f"<p><strong>{raw_text}</strong></p>"
 
     html = re.sub(r'<p>\s*<strong>([^<]+:[^<]*)</strong>\s*</p>', format_subhead, html)
 
@@ -267,7 +314,6 @@ def build_trauma_summary_html(clean_md):
     # 3. Extract Intermediate Topic Sections with Thematic Colors & Modern Badges
     parts = re.split(r'\n(?=## )', clean_md)
     topic_cards = []
-    nav_pills = []
     
     sec_idx = 0
     for part in parts:
@@ -284,20 +330,11 @@ def build_trauma_summary_html(clean_md):
         topic_body_md = '\n'.join(lines[1:]).strip()
         topic_body_md = re.sub(r'^\s*---\s*$', '', topic_body_md, flags=re.MULTILINE)
         
-        # Get topic config
         cfg = TOPIC_CONFIGS[(sec_idx - 1) % len(TOPIC_CONFIGS)]
         color = cfg['color']
         badge_text = cfg['badge']
         icon = cfg['icon']
-        short_title = cfg['short_title']
         card_id = f"traumaTopic-{sec_idx}"
-        
-        nav_pills.append(f"""
-          <a href="#{card_id}" class="summary-nav-pill" style="--pill-color: {color};">
-            <span>{icon}</span>
-            <span>بخش {sec_idx}: {short_title}</span>
-          </a>
-        """)
         
         # Convert to HTML with tables & fenced code
         raw_html = markdown.markdown(topic_body_md, tab_length=2, extensions=['tables', 'fenced_code'])
@@ -326,6 +363,8 @@ def build_trauma_summary_html(clean_md):
         """)
 
     # 4. Assemble Full Exam Summary View
+    # NOTE: Master card placed at the very END as explicitly requested!
+    # NOTE: Top quick jump nav removed as explicitly requested!
     full_summary_html = f"""
     <div class="exam-summary-container">
       <!-- Top Exam Summary Hero Banner -->
@@ -346,7 +385,7 @@ def build_trauma_summary_html(clean_md):
             <span>📖 بازگشت به درسنامه کامل</span>
           </button>
           <a href="#summaryMasterCard" class="btn-jump-master">
-            <span>⚡ پرش به نکات ۱ دقیقه‌ای شب امتحان</span>
+            <span>⚡ پرش به جمع‌بندی نهایی انتهای فصل</span>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <polyline points="19 12 12 19 5 12"></polyline>
@@ -355,21 +394,16 @@ def build_trauma_summary_html(clean_md):
         </div>
       </header>
 
-      <!-- Topic Quick-Jump Bar -->
-      <nav class="summary-topics-nav" aria-label="دسترسی سریع به بخش‌های تروما">
-        {"".join(nav_pills)}
-      </nav>
-
       <!-- 1. Clinical Tree & Decision Pathways -->
       {tree_html}
 
-      <!-- 2. Master 1-Minute Cram Card -->
-      {master_html}
-
-      <!-- 3. Comprehensive High-Yield Topic Cards -->
+      <!-- 2. Comprehensive High-Yield Topic Cards -->
       <div class="summary-topics-container">
         {"".join(topic_cards)}
       </div>
+
+      <!-- 3. Master 1-Minute Cram Card (Placed at the very END of summary) -->
+      {master_html}
 
       <!-- Bottom Sticky-Like Return & Completion Action Bar -->
       <footer class="summary-bottom-bar">
