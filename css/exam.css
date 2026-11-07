@@ -1579,3 +1579,376 @@
   transform: translateY(-1px);
 }
 
+
+/* ==========================================================================
+   ENHANCED HIGH-YIELD EXAM SUMMARY COMPONENT STYLES (TRAUMA & SURGERY REDESIGN)
+   Transforms dense text walls into modern, colorful, eye-friendly medical cards
+   ========================================================================== */
+
+/* Enhanced Topic Card Container */
+.summary-topic-card {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6) var(--space-6);
+  margin-block-end: var(--space-6);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  transition: all var(--transition-fast);
+}
+
+.summary-topic-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+/* Topic Card Header with Thematic Badge */
+.trauma-topic-header-group {
+  margin-block-end: var(--space-5);
+  padding-block-end: 14px;
+  border-block-end: 1px solid var(--border-subtle);
+}
+
+.trauma-topic-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-block-end: 10px;
+}
+
+.trauma-topic-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.trauma-topic-num-pill {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.summary-topic-title {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.45;
+}
+
+/* Sub-Heading Banners (Theory, OSCE Algorithm, Organ Specific, etc.) */
+.trauma-subhead-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, var(--bg-body-secondary) 0%, var(--bg-surface) 100%);
+  border: 1px solid var(--border-subtle);
+  border-inline-start: 5px solid var(--topic-accent, #e11d48);
+  border-radius: var(--radius-lg);
+  margin-block: 24px 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="dark"] .trauma-subhead-banner {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
+}
+
+.subhead-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.subhead-icon {
+  font-size: 1.25rem;
+}
+
+.subhead-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.subhead-tag {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+/* Beautiful Unordered Bullet Micro-Cards */
+.summary-topic-card ul {
+  list-style: none;
+  padding-inline-start: 0;
+  margin: 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.summary-topic-card ul > li {
+  position: relative;
+  padding: 12px 18px 12px 16px;
+  padding-inline-start: 32px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  font-size: 1.0rem;
+  line-height: 2.05;
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+}
+
+[data-theme="dark"] .summary-topic-card ul > li {
+  background: rgba(30, 41, 59, 0.45);
+}
+
+.summary-topic-card ul > li:hover {
+  border-color: var(--border-default);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.summary-topic-card ul > li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 14px;
+  top: 21px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--topic-accent, #e11d48);
+  box-shadow: 0 0 6px var(--topic-accent, #e11d48);
+}
+
+.summary-topic-card ul > li strong {
+  color: var(--text-primary);
+  font-weight: 800;
+}
+
+/* Nested Sub-Lists inside Bullet Cards */
+.summary-topic-card ul ul,
+.summary-topic-card ol ul {
+  margin-block-start: 10px;
+  padding-inline-start: 8px;
+  gap: 8px;
+}
+
+.summary-topic-card ul ul > li,
+.summary-topic-card ol ul > li {
+  background: var(--bg-body-secondary);
+  border: 1px dashed var(--border-subtle);
+  font-size: 0.96rem;
+  line-height: 1.95;
+  padding: 8px 14px 8px 24px;
+}
+
+.summary-topic-card ul ul > li::before,
+.summary-topic-card ol ul > li::before {
+  width: 6px;
+  height: 6px;
+  top: 18px;
+  inset-inline-start: 10px;
+  background: var(--text-muted);
+  box-shadow: none;
+}
+
+/* Step-by-Step Clinical Management Stepper Cards */
+.summary-topic-card ol {
+  list-style: none;
+  counter-reset: trauma-step;
+  padding-inline-start: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 18px 0;
+}
+
+.summary-topic-card ol > li {
+  counter-increment: trauma-step;
+  position: relative;
+  background: linear-gradient(135deg, var(--bg-body-secondary) 0%, var(--bg-surface) 100%);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px 16px 16px;
+  border-inline-start: 5px solid var(--topic-accent, #e11d48);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  font-size: 1.0rem;
+  line-height: 2.05;
+}
+
+[data-theme="dark"] .summary-topic-card ol > li {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.7) 100%);
+}
+
+.summary-topic-card ol > li::before {
+  content: "گام " counter(trauma-step);
+  display: inline-block;
+  background: var(--topic-accent, #e11d48);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 3px 12px;
+  border-radius: var(--radius-full);
+  margin-inline-end: 12px;
+  vertical-align: middle;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Emergency Trap Callouts */
+.trauma-trap-callout {
+  margin-block: 22px;
+  padding: 18px 22px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(245, 158, 11, 0.05) 100%);
+  border: 1.5px solid rgba(239, 68, 68, 0.35);
+  border-inline-start: 6px solid #ef4444;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.06);
+}
+
+[data-theme="dark"] .trauma-trap-callout {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.16) 0%, rgba(245, 158, 11, 0.08) 100%);
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
+.trap-callout-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-block-end: 10px;
+  padding-block-end: 8px;
+  border-block-end: 1px dashed rgba(239, 68, 68, 0.25);
+}
+
+.trap-icon-box {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.trap-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 900;
+  color: #dc2626;
+}
+
+[data-theme="dark"] .trap-title {
+  color: #f87171;
+}
+
+.trap-callout-body {
+  font-size: 1.0rem;
+  line-height: 2.0;
+  color: var(--text-primary);
+}
+
+.trap-callout-body p {
+  margin: 0;
+}
+
+/* Modern Clinical Tables */
+.trauma-table-wrapper {
+  margin-block: 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+}
+
+.table-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: var(--bg-body-secondary);
+  border-block-end: 1px solid var(--border-subtle);
+}
+
+.table-icon {
+  font-size: 1.2rem;
+}
+
+.table-card-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.trauma-table-wrapper .exam-table-responsive {
+  padding: 0;
+  margin: 0;
+}
+
+.trauma-table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.trauma-table-wrapper table th {
+  background: var(--bg-surface-secondary, rgba(0, 0, 0, 0.03));
+  color: var(--text-primary);
+  font-weight: 800;
+  font-size: 0.92rem;
+  padding: 14px 16px;
+  border-block-end: 2px solid var(--border-default);
+  text-align: right;
+  direction: rtl;
+}
+
+.trauma-table-wrapper table td {
+  padding: 13px 16px;
+  font-size: 0.95rem;
+  line-height: 1.9;
+  border-block-end: 1px solid var(--border-subtle);
+  text-align: right;
+  direction: rtl;
+}
+
+.trauma-table-wrapper table tbody tr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.015);
+}
+
+[data-theme="dark"] .trauma-table-wrapper table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.trauma-table-wrapper table tbody tr:hover {
+  background: rgba(0, 0, 0, 0.035);
+}
+
+[data-theme="dark"] .trauma-table-wrapper table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Master Card Item Spacing & Comfort */
+.summary-master-card {
+  padding: var(--space-6) var(--space-6);
+  margin-block-end: var(--space-6);
+}
+
+.master-card-list li {
+  padding: 12px 18px;
+  font-size: 1.02rem;
+  line-height: 2.05;
+}
