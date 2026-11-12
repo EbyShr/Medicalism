@@ -658,9 +658,11 @@
         let correctCount = 0;
 
         questions.forEach(q => {
-          const ans = chAnswers[q.id] || chAnswers[String(q.id)] ||
-                      globalAnswers[q.id] || globalAnswers[String(q.id)] ||
-                      allAnswers[q.id] || allAnswers[String(q.id)];
+          const qKey = q.globalId || `${ch.id}_${q.id}`;
+          const isSurgId = typeof q.id === 'string' && q.id.startsWith('surg_');
+          const ans = chAnswers[qKey] || chAnswers[q.id] || chAnswers[String(q.id)] ||
+                      globalAnswers[qKey] || (isSurgId ? globalAnswers[q.id] : undefined) ||
+                      allAnswers[qKey] || (isSurgId ? allAnswers[q.id] : undefined);
           if (ans !== undefined && ans !== null) {
             answeredCount++;
             if (ans === q.correct_answer) {
@@ -940,7 +942,7 @@
     }
 
     startSingleChapterQuiz(chapterId, mode = 'study') {
-      this.startQuiz(chapterId, mode);
+      this.startQuiz(chapterId, mode, true);
     }
 
     startConfiguredCourseQuiz() {
@@ -953,10 +955,10 @@
       const isAllSelected = individual.length > 0 && individual.every(c => this.selectedChapterIds.has(c.id));
 
       if (isAllSelected) {
-        this.startQuiz(`${this.currentCourseId}-all`, this.selectedCourseMode);
+        this.startQuiz(`${this.currentCourseId}-all`, this.selectedCourseMode, true);
       } else {
         const selectedList = Array.from(this.selectedChapterIds);
-        this.startQuiz(selectedList, this.selectedCourseMode);
+        this.startQuiz(selectedList, this.selectedCourseMode, true);
       }
     }
 
@@ -984,6 +986,17 @@
     /* ==========================================================================
        START QUIZ & RANDOM QUESTION ORDER ENGINE (حالت مطالعه با چیدمان تصادفی)
        ========================================================================== */
+    getQuestionKey(q) {
+      if (!q) return '';
+      if (q.globalId) return String(q.globalId);
+      const idStr = String(q.id || '');
+      if (idStr.startsWith('surg_') || idStr.startsWith('ncd_') || idStr.startsWith('rad_')) {
+        return idStr;
+      }
+      const chap = q.chapterId || (this.currentQuiz && this.currentQuiz.id) || 'global';
+      return `${chap}_${idStr}`;
+    }
+
     shuffleArray(arr) {
       const a = [...arr];
       for (let i = a.length - 1; i > 0; i--) {
@@ -997,7 +1010,14 @@
       if (this.mode !== 'study' || !this.allQuestions || this.allQuestions.length === 0) return;
       this.filteredQuestions = this.shuffleArray([...this.allQuestions]);
       this.currentIndex = 0;
+      this.answers = {};
+      this.flags = new Set();
+      this.strikes = {};
+      this.isSubmitted = false;
+      this.pacingSeconds = 0;
+      this.questionPacingMap = {};
       this.renderCurrentQuestion();
+      if (this.dom.explanationCard) this.dom.explanationCard.style.display = 'none';
       window.scrollTo({ top: 120, behavior: 'smooth' });
     }
 
@@ -1005,7 +1025,7 @@
       this.shuffleCurrentQuestions();
     }
 
-    async startQuiz(quizId, initialMode = 'study') {
+    async startQuiz(quizId, initialMode = 'study', isFreshSession = false) {
       try {
         let quizMeta = null;
         if (typeof quizId === 'string') {
@@ -1037,8 +1057,28 @@
           return;
         }
 
-        // Restore state from LocalStorage
-        this.restoreState();
+        // Clean session initialization for Study Mode or fresh runs (ensures 0 pre-answered questions)
+        if (this.mode === 'study' || isFreshSession) {
+          this.answers = {};
+          this.flags = new Set();
+          this.strikes = {};
+          this.isSubmitted = false;
+          this.timerSeconds = 0;
+          this.pacingSeconds = 0;
+          this.questionPacingMap = {};
+          const qIdStr = typeof quizId === 'string' ? quizId : (Array.isArray(quizId) ? quizId.join(',') : '');
+          if (qIdStr) {
+            try {
+              localStorage.removeItem(`med_quiz_answers_${qIdStr}`);
+              localStorage.removeItem(`med_quiz_flags_${qIdStr}`);
+              localStorage.removeItem(`med_quiz_submitted_${qIdStr}`);
+              localStorage.removeItem(`med_quiz_time_${qIdStr}`);
+            } catch (e) {}
+          }
+        } else {
+          // Restore state from LocalStorage for resuming exam session
+          this.restoreState();
+        }
 
         if (this.mode === 'study') {
           // Shuffle all questions in randomized order across selected topics!
@@ -1096,11 +1136,11 @@
       }
 
       const q = this.filteredQuestions[this.currentIndex];
-      const qId = q.id;
-      const isAnswered = this.answers.hasOwnProperty(qId);
-      const selectedKey = this.answers[qId];
+      const qKey = this.getQuestionKey(q);
+      const isAnswered = this.answers.hasOwnProperty(qKey) || (q.id && String(q.id) === qKey && this.answers.hasOwnProperty(q.id));
+      const selectedKey = this.answers[qKey] || (q.id && this.answers[q.id]);
       const isCorrect = isAnswered && selectedKey === q.correct_answer;
-      const isFlagged = this.flags.has(qId);
+      const isFlagged = this.flags.has(qKey) || (q.id && this.flags.has(q.id));
 
       // Meta & Header
       if (this.dom.questionCounter) {
@@ -1178,14 +1218,14 @@
 
       // Per-Question Pacing Timer Handling
       if (isAnswered) {
-        this.stopPacingTimer(qId);
+        this.stopPacingTimer(qKey);
       } else {
-        this.startPacingTimer(qId);
+        this.startPacingTimer(qKey);
       }
 
       // Render Options
       const showFeedback = (this.mode === 'study' && isAnswered) || this.isSubmitted;
-      const qStrikes = (this.strikes && this.strikes[qId]) || new Set();
+      const qStrikes = (this.strikes && this.strikes[qKey]) || new Set();
       let optionsHtml = '';
 
       q.options.forEach(opt => {
@@ -1269,7 +1309,7 @@
         // Right-click toggles strike-through
         el.addEventListener('contextmenu', (e) => {
           e.preventDefault();
-          this.toggleOptionStrike(qId, key);
+          this.toggleOptionStrike(qKey, key);
         });
 
         // Keyboard accessibility (Space on focused option)
@@ -1286,7 +1326,7 @@
           strikeBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             e.preventDefault();
-            this.toggleOptionStrike(qId, key);
+            this.toggleOptionStrike(qKey, key);
           });
         }
       });
@@ -1312,18 +1352,18 @@
 
     handleOptionSelection(optionKey) {
       const q = this.filteredQuestions[this.currentIndex];
-      const qId = q.id;
+      const qKey = this.getQuestionKey(q);
 
       // In Study Mode, if already answered, don't re-answer unless reset
-      if (this.mode === 'study' && this.answers.hasOwnProperty(qId)) {
+      if (this.mode === 'study' && (this.answers.hasOwnProperty(qKey) || (q.id && String(q.id) === qKey && this.answers.hasOwnProperty(q.id)))) {
         return;
       }
 
       // Stop pacing timer for this question
-      this.stopPacingTimer(qId);
+      this.stopPacingTimer(qKey);
 
-      // Record answer
-      this.answers[qId] = optionKey;
+      // Record answer under globally unique key
+      this.answers[qKey] = optionKey;
       this.saveState();
 
       // Re-render question
@@ -1339,11 +1379,11 @@
       }
     }
 
-    toggleOptionStrike(qId, optKey) {
+    toggleOptionStrike(qKey, optKey) {
       if (!this.strikes) this.strikes = {};
-      if (!this.strikes[qId]) this.strikes[qId] = new Set();
+      if (!this.strikes[qKey]) this.strikes[qKey] = new Set();
       
-      const qStrikes = this.strikes[qId];
+      const qStrikes = this.strikes[qKey];
       if (qStrikes.has(optKey)) {
         qStrikes.delete(optKey);
       } else {
@@ -1365,22 +1405,22 @@
       }
     }
 
-    startPacingTimer(qId) {
+    startPacingTimer(qKey) {
       this.clearPacingInterval();
-      this.pacingSeconds = (this.questionPacingMap && this.questionPacingMap[qId]) || 0;
+      this.pacingSeconds = (this.questionPacingMap && this.questionPacingMap[qKey]) || 0;
       this.updatePacingDisplay(false);
 
       this.pacingInterval = setInterval(() => {
         this.pacingSeconds++;
-        if (this.questionPacingMap) this.questionPacingMap[qId] = this.pacingSeconds;
+        if (this.questionPacingMap) this.questionPacingMap[qKey] = this.pacingSeconds;
         this.updatePacingDisplay(false);
       }, 1000);
     }
 
-    stopPacingTimer(qId) {
+    stopPacingTimer(qKey) {
       this.clearPacingInterval();
-      if (qId && this.questionPacingMap) {
-        this.questionPacingMap[qId] = this.pacingSeconds;
+      if (qKey && this.questionPacingMap) {
+        this.questionPacingMap[qKey] = this.pacingSeconds;
       }
       this.updatePacingDisplay(true);
     }
@@ -1748,10 +1788,12 @@
     toggleFlagCurrent() {
       const q = this.filteredQuestions[this.currentIndex];
       if (!q) return;
-      if (this.flags.has(q.id)) {
-        this.flags.delete(q.id);
+      const qKey = this.getQuestionKey(q);
+      if (this.flags.has(qKey) || (q.id && this.flags.has(q.id))) {
+        this.flags.delete(qKey);
+        if (q.id) this.flags.delete(q.id);
       } else {
-        this.flags.add(q.id);
+        this.flags.add(qKey);
       }
       this.saveState();
       this.renderCurrentQuestion();
@@ -1762,9 +1804,10 @@
       let gridHtml = '';
 
       this.filteredQuestions.forEach((q, idx) => {
-        const qId = q.id;
-        const isAnswered = this.answers.hasOwnProperty(qId);
-        const isFlagged = this.flags.has(qId);
+        const qKey = this.getQuestionKey(q);
+        const isAnswered = this.answers.hasOwnProperty(qKey) || (q.id && String(q.id) === qKey && this.answers.hasOwnProperty(q.id));
+        const selectedKey = this.answers[qKey] || (q.id && this.answers[q.id]);
+        const isFlagged = this.flags.has(qKey) || (q.id && this.flags.has(q.id));
         const isActive = idx === this.currentIndex;
 
         let btnClasses = ['matrix-q-btn'];
@@ -1772,7 +1815,7 @@
         
         if (this.isSubmitted || this.mode === 'study') {
           if (isAnswered) {
-            if (this.answers[qId] === q.correct_answer) {
+            if (selectedKey === q.correct_answer) {
               btnClasses.push('is-correct');
             } else {
               btnClasses.push('is-wrong');
@@ -1875,7 +1918,10 @@
        ========================================================================== */
     confirmSubmitExam() {
       const total = this.filteredQuestions.length;
-      const answered = this.filteredQuestions.filter(q => this.answers.hasOwnProperty(q.id)).length;
+      const answered = this.filteredQuestions.filter(q => {
+        const qKey = this.getQuestionKey(q);
+        return this.answers.hasOwnProperty(qKey) || (q.id && String(q.id) === qKey && this.answers.hasOwnProperty(q.id));
+      }).length;
       const unanswered = total - answered;
 
       let msg = `آیا از ثبت نهایی و اتمام آزمون اطمینان دارید؟\n\nتعداد کل سوالات: ${total}\nپاسخ‌داده‌شده: ${answered}`;
@@ -1911,9 +1957,12 @@
       let unanswered = 0;
 
       this.filteredQuestions.forEach(q => {
-        if (!this.answers.hasOwnProperty(q.id)) {
+        const qKey = this.getQuestionKey(q);
+        const isAns = this.answers.hasOwnProperty(qKey) || (q.id && String(q.id) === qKey && this.answers.hasOwnProperty(q.id));
+        const userChoice = this.answers[qKey] || (q.id && this.answers[q.id]);
+        if (!isAns) {
           unanswered++;
-        } else if (this.answers[q.id] === q.correct_answer) {
+        } else if (userChoice === q.correct_answer) {
           correct++;
         } else {
           wrong++;
@@ -2037,8 +2086,9 @@
 
       let html = '';
       this.filteredQuestions.forEach((q, idx) => {
-        const isAnswered = this.answers.hasOwnProperty(q.id);
-        const userChoice = this.answers[q.id];
+        const qKey = this.getQuestionKey(q);
+        const isAnswered = this.answers.hasOwnProperty(qKey) || (q.id && String(q.id) === qKey && this.answers.hasOwnProperty(q.id));
+        const userChoice = this.answers[qKey] || (q.id && this.answers[q.id]);
         const isCorrect = isAnswered && userChoice === q.correct_answer;
         const exp = q.detailed_explanation || {};
 
@@ -2097,7 +2147,10 @@
 
     retakeMistakesOnly() {
       const wrongOrUnanswered = this.filteredQuestions.filter(q => {
-        return !this.answers.hasOwnProperty(q.id) || this.answers[q.id] !== q.correct_answer;
+        const qKey = this.getQuestionKey(q);
+        const isAnswered = this.answers.hasOwnProperty(qKey) || (q.id && String(q.id) === qKey && this.answers.hasOwnProperty(q.id));
+        const userChoice = this.answers[qKey] || (q.id && this.answers[q.id]);
+        return !isAnswered || userChoice !== q.correct_answer;
       });
 
       if (wrongOrUnanswered.length === 0) {
@@ -2111,7 +2164,11 @@
       this.mode = 'study'; // Start study mode for smart review
       
       // Clear answers for these questions only
-      wrongOrUnanswered.forEach(q => delete this.answers[q.id]);
+      wrongOrUnanswered.forEach(q => {
+        const qKey = this.getQuestionKey(q);
+        delete this.answers[qKey];
+        if (q.id) delete this.answers[q.id];
+      });
       this.saveState();
 
       this.dom.scorecardView.style.display = 'none';
@@ -2259,7 +2316,8 @@
         this.goToNextQuestion();
       } else if (e.key === 'Enter') {
         // Next question only when currently answered
-        if (this.answers.hasOwnProperty(q.id)) {
+        const qKey = this.getQuestionKey(q);
+        if (this.answers.hasOwnProperty(qKey) || (q.id && String(q.id) === qKey && this.answers.hasOwnProperty(q.id))) {
           e.preventDefault();
           this.goToNextQuestion();
         }

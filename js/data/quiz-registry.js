@@ -161,23 +161,25 @@
       shortTitle: 'جراحی جنرال (لارنس)',
       category: 'جراحی جنرال لارنس',
       categoryColor: '#e11d48',
+      badge: '۳۴۸ سوال در ۱۸ مبحث',
+      totalQuestions: 348,
       description: 'بانک آزمون و تست‌های تحلیلی جراحی عمومی بر اساس رفرنس معتبر لارنس (Lawrence Essentials of General Surgery)؛ شامل تشریح گزینه‌ها، کالبدشکافی دام‌های تستی و درسنامه جامع بالینی.',
       chapters: [
         {
           id: 'surgery-all',
           title: 'همه مباحث (آزمون جامع جراحی جنرال لارنس)',
           shortTitle: 'آزمون جامع جراحی',
-          badge: '431 سوال',
-          totalQuestions: 431,
-          estimatedMinutes: 431,
+          badge: '348 سوال',
+          totalQuestions: 348,
+          estimatedMinutes: 348,
           isAll: true
         },
         {
           id: 'surgery-ch10-hernia',
           title: 'فصل ۱۰: فتق‌های جدار شکم و کشاله ران (Abdominal Wall, Including Hernia)',
           shortTitle: 'جدار شکم و فتق‌ها',
-          badge: '26 سوال',
-          totalQuestions: 26,
+          badge: '24 سوال',
+          totalQuestions: 24,
           estimatedMinutes: 30,
           fileUrl: './data/quizzes/surgery_abdominal_wall_and_hernia_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_ABDOMINAL_WALL_AND_HERNIA_DATA)) ? window.SURGERY_ABDOMINAL_WALL_AND_HERNIA_DATA : [],
@@ -187,8 +189,8 @@
           id: 'surgery-ch15-biliary',
           title: 'فصل ۱۵: کیسه صفرا و مجاری صفراوی (Biliary Tract & Gallbladder)',
           shortTitle: 'کیسه صفرا و مجاری صفراوی',
-          badge: '19 سوال',
-          totalQuestions: 19,
+          badge: '13 سوال',
+          totalQuestions: 13,
           estimatedMinutes: 25,
           fileUrl: './data/quizzes/surgery_biliary_tract_and_gallbladder_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_BILIARY_TRACT_AND_GALLBLADDER_DATA)) ? window.SURGERY_BILIARY_TRACT_AND_GALLBLADDER_DATA : [],
@@ -198,8 +200,8 @@
           id: 'surgery-ch02-fluids',
           title: 'فصل ۲: آب، الکترولیت و تعادل اسید و باز (Fluid & Electrolyte Management)',
           shortTitle: 'مایعات و الکترولیت‌ها',
-          badge: '17 سوال',
-          totalQuestions: 17,
+          badge: '15 سوال',
+          totalQuestions: 15,
           estimatedMinutes: 25,
           fileUrl: './data/quizzes/surgery_fluid_and_electrolytes_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_FLUID_AND_ELECTROLYTES_DATA)) ? window.SURGERY_FLUID_AND_ELECTROLYTES_DATA : [],
@@ -209,8 +211,8 @@
           id: 'surgery-ch19-liver-spleen',
           title: 'فصل ۱۹: کبد و طحال (Liver & Spleen)',
           shortTitle: 'کبد و طحال',
-          badge: '20 سوال',
-          totalQuestions: 20,
+          badge: '17 سوال',
+          totalQuestions: 17,
           estimatedMinutes: 25,
           fileUrl: './data/quizzes/surgery_liver_and_spleen_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_LIVER_AND_SPLEEN_DATA)) ? window.SURGERY_LIVER_AND_SPLEEN_DATA : [],
@@ -220,8 +222,8 @@
           id: 'surgery-ch16-pancreas',
           title: 'فصل ۱۶: پانکراس (Pancreas)',
           shortTitle: 'پانکراس',
-          badge: '29 سوال',
-          totalQuestions: 29,
+          badge: '21 سوال',
+          totalQuestions: 21,
           estimatedMinutes: 30,
           fileUrl: './data/quizzes/surgery_pancreas_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_PANCREAS_DATA)) ? window.SURGERY_PANCREAS_DATA : [],
@@ -231,8 +233,8 @@
           id: 'surgery-ch01-periop',
           title: 'فصل ۱: مراقبت‌ها و عوارض قبل و بعد از عمل (Perioperative Care)',
           shortTitle: 'مراقبت‌های قبل و بعد از عمل',
-          badge: '26 سوال',
-          totalQuestions: 26,
+          badge: '17 سوال',
+          totalQuestions: 17,
           estimatedMinutes: 30,
           fileUrl: './data/quizzes/surgery_perioperative_care_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_PERIOPERATIVE_CARE_DATA)) ? window.SURGERY_PERIOPERATIVE_CARE_DATA : [],
@@ -242,8 +244,8 @@
           id: 'surgery-ch04-shock',
           title: 'فصل ۴: شوک، ارزیابی همودینامیک و احیا (Shock & Resuscitation)',
           shortTitle: 'شوک و احیا',
-          badge: '21 سوال',
-          totalQuestions: 21,
+          badge: '20 سوال',
+          totalQuestions: 20,
           estimatedMinutes: 25,
           fileUrl: './data/quizzes/surgery_shock_and_resuscitation_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_SHOCK_AND_RESUSCITATION_DATA)) ? window.SURGERY_SHOCK_AND_RESUSCITATION_DATA : [],
@@ -253,8 +255,8 @@
           id: 'surgery-ch12-stomach',
           title: 'فصل ۱۲: معده و دوازدهه (Stomach & Duodenum)',
           shortTitle: 'معده و دوازدهه',
-          badge: '41 سوال',
-          totalQuestions: 41,
+          badge: '29 سوال',
+          totalQuestions: 29,
           estimatedMinutes: 45,
           fileUrl: './data/quizzes/surgery_stomach_and_duodenum_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_STOMACH_AND_DUODENUM_DATA)) ? window.SURGERY_STOMACH_AND_DUODENUM_DATA : [],
@@ -264,8 +266,8 @@
           id: 'surgery-ch05-wound-trauma',
           title: 'فصل ۵: ترمیم زخم، پیوند پوست و تروما (Wound Healing & Trauma)',
           shortTitle: 'ترمیم زخم و تروما',
-          badge: '23 سوال',
-          totalQuestions: 23,
+          badge: '22 سوال',
+          totalQuestions: 22,
           estimatedMinutes: 30,
           fileUrl: './data/quizzes/surgery_wound_healing_and_trauma_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_WOUND_HEALING_AND_TRAUMA_DATA)) ? window.SURGERY_WOUND_HEALING_AND_TRAUMA_DATA : [],
@@ -286,8 +288,8 @@
           id: 'surgery-ch03-bleeding',
           title: 'فصل ۳: خونریزی جراحی، انتقال خون و انعقاد (Surgical Bleeding & Transfusion)',
           shortTitle: 'خونریزی جراحی و ترانسفوزیون',
-          badge: '12 سوال',
-          totalQuestions: 12,
+          badge: '9 سوال',
+          totalQuestions: 9,
           estimatedMinutes: 20,
           fileUrl: './data/quizzes/surgery_surgical_bleeding_and_transfusion_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_SURGICAL_BLEEDING_AND_TRANSFUSION_DATA)) ? window.SURGERY_SURGICAL_BLEEDING_AND_TRANSFUSION_DATA : [],
@@ -297,8 +299,8 @@
           id: 'surgery-ch11-esophagus',
           title: 'فصل ۱۱: بیماری‌های مری و فتق هیاتال (Esophagus & Hiatal Hernia)',
           shortTitle: 'مری و فتق هیاتال',
-          badge: '22 سوال',
-          totalQuestions: 22,
+          badge: '20 سوال',
+          totalQuestions: 20,
           estimatedMinutes: 30,
           fileUrl: './data/quizzes/surgery_esophagus_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_ESOPHAGUS_DATA)) ? window.SURGERY_ESOPHAGUS_DATA : [],
@@ -308,8 +310,8 @@
           id: 'surgery-ch13-small-intestine',
           title: 'فصل ۱۳: روده باریک (Small Intestine)',
           shortTitle: 'روده باریک',
-          badge: '19 سوال',
-          totalQuestions: 19,
+          badge: '15 سوال',
+          totalQuestions: 15,
           estimatedMinutes: 25,
           fileUrl: './data/quizzes/surgery_small_intestine_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_SMALL_INTESTINE_DATA)) ? window.SURGERY_SMALL_INTESTINE_DATA : [],
@@ -319,8 +321,8 @@
           id: 'surgery-ch06-burns',
           title: 'فصل ۶: سوختگی‌ها و آسیب‌های حرارتی (Burns & Thermal Injury)',
           shortTitle: 'سوختگی‌ها',
-          badge: '17 سوال',
-          totalQuestions: 17,
+          badge: '13 سوال',
+          totalQuestions: 13,
           estimatedMinutes: 25,
           fileUrl: './data/quizzes/surgery_burns_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_BURNS_DATA)) ? window.SURGERY_BURNS_DATA : [],
@@ -330,8 +332,8 @@
           id: 'surgery-ch18-endocrinology',
           title: 'فصل ۱۸: بیماری‌های جراحی غدد درون‌ریز (Surgical Endocrinology)',
           shortTitle: 'جراحی غدد درون‌ریز',
-          badge: '32 سوال',
-          totalQuestions: 32,
+          badge: '22 سوال',
+          totalQuestions: 22,
           estimatedMinutes: 35,
           fileUrl: './data/quizzes/surgery_surgical_endocrinology_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_SURGICAL_ENDOCRINOLOGY_DATA)) ? window.SURGERY_SURGICAL_ENDOCRINOLOGY_DATA : [],
@@ -341,8 +343,8 @@
           id: 'surgery-ch06-infections',
           title: 'فصل ۶: عفونت‌های جراحی و آنتی‌بیوتیک‌ها (Surgical Infections)',
           shortTitle: 'عفونت‌های جراحی',
-          badge: '17 سوال',
-          totalQuestions: 17,
+          badge: '12 سوال',
+          totalQuestions: 12,
           estimatedMinutes: 25,
           fileUrl: './data/quizzes/surgery_surgical_infections_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_SURGICAL_INFECTIONS_DATA)) ? window.SURGERY_SURGICAL_INFECTIONS_DATA : [],
@@ -352,8 +354,8 @@
           id: 'surgery-ch28-neurosurgery',
           title: 'فصل ۲۸: جراحی مغز، اعصاب و ستون فقرات (Neurosurgery)',
           shortTitle: 'جراحی مغز و اعصاب',
-          badge: '47 سوال',
-          totalQuestions: 47,
+          badge: '38 سوال',
+          totalQuestions: 38,
           estimatedMinutes: 50,
           fileUrl: './data/quizzes/surgery_neurosurgery_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_NEUROSURGERY_DATA)) ? window.SURGERY_NEUROSURGERY_DATA : [],
@@ -363,8 +365,8 @@
           id: 'surgery-ch14-trauma',
           title: 'فصل ۱۴: ترومای قفسه سینه، شکم، لگن و گردن (Thoracoabdominal, Pelvic & Neck Trauma)',
           shortTitle: 'ترومای توراکوآبدومینال و گردن',
-          badge: '26 سوال',
-          totalQuestions: 26,
+          badge: '24 سوال',
+          totalQuestions: 24,
           estimatedMinutes: 30,
           fileUrl: './data/quizzes/surgery_trauma_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_TRAUMA_DATA)) ? window.SURGERY_TRAUMA_DATA : [],
@@ -525,13 +527,32 @@
         throw new Error(`آزمونی با شناسه "${quizId}" یافت نشد.`);
       }
 
+      const prepareQuestions = (rawList) => {
+        if (!Array.isArray(rawList)) return [];
+        return rawList.map((q, idx) => {
+          const item = { ...q };
+          if (!item.chapterId) item.chapterId = quizId;
+          if (!item.globalId) {
+            const idStr = String(item.id || '');
+            if (idStr.startsWith('surg_') || idStr.startsWith('ncd_') || idStr.startsWith('rad_')) {
+              item.globalId = idStr;
+            } else {
+              item.globalId = `${quizId}_q${item.id || (idx + 1)}`;
+            }
+          }
+          return item;
+        });
+      };
+
       // Check memory cache first
       if (this.questionsCache.has(quizId)) {
         const cached = this.questionsCache.get(quizId);
         if (cached && cached.length > 0) {
-          quiz.totalQuestions = cached.length;
-          quiz.badge = `${cached.length} سوال`;
-          return cached;
+          const prepared = prepareQuestions(cached);
+          this.questionsCache.set(quizId, prepared);
+          quiz.totalQuestions = prepared.length;
+          quiz.badge = `${prepared.length} سوال`;
+          return prepared;
         }
       }
 
@@ -541,8 +562,9 @@
           const response = await fetch(quiz.fileUrl);
           if (response.ok) {
             const data = await response.json();
-            const questions = Array.isArray(data) ? data : (data && Array.isArray(data.questions) ? data.questions : []);
-            if (questions.length > 0) {
+            const rawQuestions = Array.isArray(data) ? data : (data && Array.isArray(data.questions) ? data.questions : []);
+            if (rawQuestions.length > 0) {
+              const questions = prepareQuestions(rawQuestions);
               this.questionsCache.set(quizId, questions);
               quiz.totalQuestions = questions.length;
               quiz.badge = `${questions.length} سوال`;
@@ -556,10 +578,11 @@
 
       // Use embedded fallback if available
       if (quiz.fallbackQuestions && Array.isArray(quiz.fallbackQuestions) && quiz.fallbackQuestions.length > 0) {
-        this.questionsCache.set(quizId, quiz.fallbackQuestions);
-        quiz.totalQuestions = quiz.fallbackQuestions.length;
-        quiz.badge = `${quiz.fallbackQuestions.length} سوال`;
-        return quiz.fallbackQuestions;
+        const questions = prepareQuestions(quiz.fallbackQuestions);
+        this.questionsCache.set(quizId, questions);
+        quiz.totalQuestions = questions.length;
+        quiz.badge = `${questions.length} سوال`;
+        return questions;
       }
 
       return [];

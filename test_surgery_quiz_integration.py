@@ -56,9 +56,9 @@ def test_surgery_quiz():
         
         card_text = surg_card.inner_text()
         assert "جراحی جنرال" in card_text and "لارنس" in card_text, "Surgery card must mention Lawrence General Surgery"
-        assert "۴۳۱ سوال" in card_text or "431 سوال" in card_text or "۴۳۱" in card_text, f"Surgery card must show 431 questions, got: {card_text}"
+        assert "۳۴۸ سوال" in card_text or "348 سوال" in card_text or "۳۴۸" in card_text, f"Surgery card must show 348 questions, got: {card_text}"
         assert "۱۸ فصل" in card_text or "18 فصل" in card_text or "۱۸" in card_text, f"Surgery card must show 18 chapters, got: {card_text}"
-        print("PASS: General Surgery Course Card visible with 431 dynamic questions and 18 chapters!")
+        print("PASS: General Surgery Course Card visible with 348 dynamic questions and 18 chapters!")
 
         print("\n=======================================================")
         print("=== TEST 2: OPEN SURGERY COURSE VIEW & CHAPTERS ===")
@@ -79,48 +79,48 @@ def test_surgery_quiz():
         assert len(chapter_cards) == 18, f"Expected 18 surgery chapter cards, found {len(chapter_cards)}"
         ch1_text = chapter_cards[0].inner_text()
         assert "فتق‌های جدار شکم" in ch1_text, f"Expected hernia chapter in card text, got: {ch1_text}"
-        assert "۲۶ سوال" in ch1_text or "26" in ch1_text, "Chapter 10 card must show 26 questions"
-        print("PASS: Chapter 10 (فتق‌های جدار شکم و کشاله ران) card verified with 26 questions!")
+        assert "۲۴ سوال" in ch1_text or "24" in ch1_text, "Chapter 10 card must show 24 questions"
+        print("PASS: Chapter 10 (فتق‌های جدار شکم و کشاله ران) card verified with 24 questions!")
 
         ch2_text = chapter_cards[1].inner_text()
         assert "کیسه صفرا و مجاری صفراوی" in ch2_text, f"Expected biliary chapter in card text, got: {ch2_text}"
-        assert "۱۹ سوال" in ch2_text or "19" in ch2_text, "Chapter 15 card must show 19 questions"
-        print("PASS: Chapter 15 (کیسه صفرا و مجاری صفراوی) card verified with 19 questions!")
+        assert "۱۳ سوال" in ch2_text or "13" in ch2_text, "Chapter 15 card must show 13 questions"
+        print("PASS: Chapter 15 (کیسه صفرا و مجاری صفراوی) card verified with 13 questions!")
 
         ch3_text = chapter_cards[2].inner_text()
         assert "مایعات و الکترولیت‌ها" in ch3_text or "تعادل اسید و باز" in ch3_text, f"Expected fluids chapter in card text, got: {ch3_text}"
-        assert "۱۷ سوال" in ch3_text or "17" in ch3_text, "Chapter 2 card must show 17 questions"
-        print("PASS: Chapter 2 (مایعات و الکترولیت‌ها) card verified with 17 questions!")
+        assert "۱۵ سوال" in ch3_text or "15" in ch3_text, "Chapter 2 card must show 15 questions"
+        print("PASS: Chapter 2 (مایعات و الکترولیت‌ها) card verified with 15 questions!")
 
         ch4_text = chapter_cards[3].inner_text()
         assert "کبد و طحال" in ch4_text, f"Expected liver & spleen chapter in card text, got: {ch4_text}"
-        assert "۲۰ سوال" in ch4_text or "20" in ch4_text, "Chapter 19 card must show 20 questions"
-        print("PASS: Chapter 19 (کبد و طحال) card verified with 20 questions!")
+        assert "۱۷ سوال" in ch4_text or "17" in ch4_text, "Chapter 19 card must show 17 questions"
+        print("PASS: Chapter 19 (کبد و طحال) card verified with 17 questions!")
 
         ch5_text = chapter_cards[4].inner_text()
         assert "پانکراس" in ch5_text, f"Expected pancreas chapter in card text, got: {ch5_text}"
-        assert "۲۹ سوال" in ch5_text or "29" in ch5_text, "Chapter 16 card must show 29 questions"
-        print("PASS: Chapter 16 (پانکراس) card verified with 29 questions!")
+        assert "۲۱ سوال" in ch5_text or "21" in ch5_text, "Chapter 16 card must show 21 questions"
+        print("PASS: Chapter 16 (پانکراس) card verified with 21 questions!")
 
         ch6_text = chapter_cards[5].inner_text()
         assert "مراقبت‌ها و عوارض قبل و بعد از عمل" in ch6_text or "مراقبت‌های قبل و بعد از عمل" in ch6_text, f"Expected periop care chapter in card text, got: {ch6_text}"
-        assert "۲۶ سوال" in ch6_text or "26" in ch6_text, "Chapter 1 card must show 26 questions"
-        print("PASS: Chapter 1 (مراقبت‌ها و عوارض قبل و بعد از عمل) card verified with 26 questions!")
+        assert "۱۷ سوال" in ch6_text or "17" in ch6_text, "Chapter 1 card must show 17 questions"
+        print("PASS: Chapter 1 (مراقبت‌ها و عوارض قبل و بعد از عمل) card verified with 17 questions!")
 
         ch7_text = chapter_cards[6].inner_text()
         assert "شوک" in ch7_text and "احیا" in ch7_text, f"Expected shock chapter in card text, got: {ch7_text}"
-        assert "۲۱ سوال" in ch7_text or "21" in ch7_text, "Chapter 4 card must show 21 questions"
-        print("PASS: Chapter 4 (شوک، ارزیابی همودینامیک و احیا) card verified with 21 questions!")
+        assert "۲۰ سوال" in ch7_text or "20" in ch7_text, "Chapter 4 card must show 20 questions"
+        print("PASS: Chapter 4 (شوک، ارزیابی همودینامیک و احیا) card verified with 20 questions!")
 
         ch8_text = chapter_cards[7].inner_text()
         assert "معده" in ch8_text and "دوازدهه" in ch8_text, f"Expected stomach chapter in card text, got: {ch8_text}"
-        assert "۴۱ سوال" in ch8_text or "41" in ch8_text, "Chapter 12 card must show 41 questions"
-        print("PASS: Chapter 12 (معده و دوازدهه) card verified with 41 questions!")
+        assert "۲۹ سوال" in ch8_text or "29" in ch8_text, "Chapter 12 card must show 29 questions"
+        print("PASS: Chapter 12 (معده و دوازدهه) card verified with 29 questions!")
 
         ch9_text = chapter_cards[8].inner_text()
         assert "ترمیم زخم" in ch9_text or "تروما" in ch9_text, f"Expected wound healing & trauma chapter in card text, got: {ch9_text}"
-        assert "۲۳ سوال" in ch9_text or "23" in ch9_text, "Chapter 5 card must show 23 questions"
-        print("PASS: Chapter 5 (ترمیم زخم، پیوند پوست و تروما) card verified with 23 questions!")
+        assert "۲۲ سوال" in ch9_text or "22" in ch9_text, "Chapter 5 card must show 22 questions"
+        print("PASS: Chapter 5 (ترمیم زخم، پیوند پوست و تروما) card verified with 22 questions!")
 
         ch10_text = chapter_cards[9].inner_text()
         assert "عروق" in ch10_text or "انکولوژی" in ch10_text, f"Expected vascular & oncology chapter in card text, got: {ch10_text}"
@@ -129,43 +129,43 @@ def test_surgery_quiz():
 
         ch11_text = chapter_cards[10].inner_text()
         assert "خونریزی جراحی" in ch11_text or "انتقال خون" in ch11_text, f"Expected bleeding & transfusion chapter in card text, got: {ch11_text}"
-        assert "۱۲ سوال" in ch11_text or "12" in ch11_text, "Chapter 3 card must show 12 questions"
-        print("PASS: Chapter 3 (خونریزی جراحی، انتقال خون و انعقاد) card verified with 12 questions!")
+        assert "۹ سوال" in ch11_text or "9" in ch11_text, "Chapter 3 card must show 9 questions"
+        print("PASS: Chapter 3 (خونریزی جراحی، انتقال خون و انعقاد) card verified with 9 questions!")
 
         ch12_text = chapter_cards[11].inner_text()
         assert "مری" in ch12_text or "فتق هیاتال" in ch12_text, f"Expected esophagus chapter in card text, got: {ch12_text}"
-        assert "۲۲ سوال" in ch12_text or "22" in ch12_text, "Chapter 11 card must show 22 questions"
-        print("PASS: Chapter 11 (بیماری‌های مری و فتق هیاتال) card verified with 22 questions!")
+        assert "۲۰ سوال" in ch12_text or "20" in ch12_text, "Chapter 11 card must show 20 questions"
+        print("PASS: Chapter 11 (بیماری‌های مری و فتق هیاتال) card verified with 20 questions!")
 
         ch13_text = chapter_cards[12].inner_text()
         assert "روده باریک" in ch13_text, f"Expected small intestine chapter in card text, got: {ch13_text}"
-        assert "۱۹ سوال" in ch13_text or "19" in ch13_text, "Chapter 13 card must show 19 questions"
-        print("PASS: Chapter 13 (روده باریک) card verified with 19 questions!")
+        assert "۱۵ سوال" in ch13_text or "15" in ch13_text, "Chapter 13 card must show 15 questions"
+        print("PASS: Chapter 13 (روده باریک) card verified with 15 questions!")
 
         ch14_text = chapter_cards[13].inner_text()
         assert "سوختگی" in ch14_text, f"Expected burns chapter in card text, got: {ch14_text}"
-        assert "۱۷ سوال" in ch14_text or "17" in ch14_text, "Chapter 6 card must show 17 questions"
-        print("PASS: Chapter 6 (سوختگی‌ها و آسیب‌های حرارتی) card verified with 17 questions!")
+        assert "۱۳ سوال" in ch14_text or "13" in ch14_text, "Chapter 6 card must show 13 questions"
+        print("PASS: Chapter 6 (سوختگی‌ها و آسیب‌های حرارتی) card verified with 13 questions!")
 
         ch15_text = chapter_cards[14].inner_text()
         assert "غدد درون‌ریز" in ch15_text or "غدد" in ch15_text, f"Expected endocrine chapter in card text, got: {ch15_text}"
-        assert "۳۲ سوال" in ch15_text or "32" in ch15_text, "Chapter 18 card must show 32 questions"
-        print("PASS: Chapter 18 (بیماری‌های جراحی غدد درون‌ریز) card verified with 32 questions!")
+        assert "۲۲ سوال" in ch15_text or "22" in ch15_text, "Chapter 18 card must show 22 questions"
+        print("PASS: Chapter 18 (بیماری‌های جراحی غدد درون‌ریز) card verified with 22 questions!")
 
         ch16_text = chapter_cards[15].inner_text()
         assert "عفونت" in ch16_text, f"Expected infection chapter in card text, got: {ch16_text}"
-        assert "۱۷ سوال" in ch16_text or "17" in ch16_text, "Chapter 6 (Infections) card must show 17 questions"
-        print("PASS: Chapter 6 (عفونت‌های جراحی و آنتی‌بیوتیک‌ها) card verified with 17 questions!")
+        assert "۱۲ سوال" in ch16_text or "12" in ch16_text, "Chapter 6 (Infections) card must show 12 questions"
+        print("PASS: Chapter 6 (عفونت‌های جراحی و آنتی‌بیوتیک‌ها) card verified with 12 questions!")
 
         ch17_text = chapter_cards[16].inner_text()
         assert "مغز" in ch17_text or "اعصاب" in ch17_text, f"Expected neurosurgery chapter in card text, got: {ch17_text}"
-        assert "۴۷ سوال" in ch17_text or "47" in ch17_text, "Chapter 28 (Neurosurgery) card must show 47 questions"
-        print("PASS: Chapter 28 (جراحی مغز، اعصاب و ستون فقرات) card verified with 47 questions!")
+        assert "۳۸ سوال" in ch17_text or "38" in ch17_text, "Chapter 28 (Neurosurgery) card must show 38 questions"
+        print("PASS: Chapter 28 (جراحی مغز، اعصاب و ستون فقرات) card verified with 38 questions!")
 
         ch18_text = chapter_cards[17].inner_text()
         assert "تروما" in ch18_text or "توراکوآبدومینال" in ch18_text, f"Expected trauma chapter in card text, got: {ch18_text}"
-        assert "۲۶ سوال" in ch18_text or "26" in ch18_text, "Chapter 14 (Trauma) card must show 26 questions"
-        print("PASS: Chapter 14 (ترومای قفسه سینه، شکم، لگن و گردن) card verified with 26 questions!")
+        assert "۲۴ سوال" in ch18_text or "24" in ch18_text, "Chapter 14 (Trauma) card must show 24 questions"
+        print("PASS: Chapter 14 (ترومای قفسه سینه، شکم، لگن و گردن) card verified with 24 questions!")
 
         print("\n=======================================================")
         print("=== TEST 3: STUDY MODE ON CHAPTER 14 (TRAUMA) & 3-PART VIBRANT CARDS ===")
@@ -178,9 +178,10 @@ def test_surgery_quiz():
 
         assert page.locator('#quizActiveView').is_visible(), "Active Quiz View must be visible"
         
-        # Verify total questions is 26
+        # Verify total questions is 24
         total_q = page.evaluate("() => window.medicalQuiz.filteredQuestions.length")
-        assert total_q == 26, f"Expected 26 questions in Chapter 14 (Trauma) quiz, got {total_q}"
+        assert total_q == 24, f"Expected 24 questions in Chapter 14 (Trauma) quiz, got {total_q}"
+        print(f"PASS: Active Quiz session loaded with exactly {total_q} questions!")
         print(f"PASS: Active Quiz session loaded with exactly {total_q} questions!")
 
         # Check options
@@ -290,13 +291,69 @@ def test_surgery_quiz():
         review_cards2 = review_section.locator('.exp-card-distractors').all()
         review_cards3 = review_section.locator('.exp-card-lesson').all()
 
-        assert len(review_cards1) >= 26, f"Expected at least 26 Card 1 instances in full review, found {len(review_cards1)}"
-        assert len(review_cards2) >= 26, f"Expected at least 26 Card 2 instances in full review, found {len(review_cards2)}"
-        assert len(review_cards3) >= 26, f"Expected at least 26 Card 3 instances in full review, found {len(review_cards3)}"
-        print(f"PASS: Full Exam Review renders strictly 26 instances of Card 1, Card 2, and Card 3 for Chapter 14 (Trauma)!")
+        assert len(review_cards1) >= 24, f"Expected at least 24 Card 1 instances in full review, found {len(review_cards1)}"
+        assert len(review_cards2) >= 24, f"Expected at least 24 Card 2 instances in full review, found {len(review_cards2)}"
+        assert len(review_cards3) >= 24, f"Expected at least 24 Card 3 instances in full review, found {len(review_cards3)}"
+        print(f"PASS: Full Exam Review renders strictly 24 instances of Card 1, Card 2, and Card 3 for Chapter 14 (Trauma)!")
 
         print("\n=======================================================")
-        print("=== TEST 5: ZERO HORIZONTAL OVERFLOW ACROSS BREAKPOINTS ===")
+        print("=== TEST 5: RANDOM ALL-QUESTIONS STUDY MODE (ZERO PRE-ANSWERED QUESTIONS BUG) ===")
+        print("=======================================================")
+
+        # Go back to course and launch Random All-Questions Study Mode
+        page.evaluate("() => window.medicalQuiz.returnToCourseView()")
+        page.wait_for_timeout(300)
+
+        # Select all surgery topics and launch study mode
+        page.evaluate("() => { window.medicalQuiz.selectedCourseMode = 'study'; window.medicalQuiz.selectAllCourseTopics(); window.medicalQuiz.startConfiguredCourseQuiz(); }")
+        page.wait_for_timeout(500)
+
+        assert page.locator('#quizActiveView').is_visible(), "Active Quiz View must be visible"
+
+        # Verify all 348 questions are present in random pool
+        total_random_q = page.evaluate("() => window.medicalQuiz.filteredQuestions.length")
+        assert total_random_q == 348, f"Expected 348 questions in surgery-all, got {total_random_q}"
+
+        # Verify answers map starts completely clean (0 pre-answered questions)
+        initial_answers_count = page.evaluate("() => Object.keys(window.medicalQuiz.answers).length")
+        assert initial_answers_count == 0, f"Expected 0 initial answers, but found {initial_answers_count}"
+        assert not page.locator('#explanationCard').is_visible(), "Explanation card must NOT be visible before answering"
+
+        initial_options = page.locator('#optionsList .quiz-option').all()
+        assert len(initial_options) == 4, f"Expected 4 options, found {len(initial_options)}"
+        for opt in initial_options:
+            cls = opt.get_attribute("class") or ""
+            assert "is-disabled" not in cls, "Option should NOT be disabled"
+            assert "is-correct" not in cls, "Option should NOT be pre-marked correct"
+            assert "is-wrong" not in cls, "Option should NOT be pre-marked wrong"
+
+        print(f"PASS: Random All-Questions Study Mode ({total_random_q} questions) starts with 0 pre-answered questions!")
+
+        # Answer Question 1
+        initial_options[0].click()
+        page.wait_for_timeout(250)
+
+        assert page.locator('#explanationCard').is_visible(), "Explanation card should appear after answering"
+        answers_after_q1 = page.evaluate("() => Object.keys(window.medicalQuiz.answers).length")
+        assert answers_after_q1 == 1, f"Expected exactly 1 answered question, got {answers_after_q1}"
+
+        # Navigate to Question 2
+        page.locator('#btnNextQuestion').click()
+        page.wait_for_timeout(250)
+
+        # Verify Question 2 is in clean, unanswered state (NO ID collision with Q1)
+        assert not page.locator('#explanationCard').is_visible(), "Question 2 must NOT have explanation visible before answering"
+        q2_options = page.locator('#optionsList .quiz-option').all()
+        for opt in q2_options:
+            cls = opt.get_attribute("class") or ""
+            assert "is-disabled" not in cls, "Question 2 option should NOT be disabled"
+            assert "is-correct" not in cls, "Question 2 option should NOT be pre-marked correct"
+            assert "is-wrong" not in cls, "Question 2 option should NOT be pre-marked wrong"
+
+        print("PASS: ID collision prevented! Question 2 remains completely clean and unanswered after answering Question 1!")
+
+        print("\n=======================================================")
+        print("=== TEST 6: ZERO HORIZONTAL OVERFLOW ACROSS BREAKPOINTS ===")
         print("=======================================================")
 
         for bp in breakpoints:
