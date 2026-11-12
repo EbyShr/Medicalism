@@ -611,34 +611,11 @@
               </svg>
               <span>پاسخ تشریحی، مستندات علمی و دام‌های تستی</span>
             </div>
-            <span class="explanation-correct-badge">پاسخنامه مستند</span>
+            <span class="explanation-correct-badge" id="explanationHeaderBadge">پاسخنامه مستند</span>
           </div>
 
-          <!-- Section 1: Rationale -->
-          <div class="rationale-container">
-            <div class="rationale-label">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="20 6 9 17 4 12"></polyline>
-              </svg>
-              <span>تحلیل گزینه صحیح و مبانی بالینی:</span>
-            </div>
-            <p class="rationale-text" id="rationaleText"></p>
-          </div>
-
-          <!-- Section 2: Distractors Correction -->
-          <div class="distractors-container">
-            <div class="distractors-label">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-              <span>دام‌های تستی و علت رد سایر گزینه‌ها (Distractors Correction):</span>
-            </div>
-            <div id="distractorsList">
-              <!-- Injected dynamically -->
-            </div>
-          </div>
+          <!-- Multi-Card 3-Part Vibrant Container (Cards 1, 2, 3) -->
+          <div class="exp-cards-container" id="explanationCardsContainer"></div>
         </div>
       </div>
 
@@ -781,7 +758,25 @@
   <script src="./data/quizzes/ncd_cancer_pathobiology_data.js"></script>
   <script src="./data/quizzes/ncd_hypertension_data.js"></script>
   <script src="./data/quizzes/ncd_tobacco_control_data.js"></script>
-  <script src="./js/data/quiz-registry.js"></script>
+    <script src="./data/quizzes/surgery_abdominal_wall_and_hernia_data.js"></script>
+  <script src="./data/quizzes/surgery_biliary_tract_and_gallbladder_data.js"></script>
+  <script src="./data/quizzes/surgery_fluid_and_electrolytes_data.js"></script>
+  <script src="./data/quizzes/surgery_liver_and_spleen_data.js"></script>
+  <script src="./data/quizzes/surgery_pancreas_data.js"></script>
+  <script src="./data/quizzes/surgery_perioperative_care_data.js"></script>
+  <script src="./data/quizzes/surgery_shock_and_resuscitation_data.js"></script>
+  <script src="./data/quizzes/surgery_stomach_and_duodenum_data.js"></script>
+  <script src="./data/quizzes/surgery_wound_healing_and_trauma_data.js"></script>
+  <script src="./data/quizzes/surgery_vascular_and_oncology_data.js"></script>
+  <script src="./data/quizzes/surgery_surgical_bleeding_and_transfusion_data.js"></script>
+  <script src="./data/quizzes/surgery_esophagus_data.js"></script>
+  <script src="./data/quizzes/surgery_small_intestine_data.js"></script>
+  <script src="./data/quizzes/surgery_burns_data.js"></script>
+  <script src="./data/quizzes/surgery_surgical_endocrinology_data.js"></script>
+  <script src="./data/quizzes/surgery_surgical_infections_data.js"></script>
+  <script src="./data/quizzes/surgery_neurosurgery_data.js"></script>
+  <script src="./data/quizzes/surgery_trauma_data.js"></script>
+<script src="./js/data/quiz-registry.js"></script>
   <script src="./js/quiz-engine.js"></script>
 
   <script>

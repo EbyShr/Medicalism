@@ -98,6 +98,9 @@
       this.dom.questionStem = document.getElementById('questionStem');
       this.dom.optionsList = document.getElementById('optionsList');
       this.dom.explanationCard = document.getElementById('explanationCard');
+      this.dom.explanationCardsContainer = document.getElementById('explanationCardsContainer');
+      this.dom.legacyRationaleContainer = document.getElementById('legacyRationaleContainer');
+      this.dom.distractorsContainer = document.getElementById('legacyDistractorsContainer') || document.querySelector('.distractors-container');
       this.dom.rationaleBox = document.getElementById('rationaleText');
       this.dom.distractorsList = document.getElementById('distractorsList');
       
@@ -454,7 +457,59 @@
         `;
       }
 
-      // Card 2: Smart Personal Review Bank (سوالات نشان‌شده و غلط‌ها)
+      // Card 2: General Surgery (Lawrence - جراحی جنرال لارنس)
+      const surgQuiz = quizzes.find(q => q.id === 'surgery');
+      if (surgQuiz) {
+        const surgIndividual = (surgQuiz.chapters && surgQuiz.chapters.filter(c => !c.isAll)) || [];
+        const surgChaptersCount = surgIndividual.length;
+        const surgTotalQuestions = surgQuiz.totalQuestions || 0;
+        const surgBadge = surgQuiz.badge || `${this.toPersianDigits(surgTotalQuestions)} سوال در ${this.toPersianDigits(surgChaptersCount)} مبحث`;
+
+        html += `
+          <div class="quiz-card quiz-card-surgery" data-quiz-id="${surgQuiz.id}">
+            <div>
+              <div class="quiz-card-header">
+                <span class="quiz-card-category" style="color: #e11d48; background: rgba(225, 29, 72, 0.1);">
+                  ${surgQuiz.category || 'جراحی جنرال لارنس'}
+                </span>
+                <span class="quiz-card-badge" style="background: rgba(225, 29, 72, 0.08); color: #e11d48; border-color: rgba(225, 29, 72, 0.25);">
+                  ${this.toPersianDigits(surgBadge)}
+                </span>
+              </div>
+              <h3 class="quiz-card-title">${surgQuiz.title}</h3>
+              <p class="quiz-card-desc">${surgQuiz.description}</p>
+            </div>
+            <div>
+              <div class="quiz-card-meta">
+                <div class="quiz-card-meta-item">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                  <span>${this.toPersianDigits(surgChaptersCount)} فصل و مبحث جامع لارنس</span>
+                </div>
+                <div class="quiz-card-meta-item">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span>حالت ۵تایی و شبیه‌ساز رسمی</span>
+                </div>
+              </div>
+              <div>
+                <button type="button" class="btn-open-course" style="background: linear-gradient(135deg, #e11d48, #be123c);" onclick="window.medicalQuiz.openCourseTopics('${surgQuiz.id}')">
+                  <span>مشاهده سرفصل‌ها و ورود به آزمون جراحی</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Card 3: Smart Personal Review Bank (سوالات نشان‌شده و غلط‌ها)
       html += `
         <div class="quiz-card quiz-card-review" data-quiz-id="smart-review">
           <div>
@@ -596,8 +651,8 @@
         const totalChQuestions = ch.totalQuestions || questions.length || 0;
 
         const chAnswers = this.loadStoredAnswers(ch.id);
-        const globalAnswers = this.loadStoredAnswers('ncd');
-        const allAnswers = this.loadStoredAnswers('ncd-all');
+        const globalAnswers = this.loadStoredAnswers(course.id || 'ncd');
+        const allAnswers = this.loadStoredAnswers(`${course.id || 'ncd'}-all`);
 
         let answeredCount = 0;
         let correctCount = 0;
@@ -1379,41 +1434,297 @@
       return [];
     }
 
-    renderExplanationCard(question) {
-      const exp = question.detailed_explanation || {};
-      const rationale = exp.rationale || "توضیحاتی برای این گزینه ثبت نشده است.";
-      const distractors = this.getDistractorsList(exp.distractors_correction);
+    formatMathExpr(raw) {
+      if (!raw) return '';
+      let s = String(raw).trim();
+      s = s.replace(/\\text\{([^}]+)\}/g, '$1');
+      s = s.replace(/\\mathrm\{([^}]+)\}/g, '$1');
+      s = s.replace(/\^\\circ\s*C/g, '°C');
+      s = s.replace(/\^\\circ\s*F/g, '°F');
+      s = s.replace(/\\ge/g, '≥').replace(/\\geq/g, '≥');
+      s = s.replace(/\\le/g, '≤').replace(/\\leq/g, '≤');
+      s = s.replace(/\\pm/g, '±');
+      s = s.replace(/\\times/g, '×');
+      s = s.replace(/\\approx/g, '≈');
+      s = s.replace(/\\sim/g, '~');
+      s = s.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1/$2');
+      s = s.replace(/\\\s+/g, ' ');
+      s = s.replace(/\\%/g, '%').replace(/\\_/g, '_');
+      return `<span class="med-measure" dir="ltr">${s}</span>`;
+    }
 
-      // Rationale Box
-      if (this.dom.rationaleBox) {
-        this.dom.rationaleBox.textContent = rationale;
+    formatMarkdownTables(text) {
+      if (!text) return '';
+      return text.replace(/((?:\|[^\n]+\|\r?\n)+)/g, (tableText) => {
+        const rows = tableText.trim().split('\n').map(r => r.trim()).filter(Boolean);
+        if (rows.length < 2) return tableText;
+
+        let tableHtml = '<div class="table-responsive"><table class="clinical-table" dir="rtl">';
+        let isHeader = true;
+
+        rows.forEach((row, rowIdx) => {
+          if (row.match(/^\|[\s\-:|]+\|$/)) {
+            isHeader = false;
+            return;
+          }
+          const cells = row.split('|').slice(1, -1).map(c => c.trim());
+          if (rowIdx === 0 && isHeader) {
+            tableHtml += '<thead><tr>' + cells.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+          } else {
+            tableHtml += '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+          }
+        });
+
+        tableHtml += '</tbody></table></div>';
+        return tableHtml;
+      });
+    }
+
+    formatMarkdownText(text) {
+      if (!text) return '';
+      let s = this.escapeHtml(text);
+
+      // LaTeX math: $...$
+      s = s.replace(/\$([^\$]+)\$/g, (m, mathExpr) => {
+        return this.formatMathExpr(mathExpr);
+      });
+
+      // Markdown Bold: **text**
+      s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+      // Markdown Italic: *text*
+      s = s.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+      // Underline: <u>text</u>
+      s = s.replace(/&lt;u&gt;(.*?)&lt;\/u&gt;/g, '<u>$1</u>');
+
+      // Markdown Tables
+      if (s.includes('|') && s.includes('\n|')) {
+        s = this.formatMarkdownTables(s);
       }
 
-      // Distractors Breakdown
-      if (this.dom.distractorsList) {
-        let distractorsHtml = '';
+      // Markdown Bullet Lists (- ... or * ...) and numbered lists (1. ...)
+      const lines = s.split('\n');
+      let inList = false;
+      let listType = 'ul';
+      const output = [];
 
-        if (distractors.length > 0) {
-          distractors.forEach(item => {
-            distractorsHtml += `
-              <div class="distractor-item">
-                <div class="distractor-header">
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        const trimmed = line.trim();
+
+        const bulletMatch = trimmed.match(/^[-*•]\s+(.*)/);
+        const numMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
+
+        if (bulletMatch) {
+          if (!inList || listType !== 'ul') {
+            if (inList) output.push(`</${listType}>`);
+            output.push('<ul>');
+            inList = true;
+            listType = 'ul';
+          }
+          output.push(`<li>${bulletMatch[1]}</li>`);
+        } else if (numMatch) {
+          if (!inList || listType !== 'ol') {
+            if (inList) output.push(`</${listType}>`);
+            output.push('<ol>');
+            inList = true;
+            listType = 'ol';
+          }
+          output.push(`<li>${numMatch[2]}</li>`);
+        } else {
+          if (inList) {
+            output.push(`</${listType}>`);
+            inList = false;
+          }
+          if (trimmed.length > 0) {
+            output.push(`<p class="exp-para">${line}</p>`);
+          }
+        }
+      }
+      if (inList) {
+        output.push(`</${listType}>`);
+      }
+
+      return output.join('\n');
+    }
+
+    formatDistractorText(text) {
+      if (!text) return '';
+      // Strip leading redundant 'بررسی گزینه X:'
+      let s = String(text).replace(/^(?:-\s*)?(?:\*\*)?بررسی گزینه\s*[A-DА-Яa-d]:(?:\*\*)?\s*/i, '');
+      
+      let html = this.escapeHtml(s);
+
+      // Format LaTeX math
+      html = html.replace(/\$([^\$]+)\$/g, (m, mathExpr) => {
+        return this.formatMathExpr(mathExpr);
+      });
+
+      // Markdown bold & italic
+      html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+      // Highlight clinical warnings and consequence phrases
+      const alertKeywords = [
+        /⚠️\s*(?:پیامد بالینی|تله بالینی|هشدار بالینی)?:?/g,
+        /\b(?:خطای مرگبار پزشکی|کنترااندیکاسیون مطلق|بزرگ‌ترین دام امتحانی!|بزرگ‌ترین دام امتحانی|Reduction en masse|Flood Syndrome|Flood syndrome)\b/g
+      ];
+
+      alertKeywords.forEach(pattern => {
+        html = html.replace(pattern, '<span class="clinical-alert-pill">$&</span>');
+      });
+
+      return html;
+    }
+
+    generateExplanationCardsHtml(question) {
+      if (!question) return '';
+      const exp = question.detailed_explanation || {};
+      const rationale = exp.rationale || "تحلیل گزینه صحیح ثبت نشده است.";
+      const distractors = this.getDistractorsList(exp.distractors_correction);
+      const miniLesson = exp.mini_lesson || exp.lawrence_lesson || '';
+
+      // CARD 1: Emerald Green Rationale Card (تحلیل پاسخ صحیح و مسیر مدیریت بیمار)
+      const card1Html = `
+        <div class="exp-card exp-card-correct">
+          <div class="exp-card-header exp-header-correct">
+            <div class="exp-card-header-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>✅ ۱. تحلیل پاسخ صحیح و مسیر مدیریت بیمار (گزینه [${question.correct_answer}])</span>
+            </div>
+            <span class="exp-badge exp-badge-emerald">پاسخ قطعی رفرنس</span>
+          </div>
+          <div class="exp-card-body exp-body-correct">
+            ${this.formatMarkdownText(rationale)}
+          </div>
+        </div>
+      `;
+
+      // CARD 2: Amber/Coral Distractor Subcards (کالبدشکافی سایر گزینه‌ها و دام‌های امتحانی)
+      let distCardsHtml = '';
+      const wrongOptions = (question.options && Array.isArray(question.options))
+        ? question.options.filter(opt => opt.key !== question.correct_answer)
+        : [];
+
+      if (wrongOptions.length > 0) {
+        distCardsHtml = wrongOptions.map(opt => {
+          const matchedDist = distractors.find(d => d.key === opt.key);
+          const whyIncorrect = opt.explanation || (matchedDist && matchedDist.text) || 'تحلیل تفکیک‌شده‌ای برای این گزینه موجود نیست.';
+          return `
+            <div class="distractor-subcard">
+              <div class="distractor-subcard-header">
+                <div class="distractor-subcard-tag">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="15" y1="9" x2="9" y2="15"></line>
                     <line x1="9" y1="9" x2="15" y2="15"></line>
                   </svg>
-                  <span>تحلیل گزینه [${item.key}]: علت رد و نکته تستی</span>
+                  <span>رد گزینه [${opt.key}]</span>
                 </div>
-                <p class="distractor-text">${this.escapeHtml(item.text)}</p>
+                <div class="distractor-subcard-preview" title="${this.escapeHtml(opt.text)}">
+                  ${this.escapeHtml(opt.text)}
+                </div>
               </div>
-            `;
-          });
-        } else {
-          distractorsHtml = '<div style="font-size: 13px; color: var(--text-muted); padding: 8px 0;">تحلیل تفکیک‌شده‌ای برای سایر گزینه‌ها موجود نیست.</div>';
-        }
+              <div class="distractor-subcard-body">
+                ${this.formatDistractorText(whyIncorrect)}
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else if (distractors.length > 0) {
+        distCardsHtml = distractors.map(d => `
+          <div class="distractor-subcard">
+            <div class="distractor-subcard-header">
+              <div class="distractor-subcard-tag">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+                <span>رد گزینه [${d.key}]</span>
+              </div>
+            </div>
+            <div class="distractor-subcard-body">
+              ${this.formatDistractorText(d.text)}
+            </div>
+          </div>
+        `).join('');
+      } else {
+        distCardsHtml = '<div style="font-size: 13.5px; color: var(--text-muted); padding: 8px 0;">تحلیل تفکیک‌شده‌ای برای سایر گزینه‌ها موجود نیست.</div>';
+      }
 
-        this.dom.distractorsList.innerHTML = distractorsHtml;
+      const card2Html = `
+        <div class="exp-card exp-card-distractors">
+          <div class="exp-card-header exp-header-distractors">
+            <div class="exp-card-header-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <span>🔍 ۲. کالبدشکافی سایر گزینه‌ها و دام‌های امتحانی</span>
+            </div>
+            <span class="exp-badge exp-badge-amber">کالبدشکافی دام‌های تستی</span>
+          </div>
+          <div class="exp-card-body exp-body-distractors">
+            ${distCardsHtml}
+          </div>
+        </div>
+      `;
+
+      // CARD 3: Royal Blue / Indigo Mini-Lesson Card (درسنامه مکمل لارنس)
+      let card3Html = '';
+      if (miniLesson && miniLesson.trim().length > 0) {
+        card3Html = `
+          <div class="exp-card exp-card-lesson">
+            <div class="exp-card-header exp-header-lesson">
+              <div class="exp-card-header-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                <span>📚 ۳. درسنامه مکمل لارنس (نکات پیرامونی و جمع‌بندی طلایی)</span>
+              </div>
+              <span class="exp-badge exp-badge-indigo">نکات کلیدی های‌ییلد</span>
+            </div>
+            <div class="exp-card-body exp-body-lesson">
+              ${this.formatMarkdownText(miniLesson)}
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="exp-cards-container">
+          ${card1Html}
+          ${card2Html}
+          ${card3Html}
+        </div>
+      `;
+    }
+
+    renderExplanationCard(question) {
+      if (!question) return;
+
+      // Render Multi-Card 3-Part Vibrant UI (Card 1: Rationale, Card 2: Distractors, Card 3: Mini-Lesson)
+      if (this.dom.explanationCardsContainer) {
+        this.dom.explanationCardsContainer.innerHTML = this.generateExplanationCardsHtml(question);
+      }
+
+      // Completely disable and hide legacy duplicate boxes so only the new styled cards appear
+      if (this.dom.distractorsContainer) {
+        this.dom.distractorsContainer.style.display = 'none';
+      }
+      if (this.dom.distractorsList) {
+        this.dom.distractorsList.innerHTML = '';
+      }
+      if (this.dom.legacyRationaleContainer) {
+        this.dom.legacyRationaleContainer.style.display = 'none';
+      }
+      if (this.dom.rationaleBox) {
+        this.dom.rationaleBox.textContent = '';
       }
     }
 
@@ -1766,40 +2077,15 @@
               }).join('')}
             </div>
 
-            <div class="quiz-explanation-card" style="display: block; margin-block-start: var(--space-3);">
-              <div class="rationale-container">
-                <div class="rationale-label">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>تحلیل گزینه صحیح (${q.correct_answer}) و مبانی علمی:</span>
+            <div class="quiz-explanation-card" style="display: block; margin-block-start: var(--space-4);">
+              <div class="explanation-main-header">
+                <div class="explanation-title">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <span>پاسخ تشریحی، مستندات علمی و درسنامه بالینی لارنس</span>
                 </div>
-                <p class="rationale-text">${this.escapeHtml(exp.rationale || '')}</p>
+                <span class="explanation-correct-badge">پاسخنامه مستند</span>
               </div>
-
-              ${(() => {
-                const distList = this.getDistractorsList(exp.distractors_correction);
-                if (distList.length === 0) return '';
-                return `
-                  <div class="distractors-container">
-                    <div class="distractors-label">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                      <span>بررسی دام‌های تستی و علت رد سایر گزینه‌ها:</span>
-                    </div>
-                    ${distList.map(d => `
-                      <div class="distractor-item">
-                        <div class="distractor-header">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="15" y1="9" x2="9" y2="15"></line>
-                            <line x1="9" y1="9" x2="15" y2="15"></line>
-                          </svg>
-                          <span>رد گزینه [${d.key}]:</span>
-                        </div>
-                        <p class="distractor-text">${this.escapeHtml(d.text)}</p>
-                      </div>
-                    `).join('')}
-                  </div>
-                `;
-              })()}
+              ${this.generateExplanationCardsHtml(q)}
             </div>
           </div>
         `;

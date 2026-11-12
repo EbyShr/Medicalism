@@ -525,19 +525,30 @@
   <script src="./js/radiology.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const commAndNcd = (window.CHAPTERS_REGISTRY || []).map(ch => ({
+      const rawComm = Array.isArray(window.CHAPTERS_REGISTRY)
+        ? window.CHAPTERS_REGISTRY
+        : (window.CHAPTERS_REGISTRY && Array.isArray(window.CHAPTERS_REGISTRY.chapters) ? window.CHAPTERS_REGISTRY.chapters : []);
+      const commAndNcd = rawComm.map(ch => ({
         ...ch,
         targetUrl: `./communicable-and-noncommunicable-diseases.html#${ch.id}`,
         trackLabel: ch.number <= 16 ? 'واگیر' : 'غیرواگیر',
         trackPillClass: ch.number <= 16 ? 'pill-comm' : 'pill-ncd'
       }));
-      const rad = (window.RADIOLOGY_REGISTRY || []).map(ch => ({
+
+      const rawRad = Array.isArray(window.RADIOLOGY_REGISTRY)
+        ? window.RADIOLOGY_REGISTRY
+        : (window.RADIOLOGY_REGISTRY && Array.isArray(window.RADIOLOGY_REGISTRY.chapters) ? window.RADIOLOGY_REGISTRY.chapters : []);
+      const rad = rawRad.map(ch => ({
         ...ch,
         targetUrl: `./radiology.html#${ch.id}`,
         trackLabel: 'رادیولوژی',
         trackPillClass: 'pill-rad'
       }));
-      const surgery = (window.SURGERY_REGISTRY || []).map(ch => ({
+
+      const rawSurgery = Array.isArray(window.SURGERY_REGISTRY)
+        ? window.SURGERY_REGISTRY
+        : (window.SURGERY_REGISTRY && Array.isArray(window.SURGERY_REGISTRY.chapters) ? window.SURGERY_REGISTRY.chapters : []);
+      const surgery = rawSurgery.map(ch => ({
         ...ch,
         targetUrl: `./surgery.html#${ch.id}`,
         trackLabel: 'جراحی جنرال',
@@ -599,19 +610,6 @@
           }
         });
 
-        // Instant close as soon as the mouse moves into the main page (hero)
-        const heroSection = document.querySelector('.portal-hero');
-        if (heroSection) {
-          heroSection.addEventListener('mouseenter', () => {
-            closeDropdown(true);
-          });
-          heroSection.addEventListener('mousemove', () => {
-            if (dropdown.classList.contains('is-open')) {
-              closeDropdown(true);
-            }
-          });
-        }
-
         document.addEventListener('click', (e) => {
           if (!dropdown.contains(e.target)) {
             closeDropdown(true);
@@ -624,6 +622,19 @@
           }
         });
       }
+
+      // 1.1 Make entire Bento Cards interactive and clickable
+      document.querySelectorAll('.bento-card').forEach(card => {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', (e) => {
+          // If click originated from an anchor or button inside the card, allow native action
+          if (e.target.closest('a') || e.target.closest('button')) return;
+          const targetLink = card.querySelector('.bento-card-footer a');
+          if (targetLink && targetLink.getAttribute('href')) {
+            window.location.href = targetLink.getAttribute('href');
+          }
+        });
+      });
 
       // 2. Real-time Floating Search on Hero
       function performSearch(query) {

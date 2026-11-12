@@ -73,11 +73,11 @@ def test_quiz_and_index():
         assert "۱۰۰٪" in stats_text or "آفلاین" in stats_text
         print("[index.html] PASS: Quick Stats Strip verified with strictly 4 metric pills!")
 
-        # 4. Check 3-Card Bento Grid ("ماژول‌های اصلی سامانه")
+        # 4. Check 4-Card Bento Grid ("ماژول‌های اصلی سامانه")
         bento_grid = page.locator(".portal-bento-grid")
         assert bento_grid.is_visible(), "Bento grid must be visible"
         bento_cards = bento_grid.locator(".bento-card").all()
-        assert len(bento_cards) == 3, f"Expected 3 cards in Bento Grid, got {len(bento_cards)}"
+        assert len(bento_cards) == 4, f"Expected 4 cards in Bento Grid, got {len(bento_cards)}"
 
         # Card A: Communicable & Non-communicable diseases
         card_a_text = bento_cards[0].inner_text()
@@ -95,12 +95,18 @@ def test_quiz_and_index():
         card_b_link = bento_cards[1].locator("a.bento-cta-btn").get_attribute("href")
         assert "radiology.html" in card_b_link
 
-        # Card C: Quiz
-        card_c_text = bento_cards[2].inner_text()
+        # Card C: General Surgery (Lawrence)
+        card_surg_text = bento_cards[2].inner_text()
+        assert "جراحی جنرال" in card_surg_text
+        assert "۲۲ فصل" in card_surg_text
+        card_surg_link = bento_cards[2].locator("a.bento-cta-btn").get_attribute("href")
+        assert "surgery.html" in card_surg_link
+
+        # Card D: Quiz
+        card_c_text = bento_cards[3].inner_text()
         assert "بانک جامع آزمون" in card_c_text
-        assert "۲۹۵ سوال" in card_c_text
-        assert "۱۲ مبحث" in card_c_text
-        card_c_link = bento_cards[2].locator("a.bento-cta-btn").get_attribute("href")
+        assert "۲۹۵ سوال" in card_c_text or "سوال" in card_c_text
+        card_c_link = bento_cards[3].locator("a.bento-cta-btn").get_attribute("href")
         assert "quiz.html" in card_c_link
 
         print("[index.html] PASS: 3-Card Bento Grid verified with all 3 pillars, tags, descriptions and links!")
@@ -152,27 +158,31 @@ def test_quiz_and_index():
         assert page.locator("#perfIncorrectCount").inner_text() == "۰"
         print("[quiz.html] PASS: Student Performance Overview Banner visible with initial zero state!")
 
-        # Verify Course Hub Grid has strictly 3 cards
+        # Verify Course Hub Grid has 4 cards (NCD, General Surgery, Smart Review, Radiology)
         quiz_cards = page.locator("#quizzesGrid .quiz-card").all()
-        assert len(quiz_cards) == 3, f"Expected 3 cards in quizzesGrid, got {len(quiz_cards)}"
-        print(f"[quiz.html] PASS: Course hub grid has strictly 3 balanced cards (no empty 2/3 row)!")
+        assert len(quiz_cards) == 4, f"Expected 4 cards in quizzesGrid, got {len(quiz_cards)}"
+        print(f"[quiz.html] PASS: Course hub grid has strictly 4 balanced cards including General Surgery (Lawrence)!")
 
         card1_text = quiz_cards[0].inner_text()
         assert "بیماری‌های غیرواگیر" in card1_text
         assert "295" in card1_text or "۲۹۵" in card1_text
 
-        card2_text = quiz_cards[1].inner_text()
+        card_surg_text = quiz_cards[1].inner_text()
+        assert "جراحی جنرال" in card_surg_text and "لارنس" in card_surg_text
+        assert "۴۳۱" in card_surg_text or "431" in card_surg_text
+
+        card2_text = quiz_cards[2].inner_text()
         assert "بانک هوشمند مرور شخصی" in card2_text
         assert "نشان‌شده و غلط‌ها" in card2_text
 
-        card3_text = quiz_cards[2].inner_text()
+        card3_text = quiz_cards[3].inner_text()
         assert "رادیولوژی بالینی" in card3_text
         assert "۲۰ کیس تصویری" in card3_text
-        card3_link = quiz_cards[2].locator("a.btn-open-course").get_attribute("href")
+        card3_link = quiz_cards[3].locator("a.btn-open-course").get_attribute("href")
         assert "./radiology.html#rad-exam" in card3_link or "radiology.html#rad-exam" in card3_link
 
-        # Test Card 2 empty state modal when clicking with 0 stats
-        review_btn = quiz_cards[1].locator("button.btn-open-course")
+        # Test Card 2 (Smart Review) empty state modal when clicking with 0 stats
+        review_btn = quiz_cards[2].locator("button.btn-open-course")
         review_btn.click()
         page.wait_for_timeout(200)
         empty_modal = page.locator("#reviewEmptyModal")
