@@ -250,5 +250,17 @@
     "fileUrl": "./data/quizzes/surgery_pediatric_surgery_quiz.json",
     "varName": "SURGERY_PEDIATRIC_SURGERY_DATA",
     "description": "مجموعه سوالات تحلیلی جراحی کودکان شامل کریپتورکیدیسم و ارکیدوپکسی، تنگی هیپرتروفیک پیلور، اینتوساسپشن، آترزی مری و فیستول تراکئوازوفاژیال، توده‌های گردنی (کیست تیروگلوسال)، تراتوم ساکروکوکسیژیال و تومورهای کبدی کودکان بر اساس رفرنس لارنس."
+  },
+  "transplantation": {
+    "id": "surgery-ch20-transplantation",
+    "slug": "transplantation",
+    "title": "فصل ۲۰: پیوند اعضا و ایمونولوژی (Transplantation)",
+    "shortTitle": "پیوند اعضا",
+    "badge": "6 سوال",
+    "totalQuestions": 6,
+    "estimatedMinutes": 20,
+    "fileUrl": "./data/quizzes/surgery_transplantation_quiz.json",
+    "varName": "SURGERY_TRANSPLANTATION_DATA",
+    "description": "مجموعه سوالات تحلیلی پیوند اعضا شامل ارزیابی مرگ مغزی، اهدا پس از مرگ قلبی (DCD)، حفاظت و نگهداری از ارگان (Organ Preservation)، ایمونولوژی و HLA، پیوند کلیه، کبد، قلب و ریه و داروهای سرکوب‌کننده ایمنی بر اساس رفرنس لارنس."
   }
 }

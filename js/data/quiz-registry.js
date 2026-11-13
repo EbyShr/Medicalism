@@ -161,17 +161,17 @@
       shortTitle: 'جراحی جنرال (لارنس)',
       category: 'جراحی جنرال لارنس',
       categoryColor: '#e11d48',
-      badge: '403 سوال در 21 مبحث',
-      totalQuestions: 403,
+      badge: '409 سوال در 22 مبحث',
+      totalQuestions: 409,
       description: 'بانک آزمون و تست‌های تحلیلی جراحی عمومی بر اساس رفرنس معتبر لارنس (Lawrence Essentials of General Surgery)؛ شامل تشریح گزینه‌ها، کالبدشکافی دام‌های تستی و درسنامه جامع بالینی.',
       chapters: [
         {
           id: 'surgery-all',
           title: 'همه مباحث (آزمون جامع جراحی جنرال لارنس)',
           shortTitle: 'آزمون جامع جراحی',
-          badge: '403 سوال',
-          totalQuestions: 403,
-          estimatedMinutes: 403,
+          badge: '409 سوال',
+          totalQuestions: 409,
+          estimatedMinutes: 409,
           isAll: true
         },
         {
@@ -404,6 +404,17 @@
           fileUrl: './data/quizzes/surgery_pediatric_surgery_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_PEDIATRIC_SURGERY_DATA)) ? window.SURGERY_PEDIATRIC_SURGERY_DATA : [],
           description: 'مجموعه سوالات تحلیلی جراحی کودکان شامل کریپتورکیدیسم و ارکیدوپکسی، تنگی هیپرتروفیک پیلور، اینتوساسپشن، آترزی مری و فیستول تراکئوازوفاژیال، توده‌های گردنی (کیست تیروگلوسال)، تراتوم ساکروکوکسیژیال و تومورهای کبدی کودکان بر اساس رفرنس لارنس.'
+        },
+        {
+          id: 'surgery-ch20-transplantation',
+          title: 'فصل ۲۰: پیوند اعضا و ایمونولوژی (Transplantation)',
+          shortTitle: 'پیوند اعضا',
+          badge: '6 سوال',
+          totalQuestions: 6,
+          estimatedMinutes: 20,
+          fileUrl: './data/quizzes/surgery_transplantation_quiz.json',
+          fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_TRANSPLANTATION_DATA)) ? window.SURGERY_TRANSPLANTATION_DATA : [],
+          description: 'مجموعه سوالات تحلیلی پیوند اعضا شامل ارزیابی مرگ مغزی، اهدا پس از مرگ قلبی (DCD)، حفاظت و نگهداری از ارگان (Organ Preservation)، ایمونولوژی و HLA، پیوند کلیه، کبد، قلب و ریه و داروهای سرکوب‌کننده ایمنی بر اساس رفرنس لارنس.'
         }
       ]
     }

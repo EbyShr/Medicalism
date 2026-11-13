@@ -56,9 +56,9 @@ def test_surgery_quiz():
         
         card_text = surg_card.inner_text()
         assert "جراحی جنرال" in card_text and "لارنس" in card_text, "Surgery card must mention Lawrence General Surgery"
-        assert "۴۰۳ سوال" in card_text or "403 سوال" in card_text or "۴۰۳" in card_text, f"Surgery card must show 403 questions, got: {card_text}"
-        assert "۲۱ فصل" in card_text or "21 فصل" in card_text or "۲۱" in card_text, f"Surgery card must show 21 chapters, got: {card_text}"
-        print("PASS: General Surgery Course Card visible with 403 dynamic questions and 21 chapters!")
+        assert "۴۰۹ سوال" in card_text or "409 سوال" in card_text or "۴۰۹" in card_text, f"Surgery card must show 409 questions, got: {card_text}"
+        assert "۲۲ فصل" in card_text or "22 فصل" in card_text or "۲۲" in card_text, f"Surgery card must show 22 chapters, got: {card_text}"
+        print("PASS: General Surgery Course Card visible with 409 dynamic questions and 22 chapters!")
 
         print("\n=======================================================")
         print("=== TEST 2: OPEN SURGERY COURSE VIEW & CHAPTERS ===")
@@ -76,7 +76,7 @@ def test_surgery_quiz():
 
         # Verify Chapter Cards in Surgery Course
         chapter_cards = page.locator('#courseChaptersGrid .chapter-card').all()
-        assert len(chapter_cards) == 21, f"Expected 21 surgery chapter cards, found {len(chapter_cards)}"
+        assert len(chapter_cards) == 22, f"Expected 22 surgery chapter cards, found {len(chapter_cards)}"
         ch1_text = chapter_cards[0].inner_text()
         assert "فتق‌های جدار شکم" in ch1_text, f"Expected hernia chapter in card text, got: {ch1_text}"
         assert "۲۴ سوال" in ch1_text or "24" in ch1_text, "Chapter 10 card must show 24 questions"
@@ -181,6 +181,11 @@ def test_surgery_quiz():
         assert "اطفال" in ch21_text, f"Expected pediatric surgery chapter in card text, got: {ch21_text}"
         assert "۹ سوال" in ch21_text or "9" in ch21_text, "Chapter 21 (Pediatric Surgery) card must show 9 questions"
         print("PASS: Chapter 21 (جراحی اطفال) card verified with 9 questions!")
+
+        ch22_text = chapter_cards[21].inner_text()
+        assert "پیوند" in ch22_text, f"Expected transplantation chapter in card text, got: {ch22_text}"
+        assert "۶ سوال" in ch22_text or "6" in ch22_text, "Chapter 20 (Transplantation) card must show 6 questions"
+        print("PASS: Chapter 20 (پیوند اعضا و ایمونولوژی) card verified with 6 questions!")
 
         print("\n=======================================================")
         print("=== TEST 3: STUDY MODE ON CHAPTER 14 (TRAUMA) & 3-PART VIBRANT CARDS ===")
@@ -327,7 +332,7 @@ def test_surgery_quiz():
 
         # Verify all questions are present in random pool
         total_random_q = page.evaluate("() => window.medicalQuiz.filteredQuestions.length")
-        assert total_random_q == 403, f"Expected 403 questions in surgery-all, got {total_random_q}"
+        assert total_random_q == 409, f"Expected 409 questions in surgery-all, got {total_random_q}"
 
         # Verify answers map starts completely clean (0 pre-answered questions)
         initial_answers_count = page.evaluate("() => Object.keys(window.medicalQuiz.answers).length")
