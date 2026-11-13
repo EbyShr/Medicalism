@@ -1,4 +1,4 @@
-const SURGERY_SURGICAL_NUTRITION_DATA = [
+window.SURGERY_SURGICAL_NUTRITION_DATA = [
   {
     "id": "surg_nutr_q01",
     "topic": "تغذیه در جراحی (Surgical Nutrition) - اصول، اندیکاسیون‌ها و پایش تغذیه وریدی توتال (TPN)",
@@ -320,7 +320,3 @@ const SURGERY_SURGICAL_NUTRITION_DATA = [
     "number": 5
   }
 ];
-
-if (typeof window !== 'undefined') {
-    window.SURGERY_SURGICAL_NUTRITION_DATA = SURGERY_SURGICAL_NUTRITION_DATA;
-}

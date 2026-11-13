@@ -161,17 +161,17 @@
       shortTitle: 'جراحی جنرال (لارنس)',
       category: 'جراحی جنرال لارنس',
       categoryColor: '#e11d48',
-      badge: '414 سوال در 23 مبحث',
-      totalQuestions: 414,
+      badge: '458 سوال در 24 مبحث',
+      totalQuestions: 458,
       description: 'بانک آزمون و تست‌های تحلیلی جراحی عمومی بر اساس رفرنس معتبر لارنس (Lawrence Essentials of General Surgery)؛ شامل تشریح گزینه‌ها، کالبدشکافی دام‌های تستی و درسنامه جامع بالینی.',
       chapters: [
         {
           id: 'surgery-all',
           title: 'همه مباحث (آزمون جامع جراحی جنرال لارنس)',
           shortTitle: 'آزمون جامع جراحی',
-          badge: '414 سوال',
-          totalQuestions: 414,
-          estimatedMinutes: 414,
+          badge: '458 سوال',
+          totalQuestions: 458,
+          estimatedMinutes: 458,
           isAll: true
         },
         {
@@ -426,6 +426,17 @@
           fileUrl: './data/quizzes/surgery_surgical_nutrition_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_SURGICAL_NUTRITION_DATA)) ? window.SURGERY_SURGICAL_NUTRITION_DATA : [],
           description: 'مجموعه سوالات تحلیلی تغذیه در جراحی بر اساس رفرنس لارنس شامل اصول و اندیکاسیون‌های TPN و EN، عوارض TPN، ایمونونوترینت‌ها (گلوتامین، آرژینین، امگا ۳)، الکترولیت‌ها و تعادل نیتروژن، و شاخص‌های آزمایشگاهی ارزیابی وضعیت تغذیه.'
+        },
+        {
+          id: 'surgery-ch22-23-cardiothoracic',
+          title: 'فصل ۲۲ و ۲۳: جراحی قفسه سینه و قلب (Cardiothoracic Surgery)',
+          shortTitle: 'جراحی توراکس و قلب',
+          badge: '44 سوال',
+          totalQuestions: 44,
+          estimatedMinutes: 50,
+          fileUrl: './data/quizzes/surgery_cardiothoracic_surgery_quiz.json',
+          fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_CARDIOTHORACIC_SURGERY_DATA)) ? window.SURGERY_CARDIOTHORACIC_SURGERY_DATA : [],
+          description: 'مجموعه سوالات تحلیلی جراحی قفسه سینه و قلب بر اساس رفرنس لارنس شامل سرطان ریه، توده‌های مدیاستن و تیموما، پنوموتوراکس و پلورال افیوژن، تومورهای جدار سینه، CABG و مطالعه SYNTAX، بای‌پس قلبی-ریوی و کاردیوپلژی، بیماری‌های دریچه‌ای (عمل Ross و پروتزها)، نقایص مادرزادی (ASD, VSD, فالوت)، حمایت مکانیکی IABP و دیسکسیون آئورت.'
         }
       ]
     }

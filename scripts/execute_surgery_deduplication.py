@@ -40,7 +40,8 @@ CHAPTER_PREFIX_MAP = {
     "colon_and_rectum": "surg_colon",
     "pediatric_surgery": "surg_peds",
     "transplantation": "surg_transplant",
-    "surgical_nutrition": "surg_nutr"
+    "surgical_nutrition": "surg_nutr",
+    "cardiothoracic_surgery": "surg_ct"
 }
 
 def normalize_text(text):
@@ -215,6 +216,12 @@ def main():
                     norm_stem = normalize_text('شیرخواری با یک توده نسج نرم در پشت روی ساکروم نزد شما آورده شده است کدام گزینه صحیح است')
                 elif 'اینتوساسپشن' in stem_raw:
                     norm_stem = normalize_text('در مورد اینتوساسپشن کدام صحیح است')
+            if slug == 'cardiothoracic_surgery':
+                stem_raw = q.get('stem', '')
+                if ('شایعترین علامت' in stem_raw or 'شایع ترین علامت' in stem_raw) and ('کنسر ریه' in stem_raw or 'سرطان ریه' in stem_raw):
+                    norm_stem = normalize_text('شایع ترین علامت در سرطان ریه کدام است')
+                elif 'بیمار مرد 50 ساله با سابقه 30 سال مصرف روزانه یک پاکت سیگار' in stem_raw:
+                    norm_stem = normalize_text('بیمار مرد 50 ساله با سابقه 30 سال مصرف روزانه یک پاکت سیگار با تغییر کیفیت سرفه')
             if norm_stem in seen_stems:
                 prim_q = seen_stems[norm_stem]
                 lesson_prim = prim_q.get('detailed_explanation', {}).get('mini_lesson', '')

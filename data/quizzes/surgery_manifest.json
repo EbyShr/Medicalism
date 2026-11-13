@@ -274,5 +274,17 @@
     "fileUrl": "./data/quizzes/surgery_surgical_nutrition_quiz.json",
     "varName": "SURGERY_SURGICAL_NUTRITION_DATA",
     "description": "مجموعه سوالات تحلیلی تغذیه در جراحی بر اساس رفرنس لارنس شامل اصول و اندیکاسیون‌های TPN و EN، عوارض TPN، ایمونونوترینت‌ها (گلوتامین، آرژینین، امگا ۳)، الکترولیت‌ها و تعادل نیتروژن، و شاخص‌های آزمایشگاهی ارزیابی وضعیت تغذیه."
+  },
+  "cardiothoracic_surgery": {
+    "id": "surgery-ch22-23-cardiothoracic",
+    "slug": "cardiothoracic_surgery",
+    "title": "فصل ۲۲ و ۲۳: جراحی قفسه سینه و قلب (Cardiothoracic Surgery)",
+    "shortTitle": "جراحی توراکس و قلب",
+    "badge": "44 سوال",
+    "totalQuestions": 44,
+    "estimatedMinutes": 50,
+    "fileUrl": "./data/quizzes/surgery_cardiothoracic_surgery_quiz.json",
+    "varName": "SURGERY_CARDIOTHORACIC_SURGERY_DATA",
+    "description": "مجموعه سوالات تحلیلی جراحی قفسه سینه و قلب بر اساس رفرنس لارنس شامل سرطان ریه، توده‌های مدیاستن و تیموما، پنوموتوراکس و پلورال افیوژن، تومورهای جدار سینه، CABG و مطالعه SYNTAX، بای‌پس قلبی-ریوی و کاردیوپلژی، بیماری‌های دریچه‌ای (عمل Ross و پروتزها)، نقایص مادرزادی (ASD, VSD, فالوت)، حمایت مکانیکی IABP و دیسکسیون آئورت."
   }
 }
