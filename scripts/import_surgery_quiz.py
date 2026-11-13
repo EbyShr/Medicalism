@@ -157,6 +157,13 @@ KNOWN_CHAPTER_METADATA = {
         "description": "مجموعه ۴۷ سوال تحلیلی ترومای سر و مغز (EDH, SDH, کانتوژن)، تروما و آسیب‌های نخاعی، شکستگی‌های ستون فقرات (جفرسون، دنس، جلاد، شانس)، بیماری‌های دژنراتیو دیسک و تنگی کانال، تومورها و بیماری‌های عروقی مغز بر اساس رفرنس لارنس.",
         "estimatedMinutes": 50
     },
+    "breast": {
+        "id": "surgery-ch17-breast",
+        "title": "فصل ۱۷: بیماری‌های پستان (Breast Disease)",
+        "shortTitle": "بیماری‌های پستان",
+        "description": "مجموعه سوالات تحلیلی سرطان پستان، انواع پاتولوژی (موسینوس، داکتال، فیلودس)، غربالگری و ماموگرافی، ژنیکوماستی و اندیکاسیون‌های جراحی بر اساس رفرنس لارنس.",
+        "estimatedMinutes": 30
+    },
     "trauma": {
         "id": "surgery-ch14-trauma",
         "title": "فصل ۱۴: ترومای قفسه سینه، شکم، لگن و گردن (Thoracoabdominal, Pelvic & Neck Trauma)",
@@ -548,7 +555,7 @@ def update_quiz_html(manifest: dict):
         html = f.read()
 
     # Find the scripts section before quiz-registry.js
-    registry_script_match = re.search(r'<script\s+src=["\']\.\/js\/data\/quiz-registry\.js["\']><\/script>', html)
+    registry_script_match = re.search(r'<script\s+src=["\']\.\/js\/data\/quiz-registry\.js(?:\?[^"\']*)?["\']><\/script>', html)
     if not registry_script_match:
         print("Warning: Could not find quiz-registry.js script tag in quiz.html.")
         return

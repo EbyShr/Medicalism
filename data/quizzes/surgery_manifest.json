@@ -214,5 +214,17 @@
     "fileUrl": "./data/quizzes/surgery_trauma_quiz.json",
     "varName": "SURGERY_TRAUMA_DATA",
     "description": "مجموعه ۲۶ سوال تحلیلی هموتوراکس حجیم و توراکوتومی اورژانس، ترومای نافذ گردن و زون‌های سه‌گانه، شکستگی‌های لگن و آنژیوامبولیزاسیون، آسیب دیافراگم، قفسه سینه مواج (Flail Chest)، ترومای نافذ شکم و فلانک بر اساس رفرنس لارنس."
+  },
+  "breast": {
+    "id": "surgery-ch17-breast",
+    "slug": "breast",
+    "title": "فصل ۱۷: بیماری‌های پستان (Breast Disease)",
+    "shortTitle": "بیماری‌های پستان",
+    "badge": "17 سوال",
+    "totalQuestions": 17,
+    "estimatedMinutes": 30,
+    "fileUrl": "./data/quizzes/surgery_breast_quiz.json",
+    "varName": "SURGERY_BREAST_DATA",
+    "description": "مجموعه سوالات تحلیلی سرطان پستان، انواع پاتولوژی (موسینوس، داکتال، فیلودس)، غربالگری و ماموگرافی، ژنیکوماستی و اندیکاسیون‌های جراحی بر اساس رفرنس لارنس."
   }
 }

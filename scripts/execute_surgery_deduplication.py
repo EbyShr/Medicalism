@@ -35,7 +35,8 @@ CHAPTER_PREFIX_MAP = {
     "surgical_endocrinology": "surg_endo",
     "surgical_infections": "surg_infect",
     "neurosurgery": "surg_neuro",
-    "trauma": "surg_trauma"
+    "trauma": "surg_trauma",
+    "breast": "surg_breast"
 }
 
 def normalize_text(text):
@@ -194,6 +195,8 @@ def main():
                 continue
                 
             norm_stem = normalize_text(q.get('stem', ''))
+            if slug == 'breast' and ('ماموگرافی' in q.get('stem', '') and ('موقعیت آناتومیک تومور' in q.get('stem', '') or 'محل قرارگیری توده' in q.get('stem', '') or 'ستاره‌ای‌شکل' in q.get('stem', ''))):
+                norm_stem = normalize_text('ماموگرافی موقعیت آناتومیک تومور در کجای پستان است')
             if norm_stem in seen_stems:
                 prim_q = seen_stems[norm_stem]
                 lesson_prim = prim_q.get('detailed_explanation', {}).get('mini_lesson', '')
@@ -306,6 +309,8 @@ def main():
       shortTitle: 'جراحی جنرال (لارنس)',
       category: 'جراحی جنرال لارنس',
       categoryColor: '#e11d48',
+      badge: '{final_total} سوال در {len(manifest)} مبحث',
+      totalQuestions: {final_total},
       description: 'بانک آزمون و تست‌های تحلیلی جراحی عمومی بر اساس رفرنس معتبر لارنس (Lawrence Essentials of General Surgery)؛ شامل تشریح گزینه‌ها، کالبدشکافی دام‌های تستی و درسنامه جامع بالینی.',
       chapters: [
 {chapters_str}

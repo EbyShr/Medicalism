@@ -301,7 +301,7 @@
           </svg>
         </div>
         <div class="stat-pill-content">
-          <div class="stat-pill-value">۶۶۰+ <span class="stat-pill-unit">سوال تحلیلی</span></div>
+          <div class="stat-pill-value">۶۸۰+ <span class="stat-pill-unit">سوال تحلیلی</span></div>
           <div class="stat-pill-label">بانک سوالات جراحی لارنس، NCD و رادیولوژی</div>
         </div>
       </div>
@@ -479,13 +479,13 @@
           <div class="bento-card-body">
             <h3 class="bento-card-title">بانک جامع آزمون و سوالات تحلیلی</h3>
             <p class="bento-card-text">
-              بیش از ۶۶۰ سوال تحلیلی در ۳۰ مبحث مصوب (شامل ۳۴۸ سوال تفکیک‌شده و غنی‌سازی‌شده جراحی جنرال لارنس در ۱۸ فصل، ۲۹۵ سوال بیماری‌های غیرواگیر و ۲۰ کیس رادیولوژی)، حالت مطالعه آموزشی ۳ کارتی با رد گزینه‌ها و شبیه‌ساز رسمی با کارنامه هوشمند.
+              بیش از ۶۸۰ سوال تحلیلی در ۳۱ مبحث مصوب (شامل ۳۶۵ سوال تفکیک‌شده و غنی‌سازی‌شده جراحی جنرال لارنس در ۱۹ فصل، ۲۹۵ سوال بیماری‌های غیرواگیر و ۲۰ کیس رادیولوژی)، حالت مطالعه آموزشی ۳ کارتی با رد گزینه‌ها و شبیه‌ساز رسمی با کارنامه هوشمند.
             </p>
 
             <div class="bento-tags-list">
-              <span class="bento-tag">۳۴۸ سوال جراحی لارنس</span>
+              <span class="bento-tag">۳۶۵ سوال جراحی لارنس</span>
               <span class="bento-tag">۲۹۵ سوال بیماری‌های غیرواگیر</span>
-              <span class="bento-tag">۳۰ مبحث تخصصی</span>
+              <span class="bento-tag">۳۱ مبحث تخصصی</span>
               <span class="bento-tag">پاسخ تشریحی ۳ کارتی</span>
             </div>
           </div>
@@ -571,12 +571,14 @@
       if (dropdown && dropdownBtn) {
         let closeTimer = null;
         let openTimer = null;
+        let lastOpenedAt = 0;
 
         const openDropdown = () => {
           clearTimeout(closeTimer);
           clearTimeout(openTimer);
           dropdown.classList.add('is-open');
           dropdownBtn.setAttribute('aria-expanded', 'true');
+          lastOpenedAt = Date.now();
         };
 
         const closeDropdown = (immediate = false) => {
@@ -589,7 +591,7 @@
             closeTimer = setTimeout(() => {
               dropdown.classList.remove('is-open');
               dropdownBtn.setAttribute('aria-expanded', 'false');
-            }, 60);
+            }, 200);
           }
         };
 
@@ -610,11 +612,19 @@
 
         dropdownBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          if (dropdown.classList.contains('is-open')) {
+          // If already open and user intentionally clicks after exploring, toggle close; if just opened via hover (<350ms), keep open
+          if (dropdown.classList.contains('is-open') && (Date.now() - lastOpenedAt > 350)) {
             closeDropdown(true);
           } else {
             openDropdown();
           }
+        });
+
+        // Close dropdown when clicking any destination link inside
+        dropdown.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            closeDropdown(true);
+          });
         });
 
         document.addEventListener('click', (e) => {

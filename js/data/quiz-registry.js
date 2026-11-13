@@ -161,17 +161,17 @@
       shortTitle: 'جراحی جنرال (لارنس)',
       category: 'جراحی جنرال لارنس',
       categoryColor: '#e11d48',
-      badge: '۳۴۸ سوال در ۱۸ مبحث',
-      totalQuestions: 348,
+      badge: '365 سوال در 19 مبحث',
+      totalQuestions: 365,
       description: 'بانک آزمون و تست‌های تحلیلی جراحی عمومی بر اساس رفرنس معتبر لارنس (Lawrence Essentials of General Surgery)؛ شامل تشریح گزینه‌ها، کالبدشکافی دام‌های تستی و درسنامه جامع بالینی.',
       chapters: [
         {
           id: 'surgery-all',
           title: 'همه مباحث (آزمون جامع جراحی جنرال لارنس)',
           shortTitle: 'آزمون جامع جراحی',
-          badge: '348 سوال',
-          totalQuestions: 348,
-          estimatedMinutes: 348,
+          badge: '365 سوال',
+          totalQuestions: 365,
+          estimatedMinutes: 365,
           isAll: true
         },
         {
@@ -371,6 +371,17 @@
           fileUrl: './data/quizzes/surgery_trauma_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_TRAUMA_DATA)) ? window.SURGERY_TRAUMA_DATA : [],
           description: 'مجموعه ۲۶ سوال تحلیلی هموتوراکس حجیم و توراکوتومی اورژانس، ترومای نافذ گردن و زون‌های سه‌گانه، شکستگی‌های لگن و آنژیوامبولیزاسیون، آسیب دیافراگم، قفسه سینه مواج (Flail Chest)، ترومای نافذ شکم و فلانک بر اساس رفرنس لارنس.'
+        },
+        {
+          id: 'surgery-ch17-breast',
+          title: 'فصل ۱۷: بیماری‌های پستان (Breast Disease)',
+          shortTitle: 'بیماری‌های پستان',
+          badge: '17 سوال',
+          totalQuestions: 17,
+          estimatedMinutes: 30,
+          fileUrl: './data/quizzes/surgery_breast_quiz.json',
+          fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_BREAST_DATA)) ? window.SURGERY_BREAST_DATA : [],
+          description: 'مجموعه سوالات تحلیلی سرطان پستان، انواع پاتولوژی (موسینوس، داکتال، فیلودس)، غربالگری و ماموگرافی، ژنیکوماستی و اندیکاسیون‌های جراحی بر اساس رفرنس لارنس.'
         }
       ]
     }
