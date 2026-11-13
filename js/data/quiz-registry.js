@@ -161,17 +161,17 @@
       shortTitle: 'جراحی جنرال (لارنس)',
       category: 'جراحی جنرال لارنس',
       categoryColor: '#e11d48',
-      badge: '409 سوال در 22 مبحث',
-      totalQuestions: 409,
+      badge: '414 سوال در 23 مبحث',
+      totalQuestions: 414,
       description: 'بانک آزمون و تست‌های تحلیلی جراحی عمومی بر اساس رفرنس معتبر لارنس (Lawrence Essentials of General Surgery)؛ شامل تشریح گزینه‌ها، کالبدشکافی دام‌های تستی و درسنامه جامع بالینی.',
       chapters: [
         {
           id: 'surgery-all',
           title: 'همه مباحث (آزمون جامع جراحی جنرال لارنس)',
           shortTitle: 'آزمون جامع جراحی',
-          badge: '409 سوال',
-          totalQuestions: 409,
-          estimatedMinutes: 409,
+          badge: '414 سوال',
+          totalQuestions: 414,
+          estimatedMinutes: 414,
           isAll: true
         },
         {
@@ -415,6 +415,17 @@
           fileUrl: './data/quizzes/surgery_transplantation_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_TRANSPLANTATION_DATA)) ? window.SURGERY_TRANSPLANTATION_DATA : [],
           description: 'مجموعه سوالات تحلیلی پیوند اعضا شامل ارزیابی مرگ مغزی، اهدا پس از مرگ قلبی (DCD)، حفاظت و نگهداری از ارگان (Organ Preservation)، ایمونولوژی و HLA، پیوند کلیه، کبد، قلب و ریه و داروهای سرکوب‌کننده ایمنی بر اساس رفرنس لارنس.'
+        },
+        {
+          id: 'surgery-ch03-nutrition',
+          title: 'فصل ۳: تغذیه در جراحی (Surgical Nutrition)',
+          shortTitle: 'تغذیه در جراحی',
+          badge: '5 سوال',
+          totalQuestions: 5,
+          estimatedMinutes: 20,
+          fileUrl: './data/quizzes/surgery_surgical_nutrition_quiz.json',
+          fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_SURGICAL_NUTRITION_DATA)) ? window.SURGERY_SURGICAL_NUTRITION_DATA : [],
+          description: 'مجموعه سوالات تحلیلی تغذیه در جراحی بر اساس رفرنس لارنس شامل اصول و اندیکاسیون‌های TPN و EN، عوارض TPN، ایمونونوترینت‌ها (گلوتامین، آرژینین، امگا ۳)، الکترولیت‌ها و تعادل نیتروژن، و شاخص‌های آزمایشگاهی ارزیابی وضعیت تغذیه.'
         }
       ]
     }

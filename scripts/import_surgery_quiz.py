@@ -185,6 +185,13 @@ KNOWN_CHAPTER_METADATA = {
         "description": "مجموعه سوالات تحلیلی پیوند اعضا شامل ارزیابی مرگ مغزی، اهدا پس از مرگ قلبی (DCD)، حفاظت و نگهداری از ارگان (Organ Preservation)، ایمونولوژی و HLA، پیوند کلیه، کبد، قلب و ریه و داروهای سرکوب‌کننده ایمنی بر اساس رفرنس لارنس.",
         "estimatedMinutes": 20
     },
+    "surgical_nutrition": {
+        "id": "surgery-ch03-nutrition",
+        "title": "فصل ۳: تغذیه در جراحی (Surgical Nutrition)",
+        "shortTitle": "تغذیه در جراحی",
+        "description": "مجموعه سوالات تحلیلی تغذیه در جراحی بر اساس رفرنس لارنس شامل اصول و اندیکاسیون‌های TPN و EN، عوارض TPN، ایمونونوترینت‌ها (گلوتامین، آرژینین، امگا ۳)، الکترولیت‌ها و تعادل نیتروژن، و شاخص‌های آزمایشگاهی ارزیابی وضعیت تغذیه.",
+        "estimatedMinutes": 20
+    },
     "trauma": {
         "id": "surgery-ch14-trauma",
         "title": "فصل ۱۴: ترومای قفسه سینه، شکم، لگن و گردن (Thoracoabdominal, Pelvic & Neck Trauma)",

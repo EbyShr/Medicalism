@@ -262,5 +262,17 @@
     "fileUrl": "./data/quizzes/surgery_transplantation_quiz.json",
     "varName": "SURGERY_TRANSPLANTATION_DATA",
     "description": "مجموعه سوالات تحلیلی پیوند اعضا شامل ارزیابی مرگ مغزی، اهدا پس از مرگ قلبی (DCD)، حفاظت و نگهداری از ارگان (Organ Preservation)، ایمونولوژی و HLA، پیوند کلیه، کبد، قلب و ریه و داروهای سرکوب‌کننده ایمنی بر اساس رفرنس لارنس."
+  },
+  "surgical_nutrition": {
+    "id": "surgery-ch03-nutrition",
+    "slug": "surgical_nutrition",
+    "title": "فصل ۳: تغذیه در جراحی (Surgical Nutrition)",
+    "shortTitle": "تغذیه در جراحی",
+    "badge": "5 سوال",
+    "totalQuestions": 5,
+    "estimatedMinutes": 20,
+    "fileUrl": "./data/quizzes/surgery_surgical_nutrition_quiz.json",
+    "varName": "SURGERY_SURGICAL_NUTRITION_DATA",
+    "description": "مجموعه سوالات تحلیلی تغذیه در جراحی بر اساس رفرنس لارنس شامل اصول و اندیکاسیون‌های TPN و EN، عوارض TPN، ایمونونوترینت‌ها (گلوتامین، آرژینین، امگا ۳)، الکترولیت‌ها و تعادل نیتروژن، و شاخص‌های آزمایشگاهی ارزیابی وضعیت تغذیه."
   }
 }

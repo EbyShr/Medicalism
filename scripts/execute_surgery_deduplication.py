@@ -39,7 +39,8 @@ CHAPTER_PREFIX_MAP = {
     "breast": "surg_breast",
     "colon_and_rectum": "surg_colon",
     "pediatric_surgery": "surg_peds",
-    "transplantation": "surg_transplant"
+    "transplantation": "surg_transplant",
+    "surgical_nutrition": "surg_nutr"
 }
 
 def normalize_text(text):
