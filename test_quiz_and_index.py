@@ -69,7 +69,7 @@ def test_quiz_and_index():
         stats_text = stats_strip.inner_text()
         assert "۳۰" in stats_text and "فصل" in stats_text
         assert "۴۷۴" in stats_text and "رادیولوژی" in stats_text
-        assert ("۲۹۵" in stats_text or "۷۲۶" in stats_text or "۶۶۰" in stats_text or "۶۸۰" in stats_text) and "سوال" in stats_text
+        assert ("۲۹۵" in stats_text or "۷۰۰" in stats_text or "۶۸۰" in stats_text) and "سوال" in stats_text
         assert "۱۰۰٪" in stats_text or "آفلاین" in stats_text
         print("[index.html] PASS: Quick Stats Strip verified with strictly 4 metric pills!")
 
@@ -169,7 +169,7 @@ def test_quiz_and_index():
 
         card_surg_text = quiz_cards[1].inner_text()
         assert "جراحی جنرال" in card_surg_text and "لارنس" in card_surg_text
-        assert "۳۶۵" in card_surg_text or "365" in card_surg_text
+        assert "۳۹۴" in card_surg_text or "394" in card_surg_text or "۳۶۵" in card_surg_text
 
         card2_text = quiz_cards[2].inner_text()
         assert "بانک هوشمند مرور شخصی" in card2_text

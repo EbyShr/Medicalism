@@ -226,5 +226,17 @@
     "fileUrl": "./data/quizzes/surgery_breast_quiz.json",
     "varName": "SURGERY_BREAST_DATA",
     "description": "مجموعه سوالات تحلیلی سرطان پستان، انواع پاتولوژی (موسینوس، داکتال، فیلودس)، غربالگری و ماموگرافی، ژنیکوماستی و اندیکاسیون‌های جراحی بر اساس رفرنس لارنس."
+  },
+  "colon_and_rectum": {
+    "id": "surgery-ch14-colon-rectum",
+    "slug": "colon_and_rectum",
+    "title": "فصل ۱۴: بیماری‌های کولون، رکتوم و مقعد (Diseases of the Colon, Rectum & Anus)",
+    "shortTitle": "کولون، رکتوم و مقعد",
+    "badge": "29 سوال",
+    "totalQuestions": 29,
+    "estimatedMinutes": 45,
+    "fileUrl": "./data/quizzes/surgery_colon_and_rectum_quiz.json",
+    "varName": "SURGERY_COLON_AND_RECTUM_DATA",
+    "description": "مجموعه سوالات تحلیلی خونریزی دستگاه گوارش تحتانی، هموروئید، فیستول و آبسه آنورکتال، غربالگری و مرحله‌بندی سرطان‌های کولورکتال، سندرم‌های لینچ و FAP، ولولوس سیگموئید، دیورتیکولیت و سندرم اوگیلوی بر اساس رفرنس لارنس."
   }
 }

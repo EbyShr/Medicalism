@@ -36,7 +36,8 @@ CHAPTER_PREFIX_MAP = {
     "surgical_infections": "surg_infect",
     "neurosurgery": "surg_neuro",
     "trauma": "surg_trauma",
-    "breast": "surg_breast"
+    "breast": "surg_breast",
+    "colon_and_rectum": "surg_colon"
 }
 
 def normalize_text(text):
@@ -197,6 +198,12 @@ def main():
             norm_stem = normalize_text(q.get('stem', ''))
             if slug == 'breast' and ('ماموگرافی' in q.get('stem', '') and ('موقعیت آناتومیک تومور' in q.get('stem', '') or 'محل قرارگیری توده' in q.get('stem', '') or 'ستاره‌ای‌شکل' in q.get('stem', ''))):
                 norm_stem = normalize_text('ماموگرافی موقعیت آناتومیک تومور در کجای پستان است')
+            if slug == 'colon_and_rectum':
+                stem_raw = q.get('stem', '')
+                if 'اندیکاسیون آنتی بیوتیک تراپی در آبسه پری آنال' in stem_raw:
+                    norm_stem = normalize_text('کدام یک از موارد زیر اندیکاسیون آنتی بیوتیک تراپی در آبسه پری آنال است')
+                elif 'غربالگری' in stem_raw and 'سرطان' in stem_raw and ('متوسط' in stem_raw or 'اکثریت' in stem_raw):
+                    norm_stem = normalize_text('سن مناسب غربالگری جهت سرطان های کولون و رکتوم در افراد با ریسک متوسط کدام است')
             if norm_stem in seen_stems:
                 prim_q = seen_stems[norm_stem]
                 lesson_prim = prim_q.get('detailed_explanation', {}).get('mini_lesson', '')

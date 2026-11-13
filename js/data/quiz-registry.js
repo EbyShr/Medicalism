@@ -161,17 +161,17 @@
       shortTitle: 'جراحی جنرال (لارنس)',
       category: 'جراحی جنرال لارنس',
       categoryColor: '#e11d48',
-      badge: '365 سوال در 19 مبحث',
-      totalQuestions: 365,
+      badge: '394 سوال در 20 مبحث',
+      totalQuestions: 394,
       description: 'بانک آزمون و تست‌های تحلیلی جراحی عمومی بر اساس رفرنس معتبر لارنس (Lawrence Essentials of General Surgery)؛ شامل تشریح گزینه‌ها، کالبدشکافی دام‌های تستی و درسنامه جامع بالینی.',
       chapters: [
         {
           id: 'surgery-all',
           title: 'همه مباحث (آزمون جامع جراحی جنرال لارنس)',
           shortTitle: 'آزمون جامع جراحی',
-          badge: '365 سوال',
-          totalQuestions: 365,
-          estimatedMinutes: 365,
+          badge: '394 سوال',
+          totalQuestions: 394,
+          estimatedMinutes: 394,
           isAll: true
         },
         {
@@ -382,6 +382,17 @@
           fileUrl: './data/quizzes/surgery_breast_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_BREAST_DATA)) ? window.SURGERY_BREAST_DATA : [],
           description: 'مجموعه سوالات تحلیلی سرطان پستان، انواع پاتولوژی (موسینوس، داکتال، فیلودس)، غربالگری و ماموگرافی، ژنیکوماستی و اندیکاسیون‌های جراحی بر اساس رفرنس لارنس.'
+        },
+        {
+          id: 'surgery-ch14-colon-rectum',
+          title: 'فصل ۱۴: بیماری‌های کولون، رکتوم و مقعد (Diseases of the Colon, Rectum & Anus)',
+          shortTitle: 'کولون، رکتوم و مقعد',
+          badge: '29 سوال',
+          totalQuestions: 29,
+          estimatedMinutes: 45,
+          fileUrl: './data/quizzes/surgery_colon_and_rectum_quiz.json',
+          fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_COLON_AND_RECTUM_DATA)) ? window.SURGERY_COLON_AND_RECTUM_DATA : [],
+          description: 'مجموعه سوالات تحلیلی خونریزی دستگاه گوارش تحتانی، هموروئید، فیستول و آبسه آنورکتال، غربالگری و مرحله‌بندی سرطان‌های کولورکتال، سندرم‌های لینچ و FAP، ولولوس سیگموئید، دیورتیکولیت و سندرم اوگیلوی بر اساس رفرنس لارنس.'
         }
       ]
     }

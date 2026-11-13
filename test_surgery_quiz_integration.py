@@ -56,9 +56,9 @@ def test_surgery_quiz():
         
         card_text = surg_card.inner_text()
         assert "جراحی جنرال" in card_text and "لارنس" in card_text, "Surgery card must mention Lawrence General Surgery"
-        assert "۳۶۵ سوال" in card_text or "365 سوال" in card_text or "۳۶۵" in card_text, f"Surgery card must show 365 questions, got: {card_text}"
-        assert "۱۹ فصل" in card_text or "19 فصل" in card_text or "۱۹" in card_text, f"Surgery card must show 19 chapters, got: {card_text}"
-        print("PASS: General Surgery Course Card visible with 365 dynamic questions and 19 chapters!")
+        assert "۳۹۴ سوال" in card_text or "394 سوال" in card_text or "۳۹۴" in card_text, f"Surgery card must show 394 questions, got: {card_text}"
+        assert "۲۰ فصل" in card_text or "20 فصل" in card_text or "۲۰" in card_text, f"Surgery card must show 20 chapters, got: {card_text}"
+        print("PASS: General Surgery Course Card visible with 394 dynamic questions and 20 chapters!")
 
         print("\n=======================================================")
         print("=== TEST 2: OPEN SURGERY COURSE VIEW & CHAPTERS ===")
@@ -76,7 +76,7 @@ def test_surgery_quiz():
 
         # Verify Chapter Cards in Surgery Course
         chapter_cards = page.locator('#courseChaptersGrid .chapter-card').all()
-        assert len(chapter_cards) == 19, f"Expected 19 surgery chapter cards, found {len(chapter_cards)}"
+        assert len(chapter_cards) == 20, f"Expected 20 surgery chapter cards, found {len(chapter_cards)}"
         ch1_text = chapter_cards[0].inner_text()
         assert "فتق‌های جدار شکم" in ch1_text, f"Expected hernia chapter in card text, got: {ch1_text}"
         assert "۲۴ سوال" in ch1_text or "24" in ch1_text, "Chapter 10 card must show 24 questions"
@@ -171,6 +171,11 @@ def test_surgery_quiz():
         assert "پستان" in ch19_text, f"Expected breast chapter in card text, got: {ch19_text}"
         assert "۱۷ سوال" in ch19_text or "17" in ch19_text, "Chapter 17 (Breast) card must show 17 questions"
         print("PASS: Chapter 17 (بیماری‌های پستان) card verified with 17 questions!")
+
+        ch20_text = chapter_cards[19].inner_text()
+        assert "کولون" in ch20_text or "رکتوم" in ch20_text, f"Expected colon/rectum chapter in card text, got: {ch20_text}"
+        assert "۲۹ سوال" in ch20_text or "29" in ch20_text, "Chapter 14 (Colon & Rectum) card must show 29 questions"
+        print("PASS: Chapter 14 (بیماری‌های کولون، رکتوم و مقعد) card verified with 29 questions!")
 
         print("\n=======================================================")
         print("=== TEST 3: STUDY MODE ON CHAPTER 14 (TRAUMA) & 3-PART VIBRANT CARDS ===")
@@ -317,7 +322,7 @@ def test_surgery_quiz():
 
         # Verify all 365 questions are present in random pool
         total_random_q = page.evaluate("() => window.medicalQuiz.filteredQuestions.length")
-        assert total_random_q == 365, f"Expected 365 questions in surgery-all, got {total_random_q}"
+        assert total_random_q == 394, f"Expected 394 questions in surgery-all, got {total_random_q}"
 
         # Verify answers map starts completely clean (0 pre-answered questions)
         initial_answers_count = page.evaluate("() => Object.keys(window.medicalQuiz.answers).length")
