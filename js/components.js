@@ -49,10 +49,16 @@ window.ComponentRenderer = {
           <!-- Chapter Hero Banner -->
           <header class="chapter-hero">
           <div class="chapter-meta-tag">
-            ${chapter.isExam ? `
+            ${chapter.isExam && !chapter.isFlagship ? `
               <span style="background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); color: #ffffff; padding: 2px 10px; border-radius: var(--radius-full); font-weight: 800; box-shadow: 0 0 12px rgba(236, 72, 153, 0.45);">بخش ویژه کوئیز</span>
               <span>•</span>
               <span>کیس‌های تصویری و شبیه‌ساز بالینی</span>
+              <span>•</span>
+              <span>${chapter.estimatedReadTime}</span>
+            ` : chapter.isFlagship ? `
+              <span class="badge-flagship-gold-crimson">🔥 ویژه امتحان: آسکی، PMP و پایان‌بخش البرز</span>
+              <span>•</span>
+              <span>۳۵ ایستگاه بالینی، کیس‌های PMP و تله‌های نمره منفی</span>
               <span>•</span>
               <span>${chapter.estimatedReadTime}</span>
             ` : `
@@ -331,6 +337,7 @@ window.ComponentRenderer = {
         <div class="section-header-row">
           <div>
             <h2>
+              ${section.badge ? `<span class="section-heading-badge" style="display: inline-flex; align-items: center; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: var(--radius-full); background: rgba(225, 29, 72, 0.12); color: #e11d48; margin-inline-end: 8px; border: 1px solid rgba(225, 29, 72, 0.25); vertical-align: middle;">${section.badge}</span>` : ''}
               <span>${section.title}</span>
             </h2>
             ${section.latinTitle ? `<div class="brand-subtitle latin-term">${section.latinTitle}</div>` : ''}
@@ -10290,4 +10297,97 @@ window.ComponentRenderer = {
     return `<p>${sec.summary || ''}</p>`;
   },
 
+};
+
+/**
+ * Global Quick Exam-Day Filter for Master OSCE / EPMP / KF Module
+ */
+window.applyOSCEFilter = function(filterType) {
+  const container = document.getElementById('chapterContentArea') || document.body;
+  const filterBar = document.getElementById('osceQuickFilterBar');
+  if (!filterBar) return;
+
+  // 1. Update active button state
+  filterBar.querySelectorAll('.osce-filter-btn').forEach(btn => {
+    btn.classList.toggle('is-active', btn.getAttribute('data-filter') === filterType);
+  });
+
+  const countEl = document.getElementById('osceFilterActiveCount');
+  const sections = container.querySelectorAll('.study-section[data-chapter-id="surg-osce-pmp"]');
+
+  if (filterType === 'all') {
+    // Show everything
+    sections.forEach(sec => {
+      sec.style.display = '';
+      sec.querySelectorAll('[data-card-type], .osce-general-block, .osce-intro-block, .branch-card').forEach(el => {
+        el.style.display = '';
+      });
+    });
+    if (countEl) countEl.textContent = 'نمایش ۱۰۰٪ محتوای بسته جامع آزمون (۳۵ ایستگاه)';
+    return;
+  }
+
+  let totalVisibleItems = 0;
+
+  sections.forEach(sec => {
+    let hasMatch = false;
+
+    const cards = sec.querySelectorAll('.case-vignette-card, .epmp-positive-box, .epmp-negative-box, .order-sheet-card, .stagery-topic-card, .osce-part-card, .osce-table-wrapper, .branch-card, .osce-intro-block, .osce-general-block');
+
+    cards.forEach(card => {
+      let matches = false;
+
+      if (filterType === 'cases') {
+        // Clinical cases: Vignettes, positive actions, negative traps, branches
+        if (card.classList.contains('case-vignette-card') || 
+            card.getAttribute('data-card-type') === 'case' ||
+            card.classList.contains('epmp-positive-box') ||
+            card.classList.contains('epmp-negative-box') ||
+            card.classList.contains('branch-card')) {
+          matches = true;
+        }
+      } else if (filterType === 'negative') {
+        // ONLY the negative-score traps
+        if (card.classList.contains('epmp-negative-box') || card.getAttribute('data-card-type') === 'negative-trap') {
+          matches = true;
+        }
+      } else if (filterType === 'orders') {
+        // Hospital order sheets
+        if (card.classList.contains('order-sheet-card') || card.getAttribute('data-card-type') === 'order') {
+          matches = true;
+        }
+      } else if (filterType === 'tables') {
+        // Tables and stagery topics
+        if (card.classList.contains('osce-table-wrapper') || 
+            card.getAttribute('data-card-type') === 'table' || 
+            card.classList.contains('stagery-topic-card') || 
+            card.getAttribute('data-card-type') === 'stagery') {
+          matches = true;
+        }
+      }
+
+      if (matches) {
+        card.style.display = '';
+        hasMatch = true;
+        totalVisibleItems++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Also hide/show the section wrapper based on whether it has matching content
+    sec.style.display = hasMatch ? '' : 'none';
+  });
+
+  if (countEl) {
+    if (filterType === 'cases') {
+      countEl.innerHTML = `<span style="color: #4f46e5; font-weight: 800;">🖥️ ${totalVisibleItems} سناریو و اقدام بالینی در کیس‌های PMP و KF</span>`;
+    } else if (filterType === 'negative') {
+      countEl.innerHTML = `<span style="color: #e11d48; font-weight: 800;">⛔ ${totalVisibleItems} تله نمره منفی در EPMP (مرور سریع ۲ دقیقه‌ای)</span>`;
+    } else if (filterType === 'orders') {
+      countEl.innerHTML = `<span style="color: #d97706; font-weight: 800;">📝 ${totalVisibleItems} برگه اوردر استاندارد بیمارستانی</span>`;
+    } else if (filterType === 'tables') {
+      countEl.innerHTML = `<span style="color: #0f766e; font-weight: 800;">📊 ${totalVisibleItems} جدول مقایسه‌ای و مبحث های‌یلد استاجری</span>`;
+    }
+  }
 };

@@ -2200,6 +2200,21 @@ def main():
 
     all_chapters.sort(key=lambda x: x['number'])
 
+    # Build and prepend Flagship Module: Master OSCE, Computerized PMP (EPMP), KF & End-of-Rotation Surgery Guide
+    print("\n[Flagship Module] Processing Master OSCE, PMP & KF Surgery Guide for ABZUMS...")
+    try:
+        import build_osce_module
+        osce_chapter = build_osce_module.build_osce_module(base_dir)
+        if osce_chapter:
+            all_chapters.insert(0, osce_chapter)
+            print(f"  ✓ Flagship OSCE/PMP Module attached at #1 position: {len(osce_chapter['sections'])} sections.")
+        else:
+            print("  ⚠️ Warning: OSCE module builder returned None.")
+    except Exception as e:
+        print(f"  ❌ Error building OSCE module: {e}")
+        import traceback
+        traceback.print_exc()
+
     # 1. Write JavaScript registry file
     registry_js_path = os.path.join(base_dir, 'js', 'data', 'surgery-registry.js')
     os.makedirs(os.path.dirname(registry_js_path), exist_ok=True)

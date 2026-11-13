@@ -129,7 +129,85 @@ window.AppNavigation = {
       const isCurrentChapter = ch.id === activeChapterId;
       const isExpanded = isCurrentChapter; // Current chapter starts expanded
 
-      const isExam = ch.isExam === true;
+      const isExam = ch.isExam === true && !ch.isFlagship;
+      
+      if (ch.isFlagship) {
+        // Group sections by guide for hierarchical navigation
+        const guides = [
+          { index: 1, title: 'گاید ۱: ارزیابی قبل عمل، تروما و مبانی', sections: ch.sections.filter(s => s.guideIndex === 1) },
+          { index: 2, title: 'گاید ۲: گوارش و شکم حاد', sections: ch.sections.filter(s => s.guideIndex === 2) },
+          { index: 3, title: 'گاید ۳: پستان، اندوکرین، فتق، عروق و اطفال', sections: ch.sections.filter(s => s.guideIndex === 3) }
+        ];
+
+        const flagshipHeadingsHtml = guides.map(g => {
+          const secItems = g.sections.map(sec => {
+            const isActive = sec.id === activeSectionId;
+            const isBookmarked = window.appState ? window.appState.isBookmarked(sec.id) : false;
+            return `
+              <li class="nav-heading-item nav-flagship-case-item">
+                <a href="#${sec.id}" class="nav-heading-link nav-flagship-link ${isActive ? 'is-active' : ''}" data-target-id="${sec.id}" title="${sec.title}">
+                  <span class="nav-case-badge">${sec.badge || 'کیس'}</span>
+                  <span class="nav-heading-text">${sec.title}</span>
+                  ${isBookmarked ? `
+                    <span class="nav-bookmark-indicator">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--state-warning)" stroke="var(--state-warning)">
+                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                    </span>
+                  ` : ''}
+                </a>
+              </li>
+            `;
+          }).join('');
+
+          return `
+            <li class="nav-guide-header-item" aria-label="${g.title}">
+              <div class="nav-guide-header">
+                <div class="nav-guide-icon-pill">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                </div>
+                <span class="nav-guide-title">${g.title}</span>
+                <span class="nav-guide-count">${g.sections.length}</span>
+              </div>
+              <ul class="nav-guide-cases-list">
+                ${secItems}
+              </ul>
+            </li>
+          `;
+        }).join('');
+
+        return `
+          <li class="nav-chapter-item nav-chapter-flagship ${isCurrentChapter ? 'is-active' : ''} ${isExpanded ? 'is-expanded' : ''}" data-nav-chapter="${ch.id}">
+            <div class="nav-chapter-header nav-flagship-header" data-chapter-id="${ch.id}" role="button" tabindex="0" title="${ch.title}">
+              <div class="nav-chapter-title-group">
+                <div class="nav-flagship-pulse-icon" aria-hidden="true">
+                  <span class="nav-flagship-glow-ring"></span>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                </div>
+                <span class="badge-flagship-gold-crimson">🔥 ویژه امتحان</span>
+                <span class="nav-chapter-label nav-flagship-title-text" title="${ch.title}">آسکی، PMP و پایان‌بخش البرز</span>
+              </div>
+              <div class="nav-flagship-header-meta">
+                <span class="nav-flagship-count-pill">${ch.sections.length} کیس</span>
+                <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </div>
+            </div>
+            <ul class="nav-headings-list nav-flagship-headings-list">
+              ${flagshipHeadingsHtml}
+            </ul>
+          </li>
+          <li class="nav-flagship-divider-item" aria-hidden="true">
+            <div class="nav-flagship-divider-line">
+              <span>فصول جامع درسنامه لارنس (۲۲ فصل)</span>
+            </div>
+          </li>
+        `;
+      }
+
       const headingsHtml = ch.sections.map(sec => {
         const isActive = sec.id === activeSectionId;
         const isBookmarked = window.appState ? window.appState.isBookmarked(sec.id) : false;
