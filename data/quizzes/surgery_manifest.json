@@ -238,5 +238,17 @@
     "fileUrl": "./data/quizzes/surgery_colon_and_rectum_quiz.json",
     "varName": "SURGERY_COLON_AND_RECTUM_DATA",
     "description": "مجموعه سوالات تحلیلی خونریزی دستگاه گوارش تحتانی، هموروئید، فیستول و آبسه آنورکتال، غربالگری و مرحله‌بندی سرطان‌های کولورکتال، سندرم‌های لینچ و FAP، ولولوس سیگموئید، دیورتیکولیت و سندرم اوگیلوی بر اساس رفرنس لارنس."
+  },
+  "pediatric_surgery": {
+    "id": "surgery-ch21-pediatrics",
+    "slug": "pediatric_surgery",
+    "title": "فصل ۲۱: جراحی اطفال (Pediatric Surgery)",
+    "shortTitle": "جراحی اطفال",
+    "badge": "9 سوال",
+    "totalQuestions": 9,
+    "estimatedMinutes": 30,
+    "fileUrl": "./data/quizzes/surgery_pediatric_surgery_quiz.json",
+    "varName": "SURGERY_PEDIATRIC_SURGERY_DATA",
+    "description": "مجموعه سوالات تحلیلی جراحی کودکان شامل کریپتورکیدیسم و ارکیدوپکسی، تنگی هیپرتروفیک پیلور، اینتوساسپشن، آترزی مری و فیستول تراکئوازوفاژیال، توده‌های گردنی (کیست تیروگلوسال)، تراتوم ساکروکوکسیژیال و تومورهای کبدی کودکان بر اساس رفرنس لارنس."
   }
 }

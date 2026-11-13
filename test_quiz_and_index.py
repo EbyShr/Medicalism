@@ -169,7 +169,7 @@ def test_quiz_and_index():
 
         card_surg_text = quiz_cards[1].inner_text()
         assert "جراحی جنرال" in card_surg_text and "لارنس" in card_surg_text
-        assert "۳۹۴" in card_surg_text or "394" in card_surg_text or "۳۶۵" in card_surg_text
+        assert "۴۰۳" in card_surg_text or "403" in card_surg_text or "۳۹۴" in card_surg_text
 
         card2_text = quiz_cards[2].inner_text()
         assert "بانک هوشمند مرور شخصی" in card2_text

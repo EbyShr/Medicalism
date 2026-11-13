@@ -37,7 +37,8 @@ CHAPTER_PREFIX_MAP = {
     "neurosurgery": "surg_neuro",
     "trauma": "surg_trauma",
     "breast": "surg_breast",
-    "colon_and_rectum": "surg_colon"
+    "colon_and_rectum": "surg_colon",
+    "pediatric_surgery": "surg_peds"
 }
 
 def normalize_text(text):
@@ -204,6 +205,14 @@ def main():
                     norm_stem = normalize_text('کدام یک از موارد زیر اندیکاسیون آنتی بیوتیک تراپی در آبسه پری آنال است')
                 elif 'غربالگری' in stem_raw and 'سرطان' in stem_raw and ('متوسط' in stem_raw or 'اکثریت' in stem_raw):
                     norm_stem = normalize_text('سن مناسب غربالگری جهت سرطان های کولون و رکتوم در افراد با ریسک متوسط کدام است')
+            if slug == 'pediatric_surgery':
+                stem_raw = q.get('stem', '')
+                if 'شیرخوار' in stem_raw and 'بیضه' in stem_raw and ('یک ساله' in stem_raw or 'یکساله' in stem_raw):
+                    norm_stem = normalize_text('شیرخوار یک ساله با عدم وجود بیضه چپ در اسکروتوم نزد شما آورده شده است کدام مورد صحیح است')
+                elif 'شیرخوار' in stem_raw and 'ساکروم' in stem_raw and 'توده' in stem_raw:
+                    norm_stem = normalize_text('شیرخواری با یک توده نسج نرم در پشت روی ساکروم نزد شما آورده شده است کدام گزینه صحیح است')
+                elif 'اینتوساسپشن' in stem_raw:
+                    norm_stem = normalize_text('در مورد اینتوساسپشن کدام صحیح است')
             if norm_stem in seen_stems:
                 prim_q = seen_stems[norm_stem]
                 lesson_prim = prim_q.get('detailed_explanation', {}).get('mini_lesson', '')

@@ -161,17 +161,17 @@
       shortTitle: 'جراحی جنرال (لارنس)',
       category: 'جراحی جنرال لارنس',
       categoryColor: '#e11d48',
-      badge: '394 سوال در 20 مبحث',
-      totalQuestions: 394,
+      badge: '403 سوال در 21 مبحث',
+      totalQuestions: 403,
       description: 'بانک آزمون و تست‌های تحلیلی جراحی عمومی بر اساس رفرنس معتبر لارنس (Lawrence Essentials of General Surgery)؛ شامل تشریح گزینه‌ها، کالبدشکافی دام‌های تستی و درسنامه جامع بالینی.',
       chapters: [
         {
           id: 'surgery-all',
           title: 'همه مباحث (آزمون جامع جراحی جنرال لارنس)',
           shortTitle: 'آزمون جامع جراحی',
-          badge: '394 سوال',
-          totalQuestions: 394,
-          estimatedMinutes: 394,
+          badge: '403 سوال',
+          totalQuestions: 403,
+          estimatedMinutes: 403,
           isAll: true
         },
         {
@@ -393,6 +393,17 @@
           fileUrl: './data/quizzes/surgery_colon_and_rectum_quiz.json',
           fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_COLON_AND_RECTUM_DATA)) ? window.SURGERY_COLON_AND_RECTUM_DATA : [],
           description: 'مجموعه سوالات تحلیلی خونریزی دستگاه گوارش تحتانی، هموروئید، فیستول و آبسه آنورکتال، غربالگری و مرحله‌بندی سرطان‌های کولورکتال، سندرم‌های لینچ و FAP، ولولوس سیگموئید، دیورتیکولیت و سندرم اوگیلوی بر اساس رفرنس لارنس.'
+        },
+        {
+          id: 'surgery-ch21-pediatrics',
+          title: 'فصل ۲۱: جراحی اطفال (Pediatric Surgery)',
+          shortTitle: 'جراحی اطفال',
+          badge: '9 سوال',
+          totalQuestions: 9,
+          estimatedMinutes: 30,
+          fileUrl: './data/quizzes/surgery_pediatric_surgery_quiz.json',
+          fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_PEDIATRIC_SURGERY_DATA)) ? window.SURGERY_PEDIATRIC_SURGERY_DATA : [],
+          description: 'مجموعه سوالات تحلیلی جراحی کودکان شامل کریپتورکیدیسم و ارکیدوپکسی، تنگی هیپرتروفیک پیلور، اینتوساسپشن، آترزی مری و فیستول تراکئوازوفاژیال، توده‌های گردنی (کیست تیروگلوسال)، تراتوم ساکروکوکسیژیال و تومورهای کبدی کودکان بر اساس رفرنس لارنس.'
         }
       ]
     }
