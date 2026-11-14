@@ -5,29 +5,89 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   const contentContainer = document.getElementById('chapterContentArea') || document.getElementById('main-content');
-  const rawRegistry = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
+  const rawRegistry = window.SURGERY_INDEX || window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
   const chapters = Array.isArray(rawRegistry)
     ? rawRegistry
     : (rawRegistry && Array.isArray(rawRegistry.chapters) ? rawRegistry.chapters : []);
   
   if (chapters.length === 0) {
-    console.error('No chapters found in ACTIVE_REGISTRY or CHAPTERS_REGISTRY.');
+    console.error('No chapters found in SURGERY_INDEX, ACTIVE_REGISTRY, or CHAPTERS_REGISTRY.');
     return;
   }
 
-  // Helper to mount a chapter (always falls back safely to chapters[0] in memory)
-  function mountChapter(chapterId) {
-    const chapter = chapters.find(c => c && c.id === chapterId) || chapters[0];
-    if (window.ComponentRenderer && contentContainer && chapter) {
-      window.ComponentRenderer.renderChapter(chapter, contentContainer);
-      try {
-        if (window.AppNavigation) {
-          window.AppNavigation.initScrollspy();
-        }
-      } catch (navErr) {
-        console.warn('Scrollspy initialization warning:', navErr);
+  let mountSeq = 0;
+
+  function finalizeChapterMount(chapter) {
+    try {
+      if (window.AppNavigation) {
+        window.AppNavigation.initScrollspy();
       }
+    } catch (navErr) {
+      console.warn('Scrollspy initialization warning:', navErr);
     }
+
+    // Re-apply saved highlights and cram state AFTER chapter HTML is injected
+    try {
+      if (window.StudyFeatures && typeof window.StudyFeatures.reapplyChapterHighlights === 'function') {
+        window.StudyFeatures.reapplyChapterHighlights(chapter.id);
+      }
+    } catch (hlErr) {
+      console.warn('Highlight restoration warning:', hlErr);
+    }
+
+    try {
+      if (window.StudyFeatures && typeof window.StudyFeatures.isExamCramModeActive === 'function' && window.StudyFeatures.isExamCramModeActive()) {
+        window.StudyFeatures.applyExamCramMode(true, false);
+      }
+    } catch (cramErr) {
+      console.warn('Exam cram mode sync warning:', cramErr);
+    }
+
+    try {
+      window.dispatchEvent(new CustomEvent('chapterRendered', { detail: { chapterId: chapter.id } }));
+    } catch (evtErr) {}
+  }
+
+  // Helper to mount a chapter (supports on-demand single-chapter loading when SurgeryLoader is present)
+  function mountChapter(chapterId) {
+    const seq = ++mountSeq;
+    const fallbackEntry = chapters.find(c => c && c.id === chapterId) || chapters[0];
+    if (!fallbackEntry || !contentContainer) return;
+
+    if (window.SurgeryLoader && typeof window.SurgeryLoader.loadChapter === 'function') {
+      window.SurgeryLoader.loadChapter(fallbackEntry.id, (err, fullChapter) => {
+        if (seq !== mountSeq) return; // superseded by newer navigation
+        if (err || !fullChapter) {
+          console.error('Failed to load chapter:', fallbackEntry.id, err);
+          return;
+        }
+        if (window.ComponentRenderer) {
+          window.ComponentRenderer.renderChapter(fullChapter, contentContainer);
+          finalizeChapterMount(fullChapter);
+        }
+      });
+      return;
+    }
+
+    if (window.ComponentRenderer) {
+      window.ComponentRenderer.renderChapter(fallbackEntry, contentContainer);
+      finalizeChapterMount(fallbackEntry);
+    }
+  }
+
+  // 1. Determine initial chapter ID (prefer URL hash target, else saved state, else chapters[0])
+  let initialChapterId = window.appState ? window.appState.activeChapterId : chapters[0].id;
+  if (window.SurgeryLoader && typeof window.SurgeryLoader.resolveChapterFromHash === 'function' && window.location.hash) {
+    const hashChapterId = window.SurgeryLoader.resolveChapterFromHash(window.location.hash);
+    if (hashChapterId) {
+      initialChapterId = hashChapterId;
+    }
+  }
+  if (!initialChapterId || !chapters.some(c => c && c.id === initialChapterId)) {
+    initialChapterId = chapters[0].id;
+  }
+  if (window.appState) {
+    window.appState.activeChapterId = initialChapterId;
   }
 
   // Subscribe to reactive active chapter changes
@@ -37,17 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Initial chapter mount with safe default fallback (without clearing localStorage)
-  let initialChapterId = window.appState ? window.appState.activeChapterId : chapters[0].id;
-  if (!initialChapterId || !chapters.some(c => c && c.id === initialChapterId)) {
-    initialChapterId = chapters[0].id;
-    if (window.appState) {
-      window.appState.activeChapterId = initialChapterId;
-    }
-  }
-  mountChapter(initialChapterId);
-
-  // 2. Initialize Navigation (Desktop right sidebar & RTL mobile drawer)
+  // 2. Render sidebar TOC immediately (< 10ms) from lightweight index
   try {
     if (window.AppNavigation) {
       window.AppNavigation.init();
@@ -56,8 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
     console.warn('AppNavigation init warning:', e);
   }
 
-  // 3. Initialize Study Features (Continuous Zoom, Font switcher, Bookmarks, Focus Mode, Highlights)
-  // Runs AFTER chapter HTML is injected into contentContainer
+  // 3. Load and render ONLY the active single chapter on startup
+  mountChapter(initialChapterId);
+
+  // 4. Initialize Study Features (Continuous Zoom, Font switcher, Bookmarks, Focus Mode, Highlights)
   try {
     if (window.StudyFeatures) {
       window.StudyFeatures.init();
@@ -66,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.warn('StudyFeatures init warning:', e);
   }
 
-  // 4. Initialize Search Engine
+  // 5. Initialize Search Engine (lazy on user input, zero startup indexing loop)
   try {
     if (window.AppSearch) {
       window.AppSearch.init();
@@ -75,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.warn('AppSearch init warning:', e);
   }
 
-  // 5. Initialize Router
+  // 6. Initialize Router
   try {
     if (window.AppRouter) {
       window.AppRouter.init();

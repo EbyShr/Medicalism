@@ -146,13 +146,17 @@ window.AppSearch = {
         const latinNorm = this.normalize(sec.latinTitle || '');
         const summaryNorm = this.normalize(sec.summary || '');
         
-        // Extract text from DOM if mounted, or fallback to section registry data
+        // Extract text from DOM if mounted, or from already-cached chapter, or lightweight index metadata
         let rawBody = '';
         const secEl = document.getElementById(sec.id);
         if (secEl) {
           rawBody = secEl.innerText || '';
+        } else if (window.__SURGERY_CACHE && window.__SURGERY_CACHE[ch.id]) {
+          const cachedCh = window.__SURGERY_CACHE[ch.id];
+          const cachedSec = Array.isArray(cachedCh.sections) ? cachedCh.sections.find(s => s.id === sec.id) : null;
+          rawBody = cachedSec ? (cachedSec.contentHtml || '').replace(/<[^>]+>/g, ' ') : '';
         } else {
-          rawBody = this.extractAllText(sec);
+          rawBody = (sec.badge || '') + ' ' + (ch.title || '');
         }
 
         // Include radiology image captions in search index

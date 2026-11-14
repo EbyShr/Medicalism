@@ -432,11 +432,7 @@ window.AppNavigation = {
    */
   scrollToSection(sectionId) {
     const chapters = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
-    const targetChapter = chapters.find(ch => ch.sections.some(s => s.id === sectionId));
-
-    if (targetChapter && window.appState && window.appState.activeChapterId !== targetChapter.id) {
-      window.appState.setActiveChapter(targetChapter.id);
-    }
+    const targetChapter = chapters.find(ch => ch && Array.isArray(ch.sections) && ch.sections.some(s => s.id === sectionId));
 
     const performScroll = () => {
       const el = document.getElementById(sectionId);
@@ -455,8 +451,25 @@ window.AppNavigation = {
         if (window.appState) {
           window.appState.setActiveSection(sectionId);
         }
+        return true;
       }
+      return false;
     };
+
+    if (targetChapter && window.appState && window.appState.activeChapterId !== targetChapter.id) {
+      window.appState.setActiveChapter(targetChapter.id);
+    }
+
+    if (window.SurgeryLoader && targetChapter && (!window.__SURGERY_CACHE || !window.__SURGERY_CACHE[targetChapter.id])) {
+      const onRendered = (e) => {
+        if (e && e.detail && e.detail.chapterId === targetChapter.id) {
+          window.removeEventListener('chapterRendered', onRendered);
+          requestAnimationFrame(() => performScroll());
+        }
+      };
+      window.addEventListener('chapterRendered', onRendered);
+      return;
+    }
 
     requestAnimationFrame(() => {
       performScroll();
