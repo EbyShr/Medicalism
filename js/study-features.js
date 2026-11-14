@@ -297,7 +297,9 @@ window.StudyFeatures = {
   getCompletedChapters() {
     try {
       const data = localStorage.getItem(this.STORAGE_KEY_COMPLETED);
-      return data ? JSON.parse(data) : [];
+      if (!data) return [];
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed : [];
     } catch (e) {
       console.warn('Error reading completed chapters:', e);
       return [];
@@ -306,8 +308,12 @@ window.StudyFeatures = {
 
   isChapterCompleted(chapterId) {
     if (!chapterId) return false;
-    const completed = this.getCompletedChapters();
-    return completed.includes(chapterId);
+    try {
+      const completed = this.getCompletedChapters();
+      return Array.isArray(completed) && completed.indexOf(chapterId) !== -1;
+    } catch (e) {
+      return false;
+    }
   },
 
   toggleChapterCompletion(chapterId) {
@@ -419,7 +425,9 @@ window.StudyFeatures = {
   getHighlights() {
     try {
       const data = localStorage.getItem(this.STORAGE_KEY_HIGHLIGHTS);
-      return data ? JSON.parse(data) : [];
+      if (!data) return [];
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed : [];
     } catch (e) {
       console.warn('Error reading highlights:', e);
       return [];
@@ -428,7 +436,8 @@ window.StudyFeatures = {
 
   saveHighlights(highlights) {
     try {
-      localStorage.setItem(this.STORAGE_KEY_HIGHLIGHTS, JSON.stringify(highlights));
+      const safeHighlights = Array.isArray(highlights) ? highlights : [];
+      localStorage.setItem(this.STORAGE_KEY_HIGHLIGHTS, JSON.stringify(safeHighlights));
     } catch (e) {
       console.warn('Error saving highlights:', e);
     }
@@ -436,15 +445,20 @@ window.StudyFeatures = {
   },
 
   updateHighlightsBadge() {
-    const count = this.getHighlights().length;
-    const badges = document.querySelectorAll('#highlightsCountBadge, #mobileHighlightsCountBadge');
-    badges.forEach(badge => {
-      badge.textContent = this.toPersianDigits(count);
-      badge.style.display = count > 0 ? 'inline-flex' : 'none';
-    });
-    const modalPill = document.getElementById('highlightsModalCountPill');
-    if (modalPill) {
-      modalPill.textContent = `${this.toPersianDigits(count)} مورد`;
+    try {
+      const list = this.getHighlights();
+      const count = Array.isArray(list) ? list.length : 0;
+      const badges = document.querySelectorAll('#highlightsCountBadge, #mobileHighlightsCountBadge');
+      badges.forEach(badge => {
+        badge.textContent = this.toPersianDigits(count);
+        badge.style.display = count > 0 ? 'inline-flex' : 'none';
+      });
+      const modalPill = document.getElementById('highlightsModalCountPill');
+      if (modalPill) {
+        modalPill.textContent = `${this.toPersianDigits(count)} مورد`;
+      }
+    } catch (e) {
+      console.warn('Error updating highlights badge:', e);
     }
   },
 
@@ -614,7 +628,8 @@ window.StudyFeatures = {
     const element = container.nodeType === Node.ELEMENT_NODE ? container : container.parentElement;
     const secEl = element ? (element.closest('.study-section') || element.closest('.chapter-section')) : null;
     const secId = secEl ? secEl.id : '';
-    const secTitle = secEl ? (secEl.querySelector('h2, h3')?.textContent?.trim() || '') : '';
+    const secHeadingEl = secEl ? secEl.querySelector('h2, h3') : null;
+    const secTitle = (secHeadingEl && secHeadingEl.textContent) ? secHeadingEl.textContent.trim() : '';
 
     const chapters = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
     const chObj = chapters.find(c => c.id === chapterId);
@@ -807,52 +822,69 @@ window.StudyFeatures = {
   },
 
   reapplyChapterHighlights(chapterId) {
-    if (!chapterId) return;
-    const highlights = this.getHighlights().filter(h => h.chapterId === chapterId);
-    if (highlights.length === 0) return;
+    try {
+      if (!chapterId) return;
+      const allHighlights = this.getHighlights();
+      if (!Array.isArray(allHighlights) || allHighlights.length === 0) return;
 
-    const container = document.querySelector('#chapterContentArea, .chapter-content, #main-content');
-    if (!container) return;
+      const highlights = allHighlights.filter(
+        h => h && typeof h === 'object' && h.chapterId === chapterId && h.id && h.text
+      );
+      if (highlights.length === 0) return;
 
-    highlights.forEach(h => {
-      if (document.querySelector(`mark.user-highlight[data-id="${h.id}"]`)) return;
+      const container = document.querySelector('#chapterContentArea, .chapter-content, #main-content');
+      if (!container || !container.innerHTML || container.innerHTML.trim().length === 0) return;
 
-      const searchRoot = h.sectionId ? (document.getElementById(h.sectionId) || container) : container;
-      const range = this.findTextRange(searchRoot, h.text, h.prefix, h.suffix);
-      if (range) {
+      highlights.forEach(h => {
         try {
-          const mark = document.createElement('mark');
-          mark.className = 'user-highlight';
-          mark.setAttribute('data-color', h.color);
-          mark.setAttribute('data-id', h.id);
-          mark.setAttribute('title', 'برای ویرایش یا حذف کلیک کنید');
-          range.surroundContents(mark);
-          this.attachMarkEvents(mark);
-        } catch (e) {
-          try {
-            const mark = document.createElement('mark');
-            mark.className = 'user-highlight';
-            mark.setAttribute('data-color', h.color);
-            mark.setAttribute('data-id', h.id);
-            mark.setAttribute('title', 'برای ویرایش یا حذف کلیک کنید');
-            const contents = range.extractContents();
-            mark.appendChild(contents);
-            range.insertNode(mark);
-            this.attachMarkEvents(mark);
-          } catch (err) {
-            console.warn('Reapply highlight error:', h.id, err);
-          }
-        }
-      }
-    });
+          if (document.querySelector(`mark.user-highlight[data-id="${h.id}"]`)) return;
 
-    if (this.isExamCramModeActive()) {
-      this.scanExamCramElements(container);
+          const searchRoot = h.sectionId ? (document.getElementById(h.sectionId) || container) : container;
+          const range = this.findTextRange(searchRoot, h.text, h.prefix, h.suffix);
+          if (range) {
+            try {
+              const mark = document.createElement('mark');
+              mark.className = 'user-highlight';
+              mark.setAttribute('data-color', h.color || 'yellow');
+              mark.setAttribute('data-id', h.id);
+              mark.setAttribute('title', 'برای ویرایش یا حذف کلیک کنید');
+              range.surroundContents(mark);
+              this.attachMarkEvents(mark);
+            } catch (e) {
+              try {
+                const mark = document.createElement('mark');
+                mark.className = 'user-highlight';
+                mark.setAttribute('data-color', h.color || 'yellow');
+                mark.setAttribute('data-id', h.id);
+                mark.setAttribute('title', 'برای ویرایش یا حذف کلیک کنید');
+                const contents = range.extractContents();
+                mark.appendChild(contents);
+                range.insertNode(mark);
+                this.attachMarkEvents(mark);
+              } catch (err) {
+                console.warn('Reapply highlight error:', h.id, err);
+              }
+            }
+          }
+        } catch (itemErr) {
+          console.warn('Reapply single highlight warning:', itemErr);
+        }
+      });
+
+      if (this.isExamCramModeActive()) {
+        this.scanExamCramElements(container);
+      }
+    } catch (err) {
+      console.warn('Highlight restoration warning (non-fatal):', err);
     }
   },
 
   initTextHighlighter() {
-    this.updateHighlightsBadge();
+    try {
+      this.updateHighlightsBadge();
+    } catch (e) {
+      console.warn('Highlights badge update warning:', e);
+    }
 
     // 1. Listen for mouseup / touchend inside chapter content
     const onSelectionCheck = () => {
@@ -876,14 +908,14 @@ window.StudyFeatures = {
     };
 
     document.addEventListener('mouseup', (e) => {
-      if (e.target.closest('#highlightPopover')) return;
-      if (e.target.closest('mark.user-highlight')) return;
+      if (e.target && e.target.closest && e.target.closest('#highlightPopover')) return;
+      if (e.target && e.target.closest && e.target.closest('mark.user-highlight')) return;
       onSelectionCheck();
     });
 
     document.addEventListener('touchend', (e) => {
-      if (e.target.closest('#highlightPopover')) return;
-      if (e.target.closest('mark.user-highlight')) return;
+      if (e.target && e.target.closest && e.target.closest('#highlightPopover')) return;
+      if (e.target && e.target.closest && e.target.closest('mark.user-highlight')) return;
       onSelectionCheck();
     });
 
@@ -892,22 +924,30 @@ window.StudyFeatures = {
       const popover = document.getElementById('highlightPopover');
       if (!popover || popover.style.display === 'none') return;
       if (popover.contains(e.target)) return;
-      if (e.target.closest('mark.user-highlight')) return;
+      if (e.target && e.target.closest && e.target.closest('mark.user-highlight')) return;
 
       this.hideHighlightPopover();
     });
 
-    // 3. Re-apply highlights on initial load
+    // 3. Re-apply highlights on initial load (after chapter HTML is injected)
     const activeChId = window.appState ? window.appState.activeChapterId : 'ch-27';
     setTimeout(() => {
-      this.reapplyChapterHighlights(activeChId);
+      try {
+        this.reapplyChapterHighlights(activeChId);
+      } catch (e) {
+        console.warn('Initial highlight restoration warning:', e);
+      }
     }, 150);
 
     // 4. Re-apply highlights on chapter changes
     if (window.appState) {
       window.appState.subscribe('activeChapterId', (newChId) => {
         setTimeout(() => {
-          this.reapplyChapterHighlights(newChId);
+          try {
+            this.reapplyChapterHighlights(newChId);
+          } catch (e) {
+            console.warn('Chapter switch highlight restoration warning:', e);
+          }
         }, 120);
       });
     }
@@ -1197,7 +1237,11 @@ window.StudyFeatures = {
   STORAGE_KEY_CRAM: 'medicalism_exam_cram_mode',
 
   isExamCramModeActive() {
-    return localStorage.getItem(this.STORAGE_KEY_CRAM) === 'true';
+    try {
+      return localStorage.getItem(this.STORAGE_KEY_CRAM) === 'true';
+    } catch (e) {
+      return false;
+    }
   },
 
   initExamCramMode() {
@@ -1225,7 +1269,9 @@ window.StudyFeatures = {
   },
 
   applyExamCramMode(active, notify = true) {
-    localStorage.setItem(this.STORAGE_KEY_CRAM, active ? 'true' : 'false');
+    try {
+      localStorage.setItem(this.STORAGE_KEY_CRAM, active ? 'true' : 'false');
+    } catch (e) {}
 
     const containers = [
       document.getElementById('chapterContentArea'),

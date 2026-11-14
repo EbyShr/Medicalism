@@ -12,11 +12,17 @@ window.ComponentRenderer = {
   renderChapter(chapter, container) {
     if (!chapter || !container) return;
 
-    const isExamActive = window.StudyFeatures && typeof window.StudyFeatures.isExamCramModeActive === 'function'
-      ? window.StudyFeatures.isExamCramModeActive()
-      : (localStorage.getItem('medicalism_exam_cram_mode') === 'true');
+    let isExamActive = false;
+    try {
+      isExamActive = window.StudyFeatures && typeof window.StudyFeatures.isExamCramModeActive === 'function'
+        ? window.StudyFeatures.isExamCramModeActive()
+        : (localStorage.getItem('medicalism_exam_cram_mode') === 'true');
+    } catch (e) {
+      isExamActive = false;
+    }
 
     const hasExamSummary = Boolean(chapter.examSummaryHtml);
+    const sectionsList = Array.isArray(chapter.sections) ? chapter.sections : [];
 
     let html = `
       <article class="chapter-article" id="${chapter.id}">
@@ -88,7 +94,7 @@ window.ComponentRenderer = {
         <div class="sections-stream">
     `;
 
-    chapter.sections.forEach(section => {
+    sectionsList.forEach(section => {
       html += this.renderSection(section, chapter.id);
     });
 
@@ -97,9 +103,14 @@ window.ComponentRenderer = {
     `;
 
     // Chapter Completion Status Button
-    const isCompleted = window.StudyFeatures && typeof window.StudyFeatures.isChapterCompleted === 'function'
-      ? window.StudyFeatures.isChapterCompleted(chapter.id)
-      : false;
+    let isCompleted = false;
+    try {
+      isCompleted = window.StudyFeatures && typeof window.StudyFeatures.isChapterCompleted === 'function'
+        ? window.StudyFeatures.isChapterCompleted(chapter.id)
+        : false;
+    } catch (e) {
+      isCompleted = false;
+    }
 
     html += `
       <div class="chapter-completion-action-bar">
@@ -222,7 +233,11 @@ window.ComponentRenderer = {
     `;
 
     container.innerHTML = html;
-    this.bindSectionActions(container);
+    try {
+      this.bindSectionActions(container);
+    } catch (e) {
+      console.warn('Section actions bind warning:', e);
+    }
 
     const toggleMindmapBtn = container.querySelector('#btnToggleMindmap, .btn-toggle-mindmap');
     if (toggleMindmapBtn) {
@@ -233,11 +248,15 @@ window.ComponentRenderer = {
         }
       });
     }
-    if (window.RadiologyModule && typeof window.RadiologyModule.bindContainerEvents === 'function') {
-      window.RadiologyModule.bindContainerEvents(container);
-    }
-    if (window.ExamModule && typeof window.ExamModule.bindContainerEvents === 'function') {
-      window.ExamModule.bindContainerEvents(container);
+    try {
+      if (window.RadiologyModule && typeof window.RadiologyModule.bindContainerEvents === 'function') {
+        window.RadiologyModule.bindContainerEvents(container);
+      }
+      if (window.ExamModule && typeof window.ExamModule.bindContainerEvents === 'function') {
+        window.ExamModule.bindContainerEvents(container);
+      }
+    } catch (e) {
+      console.warn('Module container bind warning:', e);
     }
   },
 
@@ -245,7 +264,12 @@ window.ComponentRenderer = {
    * Renders an individual section with its specialized educational view
    */
   renderSection(section, chapterId) {
-    const isBookmarked = window.appState ? window.appState.isBookmarked(section.id) : false;
+    let isBookmarked = false;
+    try {
+      isBookmarked = window.appState ? window.appState.isBookmarked(section.id) : false;
+    } catch (e) {
+      isBookmarked = false;
+    }
 
     let sectionBody = '';
 
@@ -4301,7 +4325,7 @@ window.ComponentRenderer = {
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-3); margin-block-end: var(--space-6);">
           <div class="stage-info-block" style="border-inline-start-color: var(--accent-primary);">
             <div class="stage-info-label" style="color: var(--accent-primary);">ویروس نقص ایمنی انسانی (HIV):</div>
-            <div class="stage-info-value"><strong>علت اصلی مقاومت:</strong> ${v.hiv?.cause || ''}<br/><strong>الگوی ایران:</strong> ${v.hiv?.iranPattern || ''}</div>
+            <div class="stage-info-value"><strong>علت اصلی مقاومت:</strong> ${(v.hiv && v.hiv.cause) || ''}<br/><strong>الگوی ایران:</strong> ${(v.hiv && v.hiv.iranPattern) || ''}</div>
           </div>
           <div class="stage-info-block" style="border-inline-start-color: #ec4899;">
             <div class="stage-info-label" style="color: #ec4899;">ویروس هپاتیت B (HBV):</div>

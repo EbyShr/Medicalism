@@ -7,25 +7,48 @@ class AppState {
   constructor() {
     this.subscribers = new Map();
     
-    // Load persisted or default state
-    this.theme = localStorage.getItem('med_theme') || 
+    // Load persisted or default state safely without clearing existing user data
+    let savedTheme = null;
+    let savedFont = null;
+    let savedScaleRaw = null;
+    let savedBookmarksRaw = null;
+    let savedChapterId = null;
+    try {
+      savedTheme = localStorage.getItem('med_theme');
+      savedFont = localStorage.getItem('med_font_family');
+      savedScaleRaw = localStorage.getItem('med_font_scale');
+      savedBookmarksRaw = localStorage.getItem('med_bookmarks');
+      savedChapterId = localStorage.getItem('med_active_chapter');
+    } catch (e) {
+      console.warn('localStorage read warning:', e);
+    }
+
+    this.theme = (savedTheme === 'light' || savedTheme === 'dark') ? savedTheme :
       (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     
-    this.fontFamily = localStorage.getItem('med_font_family') || 'vazirmatn';
+    this.fontFamily = savedFont || 'vazirmatn';
     
     // Continuous Font Zoom (Clamped between 0.80 and 1.40)
-    const savedScale = parseFloat(localStorage.getItem('med_font_scale'));
+    const savedScale = parseFloat(savedScaleRaw);
     this.fontScale = (!isNaN(savedScale) && savedScale >= 0.8 && savedScale <= 1.4) ? savedScale : 1.0;
     
-    // Chapter & Section Navigation
-    const initialReg = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
-    this.activeChapterId = (initialReg[0] && initialReg[0].id) ? initialReg[0].id : 'ch-27';
-    this.activeSectionId = (initialReg[0] && initialReg[0].sections && initialReg[0].sections[0]) ? initialReg[0].sections[0].id : 'ch27-sec01';
+    // Chapter & Section Navigation (Safe fallback to chapters[0] without clearing storage)
+    const rawReg = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
+    const initialReg = Array.isArray(rawReg)
+      ? rawReg
+      : (rawReg && Array.isArray(rawReg.chapters) ? rawReg.chapters : []);
+    const matchedChapter = savedChapterId ? initialReg.find(c => c && c.id === savedChapterId) : null;
+    const defaultChapter = matchedChapter || initialReg[0] || null;
+    this.activeChapterId = (defaultChapter && defaultChapter.id) ? defaultChapter.id : 'ch-27';
+    this.activeSectionId = (defaultChapter && Array.isArray(defaultChapter.sections) && defaultChapter.sections[0])
+      ? defaultChapter.sections[0].id
+      : 'ch27-sec01';
     
-    // Bookmarks Array
+    // Bookmarks Array (Strict array validation)
     try {
-      this.bookmarks = JSON.parse(localStorage.getItem('med_bookmarks')) || [];
-    } catch {
+      const parsedBookmarks = savedBookmarksRaw ? JSON.parse(savedBookmarksRaw) : [];
+      this.bookmarks = Array.isArray(parsedBookmarks) ? parsedBookmarks : [];
+    } catch (e) {
       this.bookmarks = [];
     }
 
@@ -50,7 +73,7 @@ class AppState {
   setTheme(theme) {
     if (theme !== 'light' && theme !== 'dark') return;
     this.theme = theme;
-    localStorage.setItem('med_theme', theme);
+    try { localStorage.setItem('med_theme', theme); } catch (e) {}
     document.documentElement.setAttribute('data-theme', theme);
     this.notify('theme', theme);
   }
@@ -61,7 +84,7 @@ class AppState {
 
   setFontFamily(family) {
     this.fontFamily = family;
-    localStorage.setItem('med_font_family', family);
+    try { localStorage.setItem('med_font_family', family); } catch (e) {}
     
     const root = document.documentElement;
     if (family === 'shabnam') {
@@ -78,7 +101,7 @@ class AppState {
     // Clamp between 0.80 (80%) and 1.40 (140%)
     const clamped = Math.round(Math.min(Math.max(scale, 0.80), 1.40) * 100) / 100;
     this.fontScale = clamped;
-    localStorage.setItem('med_font_scale', clamped.toString());
+    try { localStorage.setItem('med_font_scale', clamped.toString()); } catch (e) {}
     document.documentElement.style.setProperty('--font-scale', clamped.toString());
     this.notify('fontScale', clamped);
   }
@@ -106,19 +129,20 @@ class AppState {
   }
 
   toggleBookmark(sectionId) {
+    if (!Array.isArray(this.bookmarks)) this.bookmarks = [];
     const idx = this.bookmarks.indexOf(sectionId);
     if (idx > -1) {
       this.bookmarks.splice(idx, 1);
     } else {
       this.bookmarks.push(sectionId);
     }
-    localStorage.setItem('med_bookmarks', JSON.stringify(this.bookmarks));
+    try { localStorage.setItem('med_bookmarks', JSON.stringify(this.bookmarks)); } catch (e) {}
     this.notify('bookmarks', this.bookmarks);
     return idx === -1; // returns true if added, false if removed
   }
 
   isBookmarked(sectionId) {
-    return this.bookmarks.includes(sectionId);
+    return Array.isArray(this.bookmarks) && this.bookmarks.indexOf(sectionId) !== -1;
   }
 
   setFocusMode(enabled) {

@@ -4,21 +4,28 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  const contentContainer = document.getElementById('chapterContentArea');
-  const chapters = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
+  const contentContainer = document.getElementById('chapterContentArea') || document.getElementById('main-content');
+  const rawRegistry = window.ACTIVE_REGISTRY || window.CHAPTERS_REGISTRY || [];
+  const chapters = Array.isArray(rawRegistry)
+    ? rawRegistry
+    : (rawRegistry && Array.isArray(rawRegistry.chapters) ? rawRegistry.chapters : []);
   
   if (chapters.length === 0) {
     console.error('No chapters found in ACTIVE_REGISTRY or CHAPTERS_REGISTRY.');
     return;
   }
 
-  // Helper to mount a chapter
+  // Helper to mount a chapter (always falls back safely to chapters[0] in memory)
   function mountChapter(chapterId) {
-    const chapter = chapters.find(c => c.id === chapterId) || chapters[0];
-    if (window.ComponentRenderer && contentContainer) {
+    const chapter = chapters.find(c => c && c.id === chapterId) || chapters[0];
+    if (window.ComponentRenderer && contentContainer && chapter) {
       window.ComponentRenderer.renderChapter(chapter, contentContainer);
-      if (window.AppNavigation) {
-        window.AppNavigation.initScrollspy();
+      try {
+        if (window.AppNavigation) {
+          window.AppNavigation.initScrollspy();
+        }
+      } catch (navErr) {
+        console.warn('Scrollspy initialization warning:', navErr);
       }
     }
   }
@@ -30,9 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Initial chapter mount
+  // Initial chapter mount with safe default fallback (without clearing localStorage)
   let initialChapterId = window.appState ? window.appState.activeChapterId : chapters[0].id;
-  if (!chapters.some(c => c.id === initialChapterId)) {
+  if (!initialChapterId || !chapters.some(c => c && c.id === initialChapterId)) {
     initialChapterId = chapters[0].id;
     if (window.appState) {
       window.appState.activeChapterId = initialChapterId;
@@ -41,22 +48,39 @@ document.addEventListener('DOMContentLoaded', () => {
   mountChapter(initialChapterId);
 
   // 2. Initialize Navigation (Desktop right sidebar & RTL mobile drawer)
-  if (window.AppNavigation) {
-    window.AppNavigation.init();
+  try {
+    if (window.AppNavigation) {
+      window.AppNavigation.init();
+    }
+  } catch (e) {
+    console.warn('AppNavigation init warning:', e);
   }
 
-  // 3. Initialize Study Features (Continuous Zoom, Font switcher, Bookmarks, Focus Mode)
-  if (window.StudyFeatures) {
-    window.StudyFeatures.init();
+  // 3. Initialize Study Features (Continuous Zoom, Font switcher, Bookmarks, Focus Mode, Highlights)
+  // Runs AFTER chapter HTML is injected into contentContainer
+  try {
+    if (window.StudyFeatures) {
+      window.StudyFeatures.init();
+    }
+  } catch (e) {
+    console.warn('StudyFeatures init warning:', e);
   }
 
   // 4. Initialize Search Engine
-  if (window.AppSearch) {
-    window.AppSearch.init();
+  try {
+    if (window.AppSearch) {
+      window.AppSearch.init();
+    }
+  } catch (e) {
+    console.warn('AppSearch init warning:', e);
   }
 
   // 5. Initialize Router
-  if (window.AppRouter) {
-    window.AppRouter.init();
+  try {
+    if (window.AppRouter) {
+      window.AppRouter.init();
+    }
+  } catch (e) {
+    console.warn('AppRouter init warning:', e);
   }
 });
