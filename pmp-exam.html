@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>شبیه‌ساز آزمون PMP جراحی | مدیکالیسم البرز</title>
+  <meta name="description" content="شبیه‌ساز جامع مدیریت مرحله‌ای بیمار (PMP) و کیس‌های بالینی جراحی جنرال ویژه دانشجویان پزشکی">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Cpath d='M16 7v18M7 16h18' stroke='%23fff' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
+
+  <!-- Webfonts: Vazirmatn, Sahel, Shabnam, JetBrains Mono (non-blocking) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/shabnam-font@v5.0.1/dist/font-face.css" rel="stylesheet" type="text/css" media="print" onload="this.media='all'">
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" type="text/css" media="print" onload="this.media='all'">
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/shabnam-font@v5.0.1/dist/font-face.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" type="text/css">
+  </noscript>
+
+  <!-- Medicalism Design System + Component Controls + PMP Workstation CSS -->
+  <link rel="stylesheet" href="./css/tokens.css?v=20261115">
+  <link rel="stylesheet" href="./css/base.css?v=20261115">
+  <link rel="stylesheet" href="./css/layout.css?v=20261115">
+  <link rel="stylesheet" href="./css/components.css?v=20261115">
+  <link rel="stylesheet" href="./css/dark-theme.css?v=20261115">
+  <link rel="stylesheet" href="./css/pmp-exam.css?v=20261115">
+</head>
+<body class="pmp-page">
+  <!-- Medicalism Top Sticky Header (Unified with Surgery & Quiz) -->
+  <header class="app-header pmp-app-header">
+    <div style="display: flex; align-items: center; gap: var(--space-3); min-width: 0;">
+      <a href="./index.html" class="header-brand" title="بازگشت به صفحه اصلی مدیکالیسم البرز" aria-label="بازگشت به صفحه اصلی مدیکالیسم البرز">
+        <div class="brand-icon-wrapper" style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+            <path d="M6 10h3l2-3 2 6 2-3h3"></path>
+          </svg>
+        </div>
+        <div class="brand-title-group">
+          <div style="display: flex; align-items: baseline; gap: 6px;">
+            <span class="brand-title">شبیه‌ساز آزمون PMP جراحی</span>
+            <span class="pmp-brand-badge">البرز</span>
+          </div>
+          <span class="brand-subtitle">مدیریت مرحله‌ای بیمار (Patient Management Problem)</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Action & Study Controls Toolbar -->
+    <div class="header-actions pmp-header-actions">
+      <nav class="pmp-nav-links" aria-label="ناوبری سریع مدیکالیسم">
+        <a href="./index.html" class="pmp-nav-pill" title="صفحه اصلی مدیکالیسم">🏠 <span class="pmp-nav-label">صفحه اصلی</span></a>
+        <a href="./surgery.html" class="pmp-nav-pill" title="درسنامه جراحی جنرال">📖 <span class="pmp-nav-label">درسنامه جراحی</span></a>
+        <a href="./quiz.html" class="pmp-nav-pill" title="بانک آزمون و تست">📝 <span class="pmp-nav-label">آزمون‌ها</span></a>
+      </nav>
+
+      <!-- Font Family Selector (Only 3 Medicalism Fonts) -->
+      <div class="font-selector-wrapper" title="انتخاب فونت متن">
+        <select class="font-select" id="fontSelect" aria-label="انتخاب نوع فونت">
+          <option value="vazirmatn">وزیرمتن (Vazirmatn)</option>
+          <option value="sahel">ساحل (Sahel)</option>
+          <option value="shabnam">شبنم (Shabnam)</option>
+        </select>
+      </div>
+
+      <!-- Continuous Font-Size Zoom Controls (A− / A+) -->
+      <div class="font-zoom-control" title="تنظیم پیوسته اندازه متن">
+        <button type="button" class="zoom-btn" id="zoomOutBtn" aria-label="کوچک‌تر کردن اندازه متن (A−)">A−</button>
+        <span class="zoom-display" id="zoomDisplay" title="اندازه فعلی متن - کلیک برای بازنشانی">100%</span>
+        <button type="button" class="zoom-btn" id="zoomInBtn" aria-label="بزرگ‌تر کردن اندازه متن (A+)">A+</button>
+      </div>
+
+      <!-- Dark / Light Theme Toggle -->
+      <button type="button" class="btn-icon" id="themeToggleBtn" title="تغییر تم روشن / تاریک" aria-label="تغییر تم">
+        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Root Container Mounted Immediately From Lightweight Index -->
+  <div id="pmpAppRoot" class="pmp-root">
+    <div style="padding: 2rem; text-align: center; color: var(--text-muted);">در حال راه‌اندازی شبیه‌ساز PMP...</div>
+  </div>
+
+  <!-- Lightweight Startup Scripts ONLY (Chunks load on-demand < 100 KB each) -->
+  <script src="./js/pmp-exam-index.js?v=20261115"></script>
+  <script src="./js/pmp-loader.js?v=20261115"></script>
+  <script src="./js/pmp-engine.js?v=20261115"></script>
+</body>
+</html>
