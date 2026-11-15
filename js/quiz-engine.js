@@ -80,9 +80,11 @@
       this.dom.courseChaptersGrid = document.getElementById('courseChaptersGrid');
 
       // Active View Elements
+      this.dom.courseFlagshipSpotlight = document.getElementById('courseFlagshipSpotlight');
       this.dom.activeQuizTitle = document.getElementById('activeQuizTitle');
       this.dom.questionCounter = document.getElementById('questionCounter');
       this.dom.questionTopicTag = document.getElementById('questionTopicTag');
+      this.dom.questionSubmetaBar = document.getElementById('questionSubmetaBar');
       this.dom.progressBar = document.getElementById('quizProgressFill');
       this.dom.timerDisplay = document.getElementById('quizTimerDisplay');
       this.dom.timerWrapper = document.getElementById('quizTimerWrapper');
@@ -97,7 +99,10 @@
       this.dom.questionCard = document.getElementById('quizQuestionCard');
       this.dom.questionStem = document.getElementById('questionStem');
       this.dom.optionsList = document.getElementById('optionsList');
+      this.dom.shortAnswerActionBox = document.getElementById('shortAnswerActionBox');
       this.dom.explanationCard = document.getElementById('explanationCard');
+      this.dom.explanationHeaderBadge = document.getElementById('explanationHeaderBadge');
+      this.dom.explanationBannersStack = document.getElementById('explanationBannersStack');
       this.dom.explanationCardsContainer = document.getElementById('explanationCardsContainer');
       this.dom.legacyRationaleContainer = document.getElementById('legacyRationaleContainer');
       this.dom.distractorsContainer = document.getElementById('legacyDistractorsContainer') || document.querySelector('.distractors-container');
@@ -387,6 +392,50 @@
       }
     }
 
+    isPracticeOnlyQuiz(quiz = this.currentQuiz) {
+      return Boolean(quiz && (quiz.practiceOnly || quiz.isFlagshipRecalls || quiz.id === 'surgery-recent-recalls'));
+    }
+
+    isSequentialOnlyQuiz(quiz = this.currentQuiz) {
+      return Boolean(quiz && (quiz.isSequentialOnly || quiz.isFlagshipRecalls || quiz.id === 'surgery-recent-recalls'));
+    }
+
+    generateFlagshipRecallsCardHtml(recallsQuiz, variant = 'hub') {
+      if (!recallsQuiz) return '';
+      const total = recallsQuiz.totalQuestions || 135;
+      return `
+        <div class="quiz-card quiz-card-flagship-recalls ${variant === 'course' ? 'is-course-spotlight' : ''}" data-quiz-id="${recallsQuiz.id}">
+          <div class="flagship-recalls-body">
+            <div class="quiz-card-header">
+              <span class="quiz-card-category flagship-recalls-category">
+                🔥 ویژه امتحان جراحی • فقط حالت تمرینی و درسنامه
+              </span>
+              <span class="quiz-card-badge flagship-recalls-badge">
+                ${this.toPersianDigits(total)} سوال پرتکرار • مرور ترتیبی ۱ تا ${this.toPersianDigits(total)}
+              </span>
+            </div>
+            <h3 class="quiz-card-title flagship-recalls-title">${recallsQuiz.title}</h3>
+            <p class="quiz-card-desc flagship-recalls-desc">${recallsQuiz.description}</p>
+            <div class="flagship-recalls-highlights">
+              <span class="flagship-pill pill-emerald">✅ ۸۰ سوال چندگزینه‌ای (۲، ۳ و ۴ گزینه‌ای)</span>
+              <span class="flagship-pill pill-indigo">✍️ ۵۵ سوال تشریحی کوتاه‌پاسخ + دکمه نمایش پاسخ</span>
+              <span class="flagship-pill pill-crimson">⚠️ راستی‌آزمایی و اصلاح کلیدهای اشتباه دانشجویی</span>
+              <span class="flagship-pill pill-amber">🔢 ترتیب استاندارد و پیوسته موضوعی (بدون بُرزدن)</span>
+            </div>
+          </div>
+          <div class="flagship-recalls-actions">
+            <div class="flagship-mode-note">فقط حالت آموزشی و درسنامه (آزمون رسمی غیرفعال برای حفظ ترتیب مباحث)</div>
+            <button type="button" class="btn-flagship-recalls-cta" onclick="window.medicalQuiz.startQuiz('${recallsQuiz.id}', 'study', true)">
+              <span>📖 شروع مرور ترتیبی سوالات و درسنامه‌ها</span>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
     renderHub() {
       if (!this.dom.hubView) return;
       this.dom.hubView.style.display = 'block';
@@ -400,6 +449,7 @@
       const quizzes = window.QuizRegistry ? window.QuizRegistry.getAllQuizzes() : [];
       if (!this.dom.quizzesGrid) return;
 
+      const recallsQuiz = quizzes.find(q => q.id === 'surgery-recent-recalls');
       const ncdQuiz = quizzes.find(q => q.id === 'ncd') || quizzes[0];
       const stats = this.computeStudentStats();
 
@@ -412,6 +462,11 @@
       const ncdChaptersCount = ncdIndividual.length;
 
       let html = '';
+
+      // Flagship Card 0: Recent Surgery Recall Questions & Lawrence Mini-Lessons (Practice-Only Sequential)
+      if (recallsQuiz) {
+        html += this.generateFlagshipRecallsCardHtml(recallsQuiz, 'hub');
+      }
 
       // Card 1: NCD Question Bank
       if (ncdQuiz) {
@@ -609,6 +664,10 @@
        VIEW 1.5: COURSE TOPICS VIEW (صفحه اختصاصی مباحث درس با فیلتر بالا)
        ========================================================================== */
     openCourseTopics(courseId = 'ncd') {
+      if (courseId === 'surgery-recent-recalls') {
+        this.startQuiz('surgery-recent-recalls', 'study', true);
+        return;
+      }
       const course = window.QuizRegistry.getQuizById(courseId);
       if (!course) return;
 
@@ -628,6 +687,13 @@
       if (this.dom.courseTotalBadge) this.dom.courseTotalBadge.textContent = course.badge || `${course.totalQuestions} سوال`;
       if (this.dom.courseTitle) this.dom.courseTitle.textContent = course.title;
       if (this.dom.courseDesc) this.dom.courseDesc.textContent = course.description;
+
+      // Spotlight Flagship Recalls Bank at the top of Surgery Course View (outside random mix chapters)
+      const spotlightEl = this.dom.courseFlagshipSpotlight || document.getElementById('courseFlagshipSpotlight');
+      if (spotlightEl) {
+        const recallsQuiz = course.id === 'surgery' && window.QuizRegistry ? window.QuizRegistry.getQuizById('surgery-recent-recalls') : null;
+        spotlightEl.innerHTML = recallsQuiz ? this.generateFlagshipRecallsCardHtml(recallsQuiz, 'course') : '';
+      }
 
       // Populate Chapters Grid
       this.renderCourseChaptersGrid(course);
@@ -963,7 +1029,7 @@
     }
 
     returnToCourseView() {
-      if (this.currentQuiz && this.currentQuiz.id === 'smart-review') {
+      if (this.currentQuiz && (this.currentQuiz.id === 'smart-review' || this.isPracticeOnlyQuiz())) {
         this.returnToHub();
         return;
       }
@@ -1007,6 +1073,7 @@
     }
 
     shuffleCurrentQuestions() {
+      if (this.isSequentialOnlyQuiz()) return;
       if (this.mode !== 'study' || !this.allQuestions || this.allQuestions.length === 0) return;
       this.filteredQuestions = this.shuffleArray([...this.allQuestions]);
       this.currentIndex = 0;
@@ -1045,8 +1112,11 @@
           quizMeta = { id: 'custom-quiz', title: 'آزمون تخصصی', category: 'بیماری‌های غیرواگیر' };
         }
 
+        const isPractice = this.isPracticeOnlyQuiz(quizMeta);
+        const isSequential = this.isSequentialOnlyQuiz(quizMeta);
+
         this.currentQuiz = quizMeta;
-        this.mode = initialMode;
+        this.mode = isPractice ? 'study' : initialMode;
         this.currentIndex = 0;
         this.activeTopic = 'all';
 
@@ -1080,11 +1150,12 @@
           this.restoreState();
         }
 
-        if (this.mode === 'study') {
+        if (this.mode === 'study' && !isSequential) {
           // Shuffle all questions in randomized order across selected topics!
           this.filteredQuestions = this.shuffleArray([...this.allQuestions]);
           this.currentIndex = 0;
         } else {
+          // Strict 1-to-N sequential order preserved
           this.filteredQuestions = [...this.allQuestions];
           this.currentIndex = 0;
         }
@@ -1139,12 +1210,17 @@
       const qKey = this.getQuestionKey(q);
       const isAnswered = this.answers.hasOwnProperty(qKey) || (q.id && String(q.id) === qKey && this.answers.hasOwnProperty(q.id));
       const selectedKey = this.answers[qKey] || (q.id && this.answers[q.id]);
-      const isCorrect = isAnswered && selectedKey === q.correct_answer;
       const isFlagged = this.flags.has(qKey) || (q.id && this.flags.has(q.id));
+      const isSequential = this.isSequentialOnlyQuiz();
+      const optsArray = Array.isArray(q.options) ? q.options : [];
+      const isShortAnswer = Boolean(q.is_short_answer || optsArray.length === 0);
 
       // Meta & Header
       if (this.dom.questionCounter) {
-        if (this.mode === 'study') {
+        if (isSequential) {
+          const dispNum = q.number || (this.currentIndex + 1);
+          this.dom.questionCounter.textContent = `سوال ${this.toPersianDigits(dispNum)} از ${this.toPersianDigits(this.filteredQuestions.length)} (مرور ترتیبی)`;
+        } else if (this.mode === 'study') {
           this.dom.questionCounter.textContent = `سوال ${this.currentIndex + 1} از ${this.filteredQuestions.length} (چیدمان تصادفی)`;
         } else {
           this.dom.questionCounter.textContent = `سوال ${this.currentIndex + 1} از ${this.filteredQuestions.length}`;
@@ -1159,6 +1235,24 @@
           this.dom.questionTopicTag.style.display = 'none';
         }
       }
+
+      // Submeta bar (Question Type + Source/Frequency badges)
+      if (this.dom.questionSubmetaBar) {
+        if (q.source_badge || q.question_type || q.is_frequent) {
+          const typeLabel = isShortAnswer
+            ? '✍️ پاسخ کوتاه (بدون گزینه)'
+            : `☑️ چندگزینه‌ای (${this.toPersianDigits(optsArray.length)} گزینه‌ای)`;
+          let subHtml = `<span class="question-type-pill ${isShortAnswer ? 'is-short-answer' : 'is-mc'}">${typeLabel}</span>`;
+          if (q.source_badge) {
+            subHtml += `<span class="question-source-pill ${q.is_frequent ? 'is-frequent' : ''}">${this.escapeHtml(q.source_badge)}</span>`;
+          }
+          this.dom.questionSubmetaBar.innerHTML = subHtml;
+          this.dom.questionSubmetaBar.style.display = 'flex';
+        } else {
+          this.dom.questionSubmetaBar.innerHTML = '';
+          this.dom.questionSubmetaBar.style.display = 'none';
+        }
+      }
       
       // Progress Bar
       if (this.dom.progressBar) {
@@ -1167,9 +1261,24 @@
       }
 
       // Batch Indicator & Shuffle in Active View
-      if (this.mode === 'study') {
+      if (isSequential) {
         if (this.dom.batchIndicatorBadge) {
           this.dom.batchIndicatorBadge.style.display = 'inline-flex';
+          this.dom.batchIndicatorBadge.classList.add('is-sequential-badge');
+        }
+        if (this.dom.batchIndicatorText) {
+          this.dom.batchIndicatorText.textContent = `🔢 مرور ترتیبی و پیوسته (سوال ۱ تا ${this.toPersianDigits(this.filteredQuestions.length)})`;
+        }
+        if (this.dom.btnShuffleOrder) {
+          this.dom.btnShuffleOrder.style.display = 'none';
+        }
+        if (this.dom.btnNextBatch) {
+          this.dom.btnNextBatch.style.display = 'none';
+        }
+      } else if (this.mode === 'study') {
+        if (this.dom.batchIndicatorBadge) {
+          this.dom.batchIndicatorBadge.style.display = 'inline-flex';
+          this.dom.batchIndicatorBadge.classList.remove('is-sequential-badge');
         }
         if (this.dom.batchIndicatorText) {
           this.dom.batchIndicatorText.textContent = 'چیدمان تصادفی سوالات';
@@ -1183,6 +1292,7 @@
       } else {
         if (this.dom.batchIndicatorBadge) {
           this.dom.batchIndicatorBadge.style.display = 'none';
+          this.dom.batchIndicatorBadge.classList.remove('is-sequential-badge');
         }
         if (this.dom.btnShuffleOrder) {
           this.dom.btnShuffleOrder.style.display = 'none';
@@ -1213,8 +1323,8 @@
         }
       }
 
-      // Question Stem
-      this.dom.questionStem.textContent = q.stem;
+      // Question Stem (supports inline bold/math/multiline formatting cleanly)
+      this.dom.questionStem.innerHTML = this.formatMarkdownText(q.stem || '', { questionNumber: q.number });
 
       // Per-Question Pacing Timer Handling
       if (isAnswered) {
@@ -1223,119 +1333,146 @@
         this.startPacingTimer(qKey);
       }
 
-      // Render Options
+      // Render Options OR Short-Answer Reveal Button
       const showFeedback = (this.mode === 'study' && isAnswered) || this.isSubmitted;
-      const qStrikes = (this.strikes && this.strikes[qKey]) || new Set();
-      let optionsHtml = '';
-
-      q.options.forEach(opt => {
-        const optKey = opt.key;
-        let optClasses = ['quiz-option'];
-
-        const isStruck = qStrikes.has(optKey);
-        if (isStruck) {
-          optClasses.push('strikethrough');
-        }
-
-        if (this.mode === 'exam' && !this.isSubmitted) {
-          if (selectedKey === optKey) {
-            optClasses.push('is-selected');
-          }
-        } else if (showFeedback) {
-          if (optKey === q.correct_answer) {
-            optClasses.push('is-correct');
-          } else if (selectedKey === optKey) {
-            optClasses.push('is-wrong');
-          }
-          optClasses.push('is-disabled');
-        }
-
-        let statusIconHtml = '';
-        if (showFeedback) {
-          if (optKey === q.correct_answer) {
-            statusIconHtml = `
-              <span class="option-status-icon" style="color: #059669;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </span>
+      if (isShortAnswer) {
+        this.dom.optionsList.innerHTML = '';
+        this.dom.optionsList.style.display = 'none';
+        if (this.dom.shortAnswerActionBox) {
+          if (!isAnswered) {
+            this.dom.shortAnswerActionBox.innerHTML = `
+              <button type="button" class="btn-reveal-short-answer" id="btnRevealShortAnswer" onclick="window.medicalQuiz.revealShortAnswer()">
+                <span class="reveal-btn-icon">👁️</span>
+                <span>نمایش پاسخ صحیح و درسنامه جامع</span>
+                <kbd class="reveal-btn-kbd">Space</kbd>
+              </button>
             `;
-          } else if (selectedKey === optKey) {
-            statusIconHtml = `
-              <span class="option-status-icon" style="color: #dc2626;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </span>
-            `;
+            this.dom.shortAnswerActionBox.style.display = 'flex';
+          } else {
+            this.dom.shortAnswerActionBox.innerHTML = '';
+            this.dom.shortAnswerActionBox.style.display = 'none';
           }
         }
+      } else {
+        if (this.dom.shortAnswerActionBox) {
+          this.dom.shortAnswerActionBox.innerHTML = '';
+          this.dom.shortAnswerActionBox.style.display = 'none';
+        }
+        this.dom.optionsList.style.display = 'flex';
 
-        const strikeBtnHtml = `
-          <button type="button" class="btn-option-strikethrough ${isStruck ? 'is-active-strike' : ''}" 
-                  data-strike-key="${optKey}" 
-                  title="${isStruck ? 'حذف خط‌خوردگی گزینه' : 'خط زدن این گزینه (رد گزینه)'}" 
-                  aria-label="${isStruck ? 'حذف خط‌خوردگی' : 'خط زدن گزینه'} ${optKey}">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        `;
+        const qStrikes = (this.strikes && this.strikes[qKey]) || new Set();
+        let optionsHtml = '';
 
-        optionsHtml += `
-          <div role="button" tabindex="0" class="${optClasses.join(' ')}" data-option-key="${optKey}">
-            <span class="quiz-option-key">${optKey}</span>
-            <span class="quiz-option-text">${this.escapeHtml(opt.text)}</span>
-            ${strikeBtnHtml}
-            ${statusIconHtml}
-          </div>
-        `;
-      });
+        optsArray.forEach(opt => {
+          const optKey = opt.key;
+          let optClasses = ['quiz-option'];
 
-      this.dom.optionsList.innerHTML = optionsHtml;
+          const isStruck = qStrikes.has(optKey);
+          if (isStruck) {
+            optClasses.push('strikethrough');
+          }
 
-      // Attach option listeners (click, contextmenu, strike button, spacebar)
-      this.dom.optionsList.querySelectorAll('.quiz-option').forEach(el => {
-        const key = el.getAttribute('data-option-key');
+          if (this.mode === 'exam' && !this.isSubmitted) {
+            if (selectedKey === optKey) {
+              optClasses.push('is-selected');
+            }
+          } else if (showFeedback) {
+            if (optKey === q.correct_answer) {
+              optClasses.push('is-correct');
+            } else if (selectedKey === optKey) {
+              optClasses.push('is-wrong');
+            }
+            optClasses.push('is-disabled');
+          }
 
-        // Normal click on option selects it (unless strike button was clicked)
-        el.addEventListener('click', (e) => {
-          if (e.target.closest('.btn-option-strikethrough')) return;
-          this.handleOptionSelection(key);
+          let statusIconHtml = '';
+          if (showFeedback) {
+            if (optKey === q.correct_answer) {
+              statusIconHtml = `
+                <span class="option-status-icon" style="color: #059669;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+              `;
+            } else if (selectedKey === optKey) {
+              statusIconHtml = `
+                <span class="option-status-icon" style="color: #dc2626;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </span>
+              `;
+            }
+          }
+
+          const strikeBtnHtml = `
+            <button type="button" class="btn-option-strikethrough ${isStruck ? 'is-active-strike' : ''}" 
+                    data-strike-key="${optKey}" 
+                    title="${isStruck ? 'حذف خط‌خوردگی گزینه' : 'خط زدن این گزینه (رد گزینه)'}" 
+                    aria-label="${isStruck ? 'حذف خط‌خوردگی' : 'خط زدن گزینه'} ${optKey}">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          `;
+
+          optionsHtml += `
+            <div role="button" tabindex="0" class="${optClasses.join(' ')}" data-option-key="${optKey}">
+              <span class="quiz-option-key">${optKey}</span>
+              <span class="quiz-option-text">${this.formatInlineMarkdown(opt.text)}</span>
+              ${strikeBtnHtml}
+              ${statusIconHtml}
+            </div>
+          `;
         });
 
-        // Right-click toggles strike-through
-        el.addEventListener('contextmenu', (e) => {
-          e.preventDefault();
-          this.toggleOptionStrike(qKey, key);
-        });
+        this.dom.optionsList.innerHTML = optionsHtml;
 
-        // Keyboard accessibility (Space on focused option)
-        el.addEventListener('keydown', (e) => {
-          if (e.key === ' ' || e.key === 'Spacebar') {
-            e.preventDefault();
+        // Attach option listeners (click, contextmenu, strike button, spacebar)
+        this.dom.optionsList.querySelectorAll('.quiz-option').forEach(el => {
+          const key = el.getAttribute('data-option-key');
+
+          // Normal click on option selects it (unless strike button was clicked)
+          el.addEventListener('click', (e) => {
+            if (e.target.closest('.btn-option-strikethrough')) return;
             this.handleOptionSelection(key);
-          }
-        });
+          });
 
-        // Strike button click toggles strike-through without selecting
-        const strikeBtn = el.querySelector('.btn-option-strikethrough');
-        if (strikeBtn) {
-          strikeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
+          // Right-click toggles strike-through
+          el.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             this.toggleOptionStrike(qKey, key);
           });
-        }
-      });
+
+          // Keyboard accessibility (Space on focused option)
+          el.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'Spacebar') {
+              e.preventDefault();
+              this.handleOptionSelection(key);
+            }
+          });
+
+          // Strike button click toggles strike-through without selecting
+          const strikeBtn = el.querySelector('.btn-option-strikethrough');
+          if (strikeBtn) {
+            strikeBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              this.toggleOptionStrike(qKey, key);
+            });
+          }
+        });
+      }
 
       // Render Explanation Card (Immediately in Study Mode after answering, or in Exam Review)
       if (showFeedback && q.detailed_explanation) {
         this.renderExplanationCard(q);
         this.dom.explanationCard.style.display = 'block';
       } else {
+        if (this.dom.explanationBannersStack) this.dom.explanationBannersStack.innerHTML = '';
         this.dom.explanationCard.style.display = 'none';
       }
 
@@ -1348,6 +1485,46 @@
           <polyline points="15 18 9 12 15 6"></polyline>
         </svg>
       `;
+    }
+
+    revealShortAnswer() {
+      const q = this.filteredQuestions && this.filteredQuestions[this.currentIndex];
+      if (!q) return;
+      const qKey = this.getQuestionKey(q);
+      if (this.mode === 'study' && (this.answers.hasOwnProperty(qKey) || (q.id && String(q.id) === qKey && this.answers.hasOwnProperty(q.id)))) {
+        return;
+      }
+
+      this.stopPacingTimer(qKey);
+      this.answers[qKey] = 'REVEALED';
+      this.saveState();
+      this.renderCurrentQuestion();
+
+      setTimeout(() => {
+        if (this.dom.explanationCard) {
+          this.dom.explanationCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 150);
+    }
+
+    jumpToQuestionByNumber(qNum) {
+      const num = parseInt(qNum, 10);
+      if (!num || !this.filteredQuestions || this.filteredQuestions.length === 0) return;
+      let idx = this.filteredQuestions.findIndex(item => Number(item.number) === num);
+      if (idx < 0 && num >= 1 && num <= this.filteredQuestions.length) {
+        idx = num - 1;
+      }
+      if (idx >= 0 && idx < this.filteredQuestions.length) {
+        this.currentIndex = idx;
+        this.renderCurrentQuestion();
+        this.closeMatrixModal();
+        const card = this.dom.questionCard || document.getElementById('quizQuestionCard');
+        if (card) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          window.scrollTo({ top: 120, behavior: 'smooth' });
+        }
+      }
     }
 
     handleOptionSelection(optionKey) {
@@ -1474,76 +1651,157 @@
       return [];
     }
 
-    formatMathExpr(raw) {
+    formatMathExpr(raw, isDisplay = false) {
       if (!raw) return '';
       let s = String(raw).trim();
       s = s.replace(/\\text\{([^}]+)\}/g, '$1');
       s = s.replace(/\\mathrm\{([^}]+)\}/g, '$1');
+      s = s.replace(/\\mathbf\{([^}]+)\}/g, '<strong>$1</strong>');
       s = s.replace(/\^\\circ\s*C/g, '°C');
       s = s.replace(/\^\\circ\s*F/g, '°F');
+      s = s.replace(/\\circ/g, '°');
       s = s.replace(/\\ge/g, '≥').replace(/\\geq/g, '≥');
       s = s.replace(/\\le/g, '≤').replace(/\\leq/g, '≤');
       s = s.replace(/\\pm/g, '±');
       s = s.replace(/\\times/g, '×');
       s = s.replace(/\\approx/g, '≈');
       s = s.replace(/\\sim/g, '~');
+      s = s.replace(/\\implies/g, '⇒');
+      s = s.replace(/\\rightarrow/g, '→').replace(/\\to\b/g, '→');
+      s = s.replace(/\\leftarrow/g, '←');
+      s = s.replace(/\\uparrow/g, '↑');
+      s = s.replace(/\\downarrow/g, '↓');
+      s = s.replace(/\\mu/g, 'μ');
+      s = s.replace(/\\alpha/g, 'α');
+      s = s.replace(/\\beta/g, 'β');
+      s = s.replace(/\\gamma/g, 'γ');
       s = s.replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1/$2');
       s = s.replace(/\\\s+/g, ' ');
       s = s.replace(/\\%/g, '%').replace(/\\_/g, '_');
+      if (isDisplay) {
+        return `<div class="exp-math-block" dir="ltr">${s}</div>`;
+      }
       return `<span class="med-measure" dir="ltr">${s}</span>`;
     }
 
     formatMarkdownTables(text) {
       if (!text) return '';
-      return text.replace(/((?:\|[^\n]+\|\r?\n)+)/g, (tableText) => {
+      return text.replace(/((?:^\|[^\n]+\|(?:\r?\n|$))+)/gm, (tableText) => {
         const rows = tableText.trim().split('\n').map(r => r.trim()).filter(Boolean);
         if (rows.length < 2) return tableText;
 
-        let tableHtml = '<div class="table-responsive"><table class="clinical-table" dir="rtl">';
-        let isHeader = true;
+        let tableHtml = '<div class="table-responsive" dir="rtl"><table class="clinical-table" dir="rtl" style="direction: rtl; text-align: right;">';
+        let hasHeader = false;
+        let inBody = false;
 
         rows.forEach((row, rowIdx) => {
           if (row.match(/^\|[\s\-:|]+\|$/)) {
-            isHeader = false;
+            if (hasHeader && !inBody) {
+              tableHtml += '<tbody>';
+              inBody = true;
+            }
             return;
           }
           const cells = row.split('|').slice(1, -1).map(c => c.trim());
-          if (rowIdx === 0 && isHeader) {
-            tableHtml += '<thead><tr>' + cells.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+          if (rowIdx === 0 && rows.length > 1 && rows[1].match(/^\|[\s\-:|]+\|$/)) {
+            tableHtml += '<thead><tr>' + cells.map(c => `<th style="text-align: right;">${c}</th>`).join('') + '</tr></thead>';
+            hasHeader = true;
           } else {
-            tableHtml += '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+            if (!inBody) {
+              tableHtml += '<tbody>';
+              inBody = true;
+            }
+            tableHtml += '<tr>' + cells.map(c => `<td style="text-align: right;">${c}</td>`).join('') + '</tr>';
           }
         });
 
-        tableHtml += '</tbody></table></div>';
-        return tableHtml;
+        if (inBody) tableHtml += '</tbody>';
+        tableHtml += '</table></div>';
+        return '\n' + tableHtml + '\n';
       });
     }
 
-    formatMarkdownText(text) {
+    persianToEnglishDigits(str) {
+      const map = { '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4', '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9' };
+      return String(str || '').replace(/[۰-۹]/g, d => map[d] || d);
+    }
+
+    linkQuestionReferences(html, currentQuestionNumber = null) {
+      if (!html) return html;
+      const total = (this.filteredQuestions && this.filteredQuestions.length) || 135;
+      const parts = html.split(/(<[^>]+>)/g);
+      return parts.map((segment, idx) => {
+        // Leave HTML tags verbatim
+        if (idx % 2 === 1) return segment;
+        return segment.replace(/سوال\s+([۰-۹\d]+)(?![۰-۹\d])/g, (match, numStr, offset, fullStr) => {
+          const before = fullStr.slice(Math.max(0, offset - 15), offset);
+          const after = fullStr.slice(offset + match.length, offset + match.length + 20);
+          if (/نکته\s*$/.test(before) || /^\s*(?:پایان|منبع|امتحان)/.test(after)) {
+            return match;
+          }
+          const numVal = parseInt(this.persianToEnglishDigits(numStr), 10);
+          if (!numVal || numVal < 1 || numVal > total || (currentQuestionNumber && numVal === Number(currentQuestionNumber))) {
+            return match;
+          }
+          return `<button type="button" class="inline-question-jump-link" onclick="window.medicalQuiz.jumpToQuestionByNumber(${numVal})" title="پرش مستقیم به سوال ${this.toPersianDigits(numVal)}">🔗 سوال ${numStr}</button>`;
+        });
+      }).join('');
+    }
+
+    formatInlineMarkdown(text, opts = {}) {
       if (!text) return '';
-      let s = this.escapeHtml(text);
+      let s = this.escapeHtml(String(text));
+      const mathTokens = [];
+      const pushMath = (expr, isDisplay) => {
+        const token = `\x00MATH${mathTokens.length}\x00`;
+        mathTokens.push(this.formatMathExpr(expr, isDisplay));
+        return token;
+      };
 
-      // LaTeX math: $...$
-      s = s.replace(/\$([^\$]+)\$/g, (m, mathExpr) => {
-        return this.formatMathExpr(mathExpr);
-      });
-
-      // Markdown Bold: **text**
+      s = s.replace(/\$\$([\s\S]*?)\$\$/g, (_, m) => pushMath(m, false));
+      s = s.replace(/\$([^\$]+)\$/g, (_, m) => pushMath(m, false));
       s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-
-      // Markdown Italic: *text*
       s = s.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-
-      // Underline: <u>text</u>
       s = s.replace(/&lt;u&gt;(.*?)&lt;\/u&gt;/g, '<u>$1</u>');
+      s = s.replace(/\x00MATH(\d+)\x00/g, (_, idx) => mathTokens[parseInt(idx, 10)] || '');
+      s = s.replace(/\r?\n/g, '<br>');
 
-      // Markdown Tables
-      if (s.includes('|') && s.includes('\n|')) {
+      if (opts && opts.enableQuestionLinks) {
+        s = this.linkQuestionReferences(s, opts.questionNumber);
+      }
+      return s;
+    }
+
+    formatMarkdownText(text, opts = {}) {
+      if (!text) return '';
+      let s = this.escapeHtml(String(text).replace(/\r\n/g, '\n'));
+
+      // Extract Display Math $$...$$ and Inline Math $...$ before markdown bold/italic
+      const mathTokens = [];
+      const pushMath = (expr, isDisplay) => {
+        const token = `\x00MATH${mathTokens.length}\x00`;
+        mathTokens.push(this.formatMathExpr(expr, isDisplay));
+        return token;
+      };
+
+      s = s.replace(/\$\$\s*([\s\S]*?)\s*\$\$/g, (_, mathExpr) => `\n${pushMath(mathExpr, true)}\n`);
+      s = s.replace(/\$([^\$]+)\$/g, (_, mathExpr) => pushMath(mathExpr, false));
+
+      // Markdown Bold & Italic & HTML tags used in text
+      s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      s = s.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+      s = s.replace(/&lt;u&gt;(.*?)&lt;\/u&gt;/g, '<u>$1</u>');
+      s = s.replace(/&lt;br\s*\/?&gt;/gi, '<br>');
+
+      // Markdown Tables (before line-by-line paragraph wrapping)
+      if (s.includes('|') && (s.includes('\n|') || s.trim().startsWith('|'))) {
         s = this.formatMarkdownTables(s);
       }
 
-      // Markdown Bullet Lists (- ... or * ...) and numbered lists (1. ...)
+      // Restore math tokens before building paragraphs/tables
+      s = s.replace(/\x00MATH(\d+)\x00/g, (_, idx) => mathTokens[parseInt(idx, 10)] || '');
+
+      // Markdown Bullet Lists, Numbered Lists, Blockquotes, and Paragraphs
       const lines = s.split('\n');
       let inList = false;
       let listType = 'ul';
@@ -1553,17 +1811,25 @@
         let line = lines[i];
         const trimmed = line.trim();
 
+        const bqMatch = trimmed.match(/^&gt;\s*(.*)/);
         const bulletMatch = trimmed.match(/^[-*•]\s+(.*)/);
         const numMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
 
-        if (bulletMatch) {
+        if (bqMatch) {
+          if (inList) {
+            output.push(`</${listType}>`);
+            inList = false;
+          }
+          output.push(`<blockquote class="exp-blockquote">${bqMatch[1]}</blockquote>`);
+        } else if (bulletMatch) {
           if (!inList || listType !== 'ul') {
             if (inList) output.push(`</${listType}>`);
             output.push('<ul>');
             inList = true;
             listType = 'ul';
           }
-          output.push(`<li>${bulletMatch[1]}</li>`);
+          const isSub = /^\s{2,}[-*•]\s+/.test(line);
+          output.push(`<li${isSub ? ' class="exp-subitem"' : ''}>${bulletMatch[1]}</li>`);
         } else if (numMatch) {
           if (!inList || listType !== 'ol') {
             if (inList) output.push(`</${listType}>`);
@@ -1571,14 +1837,19 @@
             inList = true;
             listType = 'ol';
           }
-          output.push(`<li>${numMatch[2]}</li>`);
+          const isSub = /^\s{2,}\d+\.\s+/.test(line);
+          output.push(`<li${isSub ? ' class="exp-subitem"' : ''}>${numMatch[2]}</li>`);
         } else {
           if (inList) {
             output.push(`</${listType}>`);
             inList = false;
           }
           if (trimmed.length > 0) {
-            output.push(`<p class="exp-para">${line}</p>`);
+            if (/^<(?:div|table|blockquote|ul|ol|h[1-6])\b/i.test(trimmed)) {
+              output.push(trimmed);
+            } else {
+              output.push(`<p class="exp-para">${line}</p>`);
+            }
           }
         }
       }
@@ -1586,7 +1857,11 @@
         output.push(`</${listType}>`);
       }
 
-      return output.join('\n');
+      let finalHtml = output.join('\n');
+      if (opts && opts.enableQuestionLinks) {
+        finalHtml = this.linkQuestionReferences(finalHtml, opts.questionNumber);
+      }
+      return finalHtml;
     }
 
     formatDistractorText(text) {
@@ -1624,8 +1899,14 @@
       const rationale = exp.rationale || "تحلیل گزینه صحیح ثبت نشده است.";
       const distractors = this.getDistractorsList(exp.distractors_correction);
       const miniLesson = exp.mini_lesson || exp.lawrence_lesson || '';
+      const enableQLinks = Boolean(this.isSequentialOnlyQuiz() || question.chapterId === 'surgery-recent-recalls');
+      const mdOpts = { questionNumber: question.number, enableQuestionLinks: enableQLinks };
 
-      // CARD 1: Emerald Green Rationale Card (تحلیل پاسخ صحیح و مسیر مدیریت بیمار)
+      // CARD 1: Emerald Green Rationale Card (تحلیل پاسخ صحیح و منطق بالینی)
+      const card1TitleText = exp.rationale_title
+        ? `✅ ${exp.rationale_title}${question.correct_answer ? ` (گزینه [${question.correct_answer}])` : ''}`
+        : `✅ ۱. تحلیل پاسخ صحیح و مسیر مدیریت بیمار${question.correct_answer ? ` (گزینه [${question.correct_answer}])` : ''}`;
+
       const card1Html = `
         <div class="exp-card exp-card-correct">
           <div class="exp-card-header exp-header-correct">
@@ -1633,27 +1914,52 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
-              <span>✅ ۱. تحلیل پاسخ صحیح و مسیر مدیریت بیمار (گزینه [${question.correct_answer}])</span>
+              <span>${this.escapeHtml(card1TitleText)}</span>
             </div>
             <span class="exp-badge exp-badge-emerald">پاسخ قطعی رفرنس</span>
           </div>
           <div class="exp-card-body exp-body-correct">
-            ${this.formatMarkdownText(rationale)}
+            ${this.formatMarkdownText(rationale, mdOpts)}
           </div>
         </div>
       `;
 
-      // CARD 2: Amber/Coral Distractor Subcards (کالبدشکافی سایر گزینه‌ها و دام‌های امتحانی)
-      let distCardsHtml = '';
-      const wrongOptions = (question.options && Array.isArray(question.options))
-        ? question.options.filter(opt => opt.key !== question.correct_answer)
-        : [];
+      // CARD 2: Amber/Coral Distractor Breakdown OR Verbatim Markdown Differential Section
+      let card2BodyHtml = '';
+      if (exp.distractors_markdown && exp.distractors_markdown.trim().length > 0) {
+        card2BodyHtml = `<div class="exp-distractors-rich-markdown">${this.formatMarkdownText(exp.distractors_markdown, mdOpts)}</div>`;
+      } else {
+        const wrongOptions = (question.options && Array.isArray(question.options))
+          ? question.options.filter(opt => opt.key !== question.correct_answer)
+          : [];
 
-      if (wrongOptions.length > 0) {
-        distCardsHtml = wrongOptions.map(opt => {
-          const matchedDist = distractors.find(d => d.key === opt.key);
-          const whyIncorrect = opt.explanation || (matchedDist && matchedDist.text) || 'تحلیل تفکیک‌شده‌ای برای این گزینه موجود نیست.';
-          return `
+        if (wrongOptions.length > 0) {
+          card2BodyHtml = wrongOptions.map(opt => {
+            const matchedDist = distractors.find(d => d.key === opt.key);
+            const whyIncorrect = opt.explanation || (matchedDist && matchedDist.text) || 'تحلیل تفکیک‌شده‌ای برای این گزینه موجود نیست.';
+            return `
+              <div class="distractor-subcard">
+                <div class="distractor-subcard-header">
+                  <div class="distractor-subcard-tag">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="15" y1="9" x2="9" y2="15"></line>
+                      <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    <span>رد گزینه [${opt.key}]</span>
+                  </div>
+                  <div class="distractor-subcard-preview" title="${this.escapeHtml(opt.text)}">
+                    ${this.escapeHtml(opt.text)}
+                  </div>
+                </div>
+                <div class="distractor-subcard-body">
+                  ${this.formatDistractorText(whyIncorrect)}
+                </div>
+              </div>
+            `;
+          }).join('');
+        } else if (distractors.length > 0) {
+          card2BodyHtml = distractors.map(d => `
             <div class="distractor-subcard">
               <div class="distractor-subcard-header">
                 <div class="distractor-subcard-tag">
@@ -1662,39 +1968,22 @@
                     <line x1="15" y1="9" x2="9" y2="15"></line>
                     <line x1="9" y1="9" x2="15" y2="15"></line>
                   </svg>
-                  <span>رد گزینه [${opt.key}]</span>
-                </div>
-                <div class="distractor-subcard-preview" title="${this.escapeHtml(opt.text)}">
-                  ${this.escapeHtml(opt.text)}
+                  <span>رد گزینه [${d.key}]</span>
                 </div>
               </div>
               <div class="distractor-subcard-body">
-                ${this.formatDistractorText(whyIncorrect)}
+                ${this.formatDistractorText(d.text)}
               </div>
             </div>
-          `;
-        }).join('');
-      } else if (distractors.length > 0) {
-        distCardsHtml = distractors.map(d => `
-          <div class="distractor-subcard">
-            <div class="distractor-subcard-header">
-              <div class="distractor-subcard-tag">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="15" y1="9" x2="9" y2="15"></line>
-                  <line x1="9" y1="9" x2="15" y2="15"></line>
-                </svg>
-                <span>رد گزینه [${d.key}]</span>
-              </div>
-            </div>
-            <div class="distractor-subcard-body">
-              ${this.formatDistractorText(d.text)}
-            </div>
-          </div>
-        `).join('');
-      } else {
-        distCardsHtml = '<div style="font-size: 13.5px; color: var(--text-muted); padding: 8px 0;">تحلیل تفکیک‌شده‌ای برای سایر گزینه‌ها موجود نیست.</div>';
+          `).join('');
+        } else {
+          card2BodyHtml = '<div style="font-size: 13.5px; color: var(--text-muted); padding: 8px 0;">تحلیل تفکیک‌شده‌ای برای سایر گزینه‌ها موجود نیست.</div>';
+        }
       }
+
+      const card2TitleText = exp.distractors_title
+        ? `🔍 ${exp.distractors_title}`
+        : '🔍 ۲. کالبدشکافی سایر گزینه‌ها و تشخیص‌های افتراقی';
 
       const card2Html = `
         <div class="exp-card exp-card-distractors">
@@ -1704,12 +1993,12 @@
                 <circle cx="11" cy="11" r="8"></circle>
                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
               </svg>
-              <span>🔍 ۲. کالبدشکافی سایر گزینه‌ها و دام‌های امتحانی</span>
+              <span>${this.escapeHtml(card2TitleText)}</span>
             </div>
-            <span class="exp-badge exp-badge-amber">کالبدشکافی دام‌های تستی</span>
+            <span class="exp-badge exp-badge-amber">کالبدشکافی و افتراق</span>
           </div>
           <div class="exp-card-body exp-body-distractors">
-            ${distCardsHtml}
+            ${card2BodyHtml}
           </div>
         </div>
       `;
@@ -1717,6 +2006,10 @@
       // CARD 3: Royal Blue / Indigo Mini-Lesson Card (درسنامه مکمل لارنس)
       let card3Html = '';
       if (miniLesson && miniLesson.trim().length > 0) {
+        const card3TitleText = exp.mini_lesson_title
+          ? `📚 ${exp.mini_lesson_title}`
+          : '📚 ۳. درسنامه مکمل لارنس (نکات پیرامونی و جمع‌بندی طلایی)';
+
         card3Html = `
           <div class="exp-card exp-card-lesson">
             <div class="exp-card-header exp-header-lesson">
@@ -1725,12 +2018,12 @@
                   <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
                   <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
                 </svg>
-                <span>📚 ۳. درسنامه مکمل لارنس (نکات پیرامونی و جمع‌بندی طلایی)</span>
+                <span>${this.escapeHtml(card3TitleText)}</span>
               </div>
               <span class="exp-badge exp-badge-indigo">نکات کلیدی های‌ییلد</span>
             </div>
             <div class="exp-card-body exp-body-lesson">
-              ${this.formatMarkdownText(miniLesson)}
+              ${this.formatMarkdownText(miniLesson, mdOpts)}
             </div>
           </div>
         `;
@@ -1745,8 +2038,71 @@
       `;
     }
 
+    generateExplanationBannersHtml(question) {
+      if (!question) return '';
+      const enableQLinks = Boolean(this.isSequentialOnlyQuiz() || question.chapterId === 'surgery-recent-recalls');
+      const mdOpts = { questionNumber: question.number, enableQuestionLinks: enableQLinks };
+      let html = '';
+
+      // 1. Highlighted Emerald Answer Box (definitive correct answer text)
+      if (question.correct_answer_text) {
+        html += `
+          <div class="emerald-definitive-answer-box">
+            <div class="emerald-answer-header">
+              <span class="emerald-answer-pill">✅ پاسخ صحیح</span>
+              ${question.is_short_answer ? '<span class="emerald-answer-subpill">✍️ پاسخ تشریحی کوتاه‌پاسخ</span>' : ''}
+            </div>
+            <div class="emerald-answer-content">
+              ${this.formatMarkdownText(question.correct_answer_text, mdOpts)}
+            </div>
+          </div>
+        `;
+      }
+
+      // 2. High-Visibility Student Key Fact-Check Banner (بررسی صحت کلید منبع)
+      if (question.key_verification) {
+        const isDisc = question.key_verification_status === 'discrepancy' ||
+          question.key_verification.includes('⚠️') ||
+          question.key_verification.includes('هشدار');
+
+        if (isDisc) {
+          html += `
+            <div class="key-factcheck-banner is-discrepancy" role="alert">
+              <div class="key-factcheck-top">
+                <span class="key-factcheck-status-badge is-discrepancy-badge">⚠️ بررسی صحت کلید منبع • هشدار اصلاح کلید اشتباه دانشجویی</span>
+              </div>
+              <div class="key-factcheck-body">
+                ${this.formatMarkdownText(question.key_verification, mdOpts)}
+              </div>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="key-factcheck-banner is-verified">
+              <div class="key-factcheck-top">
+                <span class="key-factcheck-status-badge is-verified-badge">✅ بررسی صحت کلید منبع</span>
+              </div>
+              <div class="key-factcheck-body">
+                ${this.formatMarkdownText(question.key_verification, mdOpts)}
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      return html;
+    }
+
     renderExplanationCard(question) {
       if (!question) return;
+
+      // Render Definitive Emerald Answer Box & Student Key Fact-Check Banner at top
+      const bannersEl = this.dom.explanationBannersStack || document.getElementById('explanationBannersStack');
+      if (bannersEl) {
+        const bannersHtml = this.generateExplanationBannersHtml(question);
+        bannersEl.innerHTML = bannersHtml;
+        bannersEl.style.display = bannersHtml ? 'flex' : 'none';
+      }
 
       // Render Multi-Card 3-Part Vibrant UI (Card 1: Rationale, Card 2: Distractors, Card 3: Mini-Lesson)
       if (this.dom.explanationCardsContainer) {
@@ -1815,7 +2171,7 @@
         
         if (this.isSubmitted || this.mode === 'study') {
           if (isAnswered) {
-            if (selectedKey === q.correct_answer) {
+            if (selectedKey === 'REVEALED' || selectedKey === q.correct_answer) {
               btnClasses.push('is-correct');
             } else {
               btnClasses.push('is-wrong');
@@ -1825,9 +2181,10 @@
           btnClasses.push('is-answered');
         }
 
+        const displayNum = this.isSequentialOnlyQuiz() && q.number ? q.number : (idx + 1);
         gridHtml += `
           <button type="button" class="${btnClasses.join(' ')}" onclick="window.medicalQuiz.jumpToQuestion(${idx})">
-            <span>${idx + 1}</span>
+            <span>${this.toPersianDigits(displayNum)}</span>
             ${isFlagged ? '<span class="matrix-flag-indicator"></span>' : ''}
           </button>
         `;
@@ -1856,10 +2213,11 @@
        MODE SWITCHING & TIMER
        ========================================================================== */
     switchMode(newMode) {
+      if (this.isPracticeOnlyQuiz()) return;
       if (this.mode === newMode) return;
       this.mode = newMode;
       
-      if (this.mode === 'study') {
+      if (this.mode === 'study' && !this.isSequentialOnlyQuiz()) {
         this.filteredQuestions = this.shuffleArray([...this.allQuestions]);
         this.currentIndex = 0;
       } else {
@@ -1874,8 +2232,18 @@
     }
 
     updateModePills() {
+      const isPracticeOnly = this.isPracticeOnlyQuiz();
       if (this.dom.btnStudyMode && this.dom.btnExamMode) {
-        if (this.mode === 'study') {
+        const studyLabel = this.dom.btnStudyMode.querySelector('span');
+        if (isPracticeOnly) {
+          this.dom.btnExamMode.style.display = 'none';
+          if (studyLabel) studyLabel.textContent = 'حالت تمرینی و درسنامه';
+        } else {
+          this.dom.btnExamMode.style.display = 'inline-flex';
+          if (studyLabel) studyLabel.textContent = 'آموزشی (۵تایی)';
+        }
+
+        if (isPracticeOnly || this.mode === 'study') {
           this.dom.btnStudyMode.classList.add('is-active-study');
           this.dom.btnExamMode.classList.remove('is-active-exam');
           if (this.dom.btnSubmit) this.dom.btnSubmit.style.display = 'none';
@@ -2210,7 +2578,7 @@
 
       this.dom.scorecardView.style.display = 'none';
       this.dom.activeView.style.display = 'block';
-      if (this.mode === 'study') {
+      if (this.mode === 'study' && !this.isSequentialOnlyQuiz()) {
         this.filteredQuestions = this.shuffleArray([...this.allQuestions]);
       } else {
         this.filteredQuestions = [...this.allQuestions];
@@ -2310,14 +2678,26 @@
       const q = this.filteredQuestions && this.filteredQuestions[this.currentIndex];
       if (!q) return;
 
+      const qKey = this.getQuestionKey(q);
+      const isAnswered = this.answers.hasOwnProperty(qKey) || (q.id && String(q.id) === qKey && this.answers.hasOwnProperty(q.id));
+      const isShortAnswer = Boolean(q.is_short_answer || !Array.isArray(q.options) || q.options.length === 0);
+
       if (e.key === 'ArrowLeft') {
         // Next in RTL
         e.preventDefault();
         this.goToNextQuestion();
+      } else if (e.key === ' ' || e.key === 'Spacebar') {
+        if (isShortAnswer && !isAnswered && !e.target.closest('button, [role="button"], a')) {
+          e.preventDefault();
+          this.revealShortAnswer();
+        }
       } else if (e.key === 'Enter') {
-        // Next question only when currently answered
-        const qKey = this.getQuestionKey(q);
-        if (this.answers.hasOwnProperty(qKey) || (q.id && String(q.id) === qKey && this.answers.hasOwnProperty(q.id))) {
+        if (isShortAnswer && !isAnswered) {
+          if (!e.target.closest('button, [role="button"], a')) {
+            e.preventDefault();
+            this.revealShortAnswer();
+          }
+        } else if (isAnswered && !e.target.closest('.quiz-top-toolbar button, .nav-arrows-bar button, .inline-question-jump-link, a')) {
           e.preventDefault();
           this.goToNextQuestion();
         }
@@ -2353,6 +2733,12 @@
     updateHeaderMeta() {
       if (this.dom.activeQuizTitle && this.currentQuiz) {
         this.dom.activeQuizTitle.textContent = this.currentQuiz.title;
+      }
+      if (this.dom.activeView) {
+        const backSpan = this.dom.activeView.querySelector('#btnBackToCourse span, #btnBackToHub span');
+        if (backSpan) {
+          backSpan.textContent = this.isPracticeOnlyQuiz() ? 'بازگشت به بانک‌ها' : 'فهرست مباحث';
+        }
       }
     }
 

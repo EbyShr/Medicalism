@@ -11,6 +11,22 @@
   // Initial registered major quiz modules with their chapters
   const INITIAL_QUIZZES = [
     {
+      id: 'surgery-recent-recalls',
+      title: '🔥 بانک سوالات اخیر و پرتکرار جراحی (تحلیل کلیدها + درسنامه جامع لارنس)',
+      shortTitle: 'بانک سوالات اخیر و پرتکرار جراحی',
+      category: 'بانک پرچم‌دار جراحی (فقط حالت تمرینی و درسنامه)',
+      categoryColor: '#e11d48',
+      badge: '۱۳۵ سوال (چندگزینه‌ای و کوتاه‌پاسخ) • مرور ترتیبی',
+      preserveBadge: true,
+      totalQuestions: 135,
+      practiceOnly: true,
+      isSequentialOnly: true,
+      isFlagshipRecalls: true,
+      fileUrl: './data/quizzes/surgery_recent_recalls_quiz.json',
+      fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_RECENT_RECALLS_DATA)) ? window.SURGERY_RECENT_RECALLS_DATA : [],
+      description: 'مجموعه کامل ۱۳۵ سوال اخیر و پرتکرار جراحی (۸۰ سوال چندگزینه‌ای ۲ تا ۴ گزینه‌ای و ۵۵ سوال تشریحی کوتاه‌پاسخ) همراه با هشدارهای اصلاح کلیدهای اشتباه دانشجویی بر اساس متن صریح لارنس، تحلیل پاسخ ۳ کارتی و درسنامه‌های خودکفای ۰ تا ۱۰۰ با ترتیب پیوسته و استاندارد (سوال ۱ تا ۱۳۵).'
+    },
+    {
       id: 'ncd',
       title: 'بانک جامع سوالات بیماری‌های غیرواگیر (NCDs)',
       shortTitle: 'بیماری‌های غیرواگیر',
@@ -460,7 +476,9 @@
         } else if (q.fallbackQuestions && Array.isArray(q.fallbackQuestions) && q.fallbackQuestions.length > 0) {
           this.questionsCache.set(q.id, q.fallbackQuestions);
           q.totalQuestions = q.fallbackQuestions.length;
-          q.badge = `${q.fallbackQuestions.length} سوال`;
+          if (!q.preserveBadge) {
+            q.badge = `${q.fallbackQuestions.length} سوال`;
+          }
         }
       });
     }
@@ -617,7 +635,9 @@
           const prepared = prepareQuestions(cached);
           this.questionsCache.set(quizId, prepared);
           quiz.totalQuestions = prepared.length;
-          quiz.badge = `${prepared.length} سوال`;
+          if (!quiz.preserveBadge) {
+            quiz.badge = `${prepared.length} سوال`;
+          }
           return prepared;
         }
       }
@@ -633,7 +653,9 @@
               const questions = prepareQuestions(rawQuestions);
               this.questionsCache.set(quizId, questions);
               quiz.totalQuestions = questions.length;
-              quiz.badge = `${questions.length} سوال`;
+              if (!quiz.preserveBadge) {
+                quiz.badge = `${questions.length} سوال`;
+              }
               return questions;
             }
           }
@@ -647,7 +669,9 @@
         const questions = prepareQuestions(quiz.fallbackQuestions);
         this.questionsCache.set(quizId, questions);
         quiz.totalQuestions = questions.length;
-        quiz.badge = `${questions.length} سوال`;
+        if (!quiz.preserveBadge) {
+          quiz.badge = `${questions.length} سوال`;
+        }
         return questions;
       }
 

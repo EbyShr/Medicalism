@@ -111,7 +111,14 @@ window.ComponentRenderer = {
             '<p class="quiz-crosslink-desc">شبیه‌ساز آزمون‌های پزشکی، تحلیل سناریوهای بالینی کشوری و کارنامه هوشمند عملکرد</p>' +
           '</div>' +
         '</div>' +
-        '<div class="quiz-crosslink-action">' +
+        '<div class="quiz-crosslink-action" style="display: flex; flex-wrap: wrap; gap: 10px;">' +
+          '<a href="./quiz.html?quiz=surgery-recent-recalls&mode=study" class="btn-quiz-crosslink" style="background: linear-gradient(135deg, #e11d48 0%, #ea580c 100%); color: #fff;">' +
+            '<span>🔥 بانک سوالات اخیر جراحی (۱۳۵ سوال ترتیبی)</span>' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(180deg);">' +
+              '<line x1="5" y1="12" x2="19" y2="12"></line>' +
+              '<polyline points="12 5 19 12 12 19"></polyline>' +
+            '</svg>' +
+          '</a>' +
           '<a href="./quiz.html" class="btn-quiz-crosslink">' +
             '<span>ورود به آزمون و سنجش یادگیری</span>' +
             '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(180deg);">' +

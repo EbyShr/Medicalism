@@ -3214,3 +3214,615 @@
   border-bottom: none;
 }
 
+/* ==========================================================================
+   FLAGSHIP RECENT SURGERY RECALLS BANK & SEQUENTIAL PRACTICE UI
+   ========================================================================== */
+
+.quiz-card-flagship-recalls {
+  grid-column: 1 / -1;
+  position: relative;
+  border-radius: var(--radius-xl, 20px);
+  padding: 24px 26px;
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.07) 0%, rgba(245, 158, 11, 0.08) 52%, rgba(16, 185, 129, 0.06) 100%);
+  border: 2px solid rgba(225, 29, 72, 0.34);
+  box-shadow: 0 12px 32px -10px rgba(225, 29, 72, 0.18), 0 4px 12px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.quiz-card-flagship-recalls:hover {
+  transform: translateY(-2px);
+  border-color: rgba(225, 29, 72, 0.58);
+  box-shadow: 0 16px 38px -10px rgba(225, 29, 72, 0.24);
+}
+
+[data-theme="dark"] .quiz-card-flagship-recalls {
+  background: linear-gradient(135deg, rgba(190, 18, 60, 0.22) 0%, rgba(180, 83, 9, 0.18) 52%, rgba(6, 95, 70, 0.18) 100%);
+  border-color: rgba(251, 113, 133, 0.42);
+  box-shadow: 0 14px 36px -12px rgba(0, 0, 0, 0.55);
+}
+
+.flagship-recalls-highlights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 16px;
+}
+
+.flagship-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--text-primary);
+  border: 1px solid rgba(225, 29, 72, 0.22);
+}
+
+[data-theme="dark"] .flagship-pill {
+  background: rgba(15, 23, 42, 0.7);
+  color: #f1f5f9;
+  border-color: rgba(251, 113, 133, 0.28);
+}
+
+.btn-flagship-recalls-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 22px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  background: linear-gradient(135deg, #e11d48 0%, #ea580c 100%);
+  box-shadow: 0 8px 20px -6px rgba(225, 29, 72, 0.48);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.btn-flagship-recalls-cta:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  box-shadow: 0 12px 26px -6px rgba(225, 29, 72, 0.58);
+}
+
+.batch-indicator-badge.is-sequential-badge {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.16), rgba(14, 165, 233, 0.16));
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.38);
+  font-weight: 800;
+}
+
+[data-theme="dark"] .batch-indicator-badge.is-sequential-badge {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+  border-color: rgba(52, 211, 153, 0.4);
+}
+
+/* Question Sub-meta Bar (Type & Source/Frequent Pills) */
+.question-submeta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.question-type-pill,
+.question-source-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.question-type-pill {
+  background: rgba(59, 130, 246, 0.11);
+  color: #1d4ed8;
+  border: 1px solid rgba(59, 130, 246, 0.28);
+}
+
+[data-theme="dark"] .question-type-pill {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+  border-color: rgba(96, 165, 250, 0.35);
+}
+
+.question-source-pill {
+  background: rgba(100, 116, 139, 0.1);
+  color: var(--text-secondary, #475569);
+  border: 1px solid rgba(100, 116, 139, 0.25);
+}
+
+[data-theme="dark"] .question-source-pill {
+  background: rgba(148, 163, 184, 0.14);
+  color: #cbd5e1;
+  border-color: rgba(148, 163, 184, 0.28);
+}
+
+.question-source-pill.is-frequent {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(225, 29, 72, 0.14));
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  font-weight: 800;
+}
+
+[data-theme="dark"] .question-source-pill.is-frequent {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.24), rgba(225, 29, 72, 0.2));
+  color: #fcd34d;
+  border-color: rgba(251, 191, 36, 0.45);
+}
+
+/* Short-Answer Reveal Action Box */
+.short-answer-action-box {
+  margin: 18px 0 10px;
+}
+
+.btn-reveal-short-answer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+  min-height: 54px;
+  padding: 14px 22px;
+  border-radius: 16px;
+  border: 2px solid rgba(16, 185, 129, 0.45);
+  background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 15.5px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 24px -8px rgba(5, 150, 105, 0.5);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.btn-reveal-short-answer:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 14px 28px -8px rgba(5, 150, 105, 0.62);
+}
+
+.btn-reveal-short-answer:active {
+  transform: translateY(0);
+}
+
+.reveal-btn-kbd {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+/* Banners Stack: Emerald Definitive Answer + Key Fact-Check Banner */
+.explanation-banners-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.emerald-definitive-answer-box {
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(5, 150, 105, 0.08) 100%);
+  border: 1.5px solid rgba(16, 185, 129, 0.48);
+  border-right: 5px solid #059669;
+  color: var(--text-primary);
+  direction: rtl;
+  text-align: right;
+}
+
+[data-theme="dark"] .emerald-definitive-answer-box {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, rgba(6, 78, 59, 0.28) 100%);
+  border-color: rgba(52, 211, 153, 0.45);
+  border-right-color: #10b981;
+}
+
+.emerald-definitive-answer-box .answer-box-title,
+.emerald-definitive-answer-box strong {
+  color: #047857;
+}
+
+[data-theme="dark"] .emerald-definitive-answer-box .answer-box-title,
+[data-theme="dark"] .emerald-definitive-answer-box strong {
+  color: #6ee7b7;
+}
+
+.key-factcheck-banner {
+  padding: 13px 16px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.75;
+  direction: rtl;
+  text-align: right;
+}
+
+.key-factcheck-banner.is-discrepancy {
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.14) 0%, rgba(245, 158, 11, 0.15) 100%);
+  border: 2px solid rgba(225, 29, 72, 0.55);
+  border-right: 6px solid #e11d48;
+  color: #881337;
+  box-shadow: 0 6px 18px -6px rgba(225, 29, 72, 0.28);
+}
+
+[data-theme="dark"] .key-factcheck-banner.is-discrepancy {
+  background: linear-gradient(135deg, rgba(190, 18, 60, 0.28) 0%, rgba(180, 83, 9, 0.24) 100%);
+  border-color: rgba(251, 113, 133, 0.58);
+  border-right-color: #fb7185;
+  color: #ffe4e6;
+}
+
+.key-factcheck-banner.is-verified {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-right: 4px solid #10b981;
+  color: #065f46;
+}
+
+[data-theme="dark"] .key-factcheck-banner.is-verified {
+  background: rgba(16, 185, 129, 0.16);
+  border-color: rgba(52, 211, 153, 0.35);
+  color: #a7f3d0;
+}
+
+/* Inline Question Jump Buttons */
+.inline-question-jump-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 8px;
+  margin: 0 2px;
+  border-radius: 999px;
+  border: 1px solid rgba(37, 99, 235, 0.36);
+  background: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
+  font-family: inherit;
+  font-size: 0.9em;
+  font-weight: 800;
+  cursor: pointer;
+  vertical-align: baseline;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.inline-question-jump-link:hover {
+  background: rgba(37, 99, 235, 0.2);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .inline-question-jump-link {
+  background: rgba(59, 130, 246, 0.22);
+  border-color: rgba(96, 165, 250, 0.45);
+  color: #93c5fd;
+}
+
+/* Rich Markdown Elements Inside Explanations & Tables */
+.exp-blockquote {
+  margin: 10px 0;
+  padding: 10px 14px;
+  border-right: 4px solid #6366f1;
+  background: rgba(99, 102, 241, 0.08);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13.5px;
+  line-height: 1.75;
+}
+
+[data-theme="dark"] .exp-blockquote {
+  background: rgba(99, 102, 241, 0.16);
+  border-right-color: #818cf8;
+}
+
+.exp-math-block {
+  margin: 10px 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.05);
+  border: 1px solid var(--border-subtle, rgba(148, 163, 184, 0.25));
+  direction: ltr;
+  text-align: center;
+  overflow-x: auto;
+  font-family: 'Cambria Math', 'Times New Roman', serif;
+  font-size: 15px;
+}
+
+[data-theme="dark"] .exp-math-block {
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.exp-subitem {
+  margin-top: 5px;
+  margin-right: 18px;
+  padding-right: 10px;
+  border-right: 2px solid rgba(148, 163, 184, 0.4);
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+.exp-distractors-rich-markdown {
+  direction: rtl;
+  text-align: right;
+  line-height: 1.85;
+}
+
+.exp-card-body table,
+.exp-card-body table.clinical-table {
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  border-collapse: collapse;
+}
+
+.exp-card-body .table-scroll-wrap,
+.exp-card-body .clinical-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 10px 0;
+}
+
+@media (max-width: 640px) {
+  .quiz-card-flagship-recalls {
+    padding: 18px 16px;
+  }
+
+  .btn-flagship-recalls-cta {
+    font-size: 14px;
+    padding: 11px 14px;
+  }
+
+  .btn-reveal-short-answer {
+    font-size: 14px;
+    padding: 12px 14px;
+  }
+
+  .reveal-btn-kbd {
+    display: none;
+  }
+
+  .key-factcheck-banner,
+  .emerald-definitive-answer-box {
+    padding: 12px 13px;
+    font-size: 13.5px;
+  }
+
+  .exp-card-body table.clinical-table th,
+  .exp-card-body table.clinical-table td {
+    padding: 7px 10px;
+    font-size: 12.5px;
+  }
+}
+
+/* Inner Elements Polish: Flagship Card, Emerald Answer Box & Key Fact-Check Banner */
+.flagship-recalls-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.flagship-recalls-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #be123c;
+  background: rgba(225, 29, 72, 0.12);
+  border: 1px solid rgba(225, 29, 72, 0.28);
+}
+
+[data-theme="dark"] .flagship-recalls-category {
+  color: #fda4af;
+  background: rgba(225, 29, 72, 0.24);
+  border-color: rgba(251, 113, 133, 0.4);
+}
+
+.flagship-recalls-badge {
+  background: rgba(245, 158, 11, 0.14);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  font-weight: 800;
+}
+
+[data-theme="dark"] .flagship-recalls-badge {
+  background: rgba(245, 158, 11, 0.22);
+  color: #fcd34d;
+  border-color: rgba(251, 191, 36, 0.38);
+}
+
+.flagship-recalls-title {
+  font-size: clamp(18px, 2.3vw, 22px);
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.45;
+  margin: 4px 0 0;
+}
+
+.flagship-recalls-desc {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.flagship-pill.pill-emerald {
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+  border-color: rgba(16, 185, 129, 0.32);
+}
+
+.flagship-pill.pill-indigo {
+  background: rgba(99, 102, 241, 0.11);
+  color: #4338ca;
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.flagship-pill.pill-crimson {
+  background: rgba(225, 29, 72, 0.1);
+  color: #be123c;
+  border-color: rgba(225, 29, 72, 0.3);
+}
+
+.flagship-pill.pill-amber {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border-color: rgba(245, 158, 11, 0.32);
+}
+
+[data-theme="dark"] .flagship-pill.pill-emerald {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+  border-color: rgba(52, 211, 153, 0.38);
+}
+
+[data-theme="dark"] .flagship-pill.pill-indigo {
+  background: rgba(99, 102, 241, 0.22);
+  color: #a5b4fc;
+  border-color: rgba(129, 140, 248, 0.4);
+}
+
+[data-theme="dark"] .flagship-pill.pill-crimson {
+  background: rgba(225, 29, 72, 0.22);
+  color: #fda4af;
+  border-color: rgba(251, 113, 133, 0.4);
+}
+
+[data-theme="dark"] .flagship-pill.pill-amber {
+  background: rgba(245, 158, 11, 0.22);
+  color: #fcd34d;
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.flagship-recalls-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.flagship-mode-note {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.emerald-answer-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.emerald-answer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  background: #059669;
+  color: #ffffff;
+}
+
+.emerald-answer-subpill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  background: rgba(5, 150, 105, 0.12);
+  color: #047857;
+  border: 1px solid rgba(5, 150, 105, 0.3);
+}
+
+[data-theme="dark"] .emerald-answer-subpill {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+  border-color: rgba(52, 211, 153, 0.38);
+}
+
+.emerald-answer-content p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.75;
+}
+
+.emerald-answer-content p + p {
+  margin-top: 6px;
+}
+
+.key-factcheck-top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.key-factcheck-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.key-factcheck-status-badge.is-discrepancy-badge {
+  background: #e11d48;
+  color: #ffffff;
+}
+
+.key-factcheck-status-badge.is-verified-badge {
+  background: rgba(16, 185, 129, 0.16);
+  color: #065f46;
+  border: 1px solid rgba(16, 185, 129, 0.38);
+}
+
+[data-theme="dark"] .key-factcheck-status-badge.is-verified-badge {
+  background: rgba(16, 185, 129, 0.24);
+  color: #a7f3d0;
+  border-color: rgba(52, 211, 153, 0.42);
+}
+
+.key-factcheck-body p {
+  margin: 0;
+  line-height: 1.75;
+}
+
+.key-factcheck-body p + p {
+  margin-top: 6px;
+}
+
+
+
