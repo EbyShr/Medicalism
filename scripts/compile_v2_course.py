@@ -256,7 +256,7 @@ def validate_str_list(items, ctx: str, max_len: int | None = None):
 
 
 def _parse_score_range(text: str):
-    """Parse numeric score ranges like '8-10' or '6' (including Persian digits); return None for caveats."""
+    """Parse numeric score ranges like '8-10', '< 4', '>= 8', or '6' (including Persian digits); return None for caveats."""
     if not isinstance(text, str):
         return None
     norm = text.translate(ASCII_DIGITS).strip()
@@ -264,6 +264,16 @@ def _parse_score_range(text: str):
     if m:
         a, b = int(m.group(1)), int(m.group(2))
         return (min(a, b), max(a, b))
+    m_cmp = re.match(r"^\s*(<=|≤|<|>=|≥|>)\s*(\d+)", norm)
+    if m_cmp:
+        op, v = m_cmp.group(1), int(m_cmp.group(2))
+        if op in ("<=", "≤"):
+            return (0, v)
+        if op == "<":
+            return (0, max(0, v - 1))
+        if op in (">=", "≥"):
+            return (v, 999)
+        return (v + 1, 999)
     m_single = re.match(r"^\s*(\d+)\b", norm)
     if m_single:
         v = int(m_single.group(1))
