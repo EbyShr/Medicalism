@@ -713,7 +713,8 @@ body.quiz-page .quiz-container {
   transform: translateY(-1px);
 }
 
-.v2-dock-btn.is-active {
+.v2-dock-btn.is-active,
+.v2-dock-btn[aria-pressed="true"] {
   background: var(--accent-primary-subtle);
   color: var(--accent-primary);
   border-color: var(--accent-primary);
@@ -1023,6 +1024,11 @@ dialog.v2-settings-dialog.is-visible .v2-settings-sheet {
 .v2-switch[aria-checked="true"]::after {
   transform: translateX(18px);
   background: #ffffff;
+}
+
+.v2-switch:focus-visible {
+  outline: 3px solid var(--accent-primary);
+  outline-offset: 3px;
 }
 
 .v2-study-stats-grid {

@@ -1,0 +1,389 @@
+/* ==========================================================================
+ * MEDICALISM ALBORZ — GOODNOTES INK & HANDWRITTEN NOTES LABS (ISOLATED CSS)
+ * Loaded dynamically ONLY when med_ink_labs_enabled === 'true' on study pages.
+ * ========================================================================== */
+
+:root {
+  --ink-auto-color: #0f172a;
+  --ink-dot-color: rgba(100, 116, 139, 0.34);
+  --ink-paper-bg: #ffffff;
+  --ink-toolbar-bg: rgba(255, 255, 255, 0.94);
+  --ink-toolbar-border: rgba(15, 23, 42, 0.14);
+}
+
+[data-theme="dark"] {
+  --ink-auto-color: #f8fafc;
+  --ink-dot-color: rgba(148, 163, 184, 0.28);
+  --ink-paper-bg: #111a2e;
+  --ink-toolbar-bg: rgba(19, 28, 49, 0.94);
+  --ink-toolbar-border: rgba(148, 163, 184, 0.24);
+}
+
+/* ==========================================================================
+ * 1. MODE A — PER-CARD VECTOR INK OVERLAY
+ * ========================================================================== */
+body.ink-labs-active .v2-section,
+body.ink-labs-active .section-card {
+  position: relative;
+}
+
+body.ink-labs-active .v2-section-header,
+body.ink-labs-active .v2-section-actions,
+body.ink-labs-active .ink-add-pad-row,
+body.ink-labs-active .ink-sketchpad-card {
+  position: relative;
+  z-index: 8;
+}
+
+.ink-card-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 6;
+  border-radius: inherit;
+  overflow: visible;
+  pointer-events: none;
+}
+
+body.ink-mode-scroll .ink-card-overlay {
+  pointer-events: none;
+  touch-action: auto;
+}
+
+body.ink-mode-draw .ink-card-overlay {
+  pointer-events: auto;
+}
+
+body.ink-mode-draw.ink-palm-on .ink-card-overlay,
+body.ink-mode-draw.ink-palm-on .ink-sketchpad-svg {
+  touch-action: pan-y pinch-zoom;
+}
+
+body.ink-mode-draw.ink-palm-off .ink-card-overlay,
+body.ink-mode-draw.ink-palm-off .ink-sketchpad-svg {
+  touch-action: none;
+}
+
+body.ink-mode-scroll .ink-sketchpad-svg {
+  touch-action: auto;
+}
+
+body.ink-mode-draw .v2-section,
+body.ink-mode-draw .section-card,
+.ink-sketchpad-card {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+body.ink-mode-pen .ink-card-overlay,
+body.ink-mode-pen .ink-sketchpad-svg,
+body.ink-mode-highlighter .ink-card-overlay,
+body.ink-mode-highlighter .ink-sketchpad-svg {
+  cursor: crosshair;
+}
+
+body.ink-mode-eraser .ink-card-overlay,
+body.ink-mode-eraser .ink-sketchpad-svg {
+  cursor: cell;
+}
+
+body.ink-labs-hidden .ink-card-overlay,
+body.ink-labs-hidden .ink-sketchpad-svg .ink-stroke {
+  opacity: 0;
+  pointer-events: none !important;
+}
+
+path.ink-stroke {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+path.ink-stroke[data-ink-color="auto"] { stroke: var(--ink-auto-color); }
+path.ink-stroke[data-ink-color="blue"] { stroke: #2563eb; }
+path.ink-stroke[data-ink-color="red"] { stroke: #ef4444; }
+path.ink-stroke[data-ink-color="green"] { stroke: #10b981; }
+path.ink-stroke[data-ink-color="amber"] { stroke: #eab308; }
+
+[data-theme="dark"] path.ink-stroke[data-ink-color="blue"] { stroke: #60a5fa; }
+[data-theme="dark"] path.ink-stroke[data-ink-color="amber"] { stroke: #facc15; }
+
+/* ==========================================================================
+ * 2. MODE B — INLINE GOODNOTES DOTTED SKETCHPAD
+ * ========================================================================== */
+.ink-add-pad-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-subtle, rgba(15, 23, 42, 0.12));
+}
+
+.ink-add-pad-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  border: 1px dashed var(--accent-primary, #0d9488);
+  background: var(--accent-primary-subtle, rgba(13, 148, 136, 0.08));
+  color: var(--accent-primary, #0d9488);
+  font-family: var(--font-current, inherit);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ink-sketchpad-card {
+  margin-top: 14px;
+  border: 1px solid var(--border-default, rgba(15, 23, 42, 0.14));
+  border-radius: 16px;
+  background: var(--ink-paper-bg);
+  box-shadow: var(--v2-card-shadow, 0 4px 16px -4px rgba(15, 23, 42, 0.08));
+  overflow: hidden;
+}
+
+.ink-sketchpad-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 14px;
+  background: var(--bg-surface-secondary, #f8fafc);
+  border-bottom: 1px solid var(--border-subtle, rgba(15, 23, 42, 0.1));
+}
+
+.ink-sketchpad-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ink-sketchpad-actions {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ink-pad-action-btn {
+  padding: 4px 9px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle, rgba(15, 23, 42, 0.14));
+  background: var(--bg-surface, #ffffff);
+  color: var(--text-secondary);
+  font-family: var(--font-current, inherit);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ink-pad-action-btn.is-danger {
+  color: var(--state-danger, #dc2626);
+  border-color: var(--state-danger-border, rgba(220, 38, 38, 0.28));
+  background: var(--state-danger-bg, rgba(220, 38, 38, 0.08));
+}
+
+.ink-sketchpad-paper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1000 / var(--pad-h, 420);
+  background-color: var(--ink-paper-bg);
+  background-image: radial-gradient(circle, var(--ink-dot-color) 1.25px, transparent 1.25px);
+  background-size: 20px 20px;
+}
+
+.ink-sketchpad-card.is-collapsed .ink-sketchpad-paper {
+  display: none;
+}
+
+.ink-sketchpad-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================================================
+ * 3. SLEEK FLOATING INK TOOLBAR (BOTTOM-CENTER)
+ * ========================================================================== */
+#v2InkToolbar {
+  position: fixed;
+  left: 50%;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 10004;
+  max-width: calc(100vw - 16px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: var(--ink-toolbar-bg);
+  border: 1px solid var(--ink-toolbar-border);
+  box-shadow: var(--shadow-lg, 0 14px 34px rgba(15, 23, 42, 0.22));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  direction: rtl;
+  font-family: var(--font-current, inherit);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ink-tb-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  max-width: 100%;
+}
+
+.ink-tb-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.ink-tb-sep {
+  display: inline-block;
+  width: 0;
+  height: 22px;
+  border-inline-start: 1px solid var(--ink-toolbar-border);
+  margin-inline: 2px;
+}
+
+.ink-tb-btn {
+  min-inline-size: 30px;
+  min-block-size: 30px;
+  padding: 4px 9px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle, rgba(15, 23, 42, 0.14));
+  background: var(--bg-surface-secondary, rgba(248, 250, 252, 0.9));
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  line-height: 1.1;
+}
+
+.ink-tb-btn[aria-pressed="true"] {
+  background: var(--accent-primary-subtle, rgba(13, 148, 136, 0.16));
+  color: var(--accent-primary, #0d9488);
+  border-color: var(--accent-primary, #0d9488);
+  box-shadow: 0 0 0 2px var(--accent-primary, #0d9488);
+  font-weight: 800;
+}
+
+.ink-tb-btn[aria-disabled="true"] {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.ink-tb-btn:focus-visible,
+.ink-color-btn:focus-visible,
+.ink-pad-action-btn:focus-visible,
+.ink-add-pad-btn:focus-visible {
+  outline: 3px solid var(--accent-primary, #0d9488);
+  outline-offset: 2px;
+}
+
+.ink-tb-close {
+  background: var(--state-danger-bg, rgba(220, 38, 38, 0.1));
+  color: var(--state-danger, #dc2626);
+  border-color: var(--state-danger-border, rgba(220, 38, 38, 0.28));
+}
+
+.ink-color-btn {
+  min-inline-size: 26px;
+  min-block-size: 26px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid var(--border-default, rgba(15, 23, 42, 0.25));
+  cursor: pointer;
+  position: relative;
+}
+
+.ink-color-btn[data-ink-color="auto"] { background: var(--ink-auto-color); }
+.ink-color-btn[data-ink-color="blue"] { background: #2563eb; }
+.ink-color-btn[data-ink-color="red"] { background: #ef4444; }
+.ink-color-btn[data-ink-color="green"] { background: #10b981; }
+.ink-color-btn[data-ink-color="amber"] { background: #eab308; }
+
+.ink-color-btn[aria-pressed="true"] {
+  border-color: var(--bg-surface, #ffffff);
+  box-shadow: 0 0 0 2.5px var(--accent-primary, #0d9488);
+  transform: scale(1.12);
+}
+
+#v2InkLiveStatus {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (pointer: coarse) {
+  .ink-tb-btn {
+    min-inline-size: 36px;
+    min-block-size: 36px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .ink-color-btn {
+    min-inline-size: 34px;
+    min-block-size: 34px;
+  }
+}
+
+@media (hover: hover) {
+  .ink-tb-btn:not([aria-disabled="true"]):hover,
+  .ink-pad-action-btn:hover,
+  .ink-add-pad-btn:hover {
+    border-color: var(--accent-primary, #0d9488);
+    transform: translateY(-1px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes inkToolbarIn {
+    from { opacity: 0; transform: translate(-50%, 16px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+  #v2InkToolbar {
+    animation: inkToolbarIn 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ink-tb-btn,
+  .ink-color-btn,
+  .ink-pad-action-btn,
+  .ink-add-pad-btn {
+    transition: transform 130ms ease, background-color 130ms ease, border-color 130ms ease, box-shadow 130ms ease;
+  }
+}
+
+@media (forced-colors: active) {
+  .ink-tb-btn[aria-pressed="true"],
+  .ink-color-btn[aria-pressed="true"] {
+    outline: 2px solid Highlight;
+    background: Highlight;
+    color: HighlightText;
+  }
+  .ink-tb-sep {
+    border-inline-start-color: ButtonText;
+  }
+}

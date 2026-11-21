@@ -29,6 +29,10 @@
     'med_font_family',
     'med_font_scale',
     'med_reduced_motion',
+    'med_brush_highlight_mode',
+    'med_ink_labs_enabled',
+    'med_ink_palm_rejection',
+    'medicalism_ink_labs_v1',
     'medicalism_exam_cram_mode',
     'rad_exam_mode',
     'med_bookmarks',
@@ -246,6 +250,61 @@
     syncDrawerControls();
   }
 
+  var BRUSH_KEY = 'med_brush_highlight_mode', INK_KEY = 'med_ink_labs_enabled', lazyBusy = {};
+  function isBrushMode() { return safeGet(BRUSH_KEY, 'false') === 'true'; }
+  function isInkLabs() { return safeGet(INK_KEY, 'false') === 'true'; }
+  function getReadingEl() { return document.querySelector('#chapterContentArea,#main-content,.chapter-content'); }
+  function loadLazyScript(id, src, cb) {
+    if (document.getElementById(id) || lazyBusy[id] || !document.head) return;
+    lazyBusy[id] = 1;
+    var s = document.createElement('script');
+    s.id = id; s.src = src; s.async = true;
+    s.onload = function () { lazyBusy[id] = 0; cb && cb(); };
+    s.onerror = function () { lazyBusy[id] = 0; };
+    document.head.appendChild(s);
+  }
+  function applyBrushMode(enabled, persist) {
+    var on = !!enabled, b = document.body, pop = document.getElementById('highlightPopover'), eng = window.MedicalismBrushEngine;
+    if (persist) safeSet(BRUSH_KEY, on ? 'true' : 'false');
+    if (on && isInkLabs()) applyInkLabs(false, true);
+    if (b) { b.classList.toggle('brush-highlight-mode', on); if (!on) delete b.dataset.brushTool; }
+    if (on) {
+      try { window.getSelection().removeAllRanges(); } catch (e) {}
+      if (pop) pop.style.display = 'none';
+      if (getReadingEl()) {
+        if (eng) eng.activate();
+        else loadLazyScript('v2-brush-js', './js/brush-highlighter.js?v=20261121e', function () {
+          if (isBrushMode() && window.MedicalismBrushEngine) window.MedicalismBrushEngine.activate();
+        });
+      }
+    } else if (eng) eng.deactivate();
+    try { window.dispatchEvent(new CustomEvent('brushHighlightModeChanged', { detail: { active: on } })); } catch (e) {}
+    syncDrawerControls();
+    if (persist) showToast(on ? '🖍️ حالت ماژیک مستقیم فعال شد' : 'حالت ماژیک مستقیم غیرفعال شد');
+    return on;
+  }
+  function applyInkLabs(enabled, persist) {
+    var on = !!enabled, eng = window.MedicalismInkLabs;
+    if (persist) safeSet(INK_KEY, on ? 'true' : 'false');
+    if (on && isBrushMode()) applyBrushMode(false, true);
+    if (on && getReadingEl()) {
+      if (!document.getElementById('v2-ink-labs-css') && document.head) {
+        var ln = document.createElement('link');
+        ln.id = 'v2-ink-labs-css'; ln.rel = 'stylesheet'; ln.href = './css/ink-labs.css?v=20261121e';
+        document.head.appendChild(ln);
+      }
+      if (eng) eng.enable();
+      else loadLazyScript('v2-ink-labs-js', './js/ink-labs.js?v=20261121e', function () {
+        if (isInkLabs() && window.MedicalismInkLabs) window.MedicalismInkLabs.enable();
+      });
+    } else if (!on && eng) {
+      eng.disable();
+    }
+    syncDrawerControls();
+    if (persist) showToast(on ? '✍️ آزمایشگاه قلم و دستخط فعال شد' : 'آزمایشگاه قلم غیرفعال شد');
+    return on;
+  }
+
   /* ========================================================================
    * 3. LOCAL BACKUP / RESTORE & CLOUD SYNC HOOK (window.MedicalismSync)
    * ======================================================================== */
@@ -366,6 +425,30 @@
             appliedKeys++;
             return;
           }
+          if (k === 'medicalism_ink_labs_v1') {
+            var curInk = parseJsonSafe(safeGet(k, '{}'), {}), incInk = parseJsonSafe(strVal, {});
+            var cCh = (curInk && curInk.chapters) || {}, iCh = (incInk && incInk.chapters) || {}, byId = function (x) { return x && x.id; };
+            Object.keys(iCh).forEach(function (cid) {
+              var tc = cCh[cid] = cCh[cid] || { overlays: {}, sketchpads: {} }, sc = iCh[cid] || {};
+              tc.overlays = tc.overlays || {}; tc.sketchpads = tc.sketchpads || {};
+              Object.keys(sc.overlays || {}).forEach(function (sid) {
+                var a = tc.overlays[sid] || {}, b = sc.overlays[sid] || {};
+                tc.overlays[sid] = { vw: b.vw || a.vw || 1000, vh: b.vh || a.vh || 600, strokes: mergeArraysUnique(a.strokes, b.strokes, byId) };
+              });
+              Object.keys(sc.sketchpads || {}).forEach(function (sid) {
+                var tp = tc.sketchpads[sid] = tc.sketchpads[sid] || [], sp = sc.sketchpads[sid] || [];
+                sp.forEach(function (np) {
+                  if (!np || !np.id) return;
+                  var ex = tp.find(function (p) { return p && p.id === np.id; });
+                  if (ex) { ex.strokes = mergeArraysUnique(ex.strokes, np.strokes, byId); ex.height = Math.max(ex.height || 420, np.height || 420); }
+                  else tp.push(np);
+                });
+              });
+            });
+            safeSet(k, JSON.stringify({ schemaVersion: '1.0', chapters: cCh }));
+            appliedKeys++;
+            return;
+          }
           if (k === 'med_bookmarks' || k === 'med_completed_chapters' || k.indexOf('med_quiz_flags_') === 0) {
             var curArr = parseJsonSafe(safeGet(k, '[]'), []);
             var incArr = parseJsonSafe(strVal, []);
@@ -393,6 +476,9 @@
       applyFontFamily(getFontFamily(), false);
       applyFontScale(getFontScale(), false);
       applyReducedMotion(safeGet('med_reduced_motion', 'false') === 'true', false);
+      applyBrushMode(isBrushMode(), false);
+      applyInkLabs(isInkLabs(), false);
+      if (window.MedicalismInkLabs && window.MedicalismInkLabs.refresh) try { window.MedicalismInkLabs.refresh(); } catch (e) {}
 
       if (window.StudyFeatures) {
         try {
@@ -488,12 +574,7 @@
       '<div class="v2-settings-sheet" role="document">' +
         '<div class="v2-settings-header">' +
           '<div class="v2-settings-title-wrap">' +
-            '<div class="v2-settings-icon-box" aria-hidden="true">' +
-              '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">' +
-                '<circle cx="12" cy="12" r="3"></circle>' +
-                '<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>' +
-              '</svg>' +
-            '</div>' +
+            '<div class="v2-settings-icon-box" aria-hidden="true"><span>⚙️</span></div>' +
             '<div>' +
               '<h2 class="v2-settings-title">تنظیمات و پروفایل مطالعه</h2>' +
               '<div class="v2-settings-subtitle">ذخیره خودکار در مرورگر • همگام‌سازی سراسری</div>' +
@@ -552,6 +633,12 @@
                 (hasBookmarks ? '<button type="button" class="v2-study-stat-btn" id="v2OpenBookmarksBtn"><span>🔖 نشانک‌ها</span><span class="v2-study-stat-count" id="v2DrawerBmCount">۰</span></button>' : '') +
               '</div>'
             ) : '') +
+          '</section>' +
+
+          '<section class="v2-settings-section" aria-label="آزمایشگاه امکانات">' +
+            '<div class="v2-settings-section-label"><span>🧪 آزمایشگاه امکانات (Labs)</span></div>' +
+            '<div class="v2-toggle-row"><div><div class="v2-toggle-label">🧪 حالت ماژیک مستقیم (حذف منوی پیشفرض مرورگر — آزمایشی)</div><div class="v2-toggle-hint">جلوگیری کامل از باز شدن منوی کپی/جستجوی اندروید، آیفون و ویندوز هنگام هایلایت کردن</div></div><button type="button" class="v2-switch" id="v2BrushModeSwitch" role="switch" aria-checked="false" aria-label="حالت ماژیک مستقیم"></button></div>' +
+            '<div class="v2-toggle-row"><div><div class="v2-toggle-label">✍️ قلم و دستخط آزمایشی (GoodNotes Ink Labs)</div><div class="v2-toggle-hint">حاشیه‌نویسی مستقیم روی کارت‌ها و برگه نقطه‌ای چسبان با پشتیبانی از قلم تبلت</div></div><button type="button" class="v2-switch" id="v2InkLabsSwitch" role="switch" aria-checked="false" aria-label="قلم و دستخط آزمایشی"></button></div>' +
           '</section>' +
 
           /* 4. Profile Backup / Restore + Cloud Hook */
@@ -692,29 +779,19 @@
       });
     }
 
-    // Study modal shortcuts
-    var hlShortcut = dialogEl.querySelector('#v2OpenHighlightsBtn');
-    if (hlShortcut) {
-      hlShortcut.addEventListener('click', function () {
-        closeSettingsDrawer();
-        setTimeout(function () {
-          var trigger = document.getElementById('highlightsToggleBtn');
-          if (trigger) trigger.click();
-          else if (window.StudyFeatures && window.StudyFeatures.openHighlightsModal) window.StudyFeatures.openHighlightsModal();
-        }, 250);
-      });
-    }
+    var brushSw = dialogEl.querySelector('#v2BrushModeSwitch'), inkSw = dialogEl.querySelector('#v2InkLabsSwitch');
+    if (brushSw) brushSw.addEventListener('click', function () { applyBrushMode(!isBrushMode(), true); });
+    if (inkSw) inkSw.addEventListener('click', function () { applyInkLabs(!isInkLabs(), true); });
 
-    var bmShortcut = dialogEl.querySelector('#v2OpenBookmarksBtn');
-    if (bmShortcut) {
-      bmShortcut.addEventListener('click', function () {
-        closeSettingsDrawer();
-        setTimeout(function () {
-          var trigger = document.getElementById('bookmarksToggleBtn');
-          if (trigger) trigger.click();
-        }, 250);
-      });
-    }
+    var hlS = dialogEl.querySelector('#v2OpenHighlightsBtn'), bmS = dialogEl.querySelector('#v2OpenBookmarksBtn');
+    if (hlS) hlS.addEventListener('click', function () {
+      closeSettingsDrawer();
+      setTimeout(function () { var t = document.getElementById('highlightsToggleBtn'); if (t) t.click(); else if (window.StudyFeatures && window.StudyFeatures.openHighlightsModal) window.StudyFeatures.openHighlightsModal(); }, 250);
+    });
+    if (bmS) bmS.addEventListener('click', function () {
+      closeSettingsDrawer();
+      setTimeout(function () { var t = document.getElementById('bookmarksToggleBtn'); if (t) t.click(); }, 250);
+    });
 
     // Backup Export / Import
     var exportBtn = dialogEl.querySelector('#v2ExportProfileBtn');
@@ -752,6 +829,7 @@
   }
 
   function syncDrawerControls() {
+    syncQuickDock();
     if (!dialogEl) return;
     var pref = getThemePreference();
     var resolved = resolveTheme(pref);
@@ -786,6 +864,10 @@
       motionSw.setAttribute('aria-checked', document.documentElement.classList.contains('v2-reduced-motion') ? 'true' : 'false');
     }
 
+    var brushSw = dialogEl.querySelector('#v2BrushModeSwitch'), inkSw = dialogEl.querySelector('#v2InkLabsSwitch');
+    if (brushSw) brushSw.setAttribute('aria-checked', isBrushMode() ? 'true' : 'false');
+    if (inkSw) inkSw.setAttribute('aria-checked', isInkLabs() ? 'true' : 'false');
+
     // Study Counts
     try {
       var hlArr = JSON.parse(safeGet('medicalism_highlights_v1', '[]') || '[]');
@@ -803,7 +885,6 @@
       }
     } catch (e) {}
 
-    syncQuickDock();
   }
 
   /* ========================================================================
@@ -826,10 +907,7 @@
     dock.setAttribute('aria-label', 'دسترسی سریع ابزارهای مطالعه');
 
     var html = '';
-    if (hasHl) {
-      html += '<button type="button" class="v2-dock-btn" data-dock-target="#highlightsToggleBtn" title="هایلایت‌های من" aria-label="هایلایت‌های من">' +
-        '<span>🖍️</span><span class="v2-dock-badge" id="v2DockHlBadge"></span></button>';
-    }
+    if (hasHl) html += '<button type="button" class="v2-dock-btn" id="v2DockBrushBtn" aria-pressed="false" title="حالت ماژیک مستقیم (روشن/خاموش)" aria-label="حالت ماژیک مستقیم"><span>🖍️</span></button><button type="button" class="v2-dock-btn" data-dock-target="#highlightsToggleBtn" title="لیست هایلایت‌های من" aria-label="لیست هایلایت‌های من"><span>📋</span><span class="v2-dock-badge" id="v2DockHlBadge"></span></button>';
     if (hasCram) {
       html += '<button type="button" class="v2-dock-btn" id="v2DockCramBtn" data-dock-target="#examCramToggleBtn" title="حالت مرور سریع / شب امتحان" aria-label="حالت مرور سریع">' +
         '<span>⚡</span></button>';
@@ -848,14 +926,11 @@
     document.body.appendChild(dock);
     document.body.classList.add('has-v2-quick-dock');
 
-    dock.querySelectorAll('.v2-dock-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var sel = btn.getAttribute('data-dock-target');
-        var target = sel ? document.querySelector(sel) : null;
-        if (target) target.click();
-      });
+    var db = dock.querySelector('#v2DockBrushBtn');
+    if (db) db.addEventListener('click', function () { applyBrushMode(!isBrushMode(), true); });
+    dock.querySelectorAll('.v2-dock-btn[data-dock-target]').forEach(function (btn) {
+      btn.addEventListener('click', function () { var t = document.querySelector(btn.getAttribute('data-dock-target')); if (t) t.click(); });
     });
-
     syncQuickDock();
   }
 
@@ -887,6 +962,9 @@
       dockCram.style.display = hidden ? 'none' : 'inline-flex';
       dockCram.classList.toggle('is-active', cramSrc.classList.contains('is-active'));
     }
+
+    var db = dock.querySelector('#v2DockBrushBtn');
+    if (db) { var ba = isBrushMode(); db.setAttribute('aria-pressed', ba ? 'true' : 'false'); db.classList.toggle('is-active', ba); }
   }
 
   /* ========================================================================
@@ -918,6 +996,9 @@
     else if (e.key === 'med_font_family') applyFontFamily(getFontFamily(), false);
     else if (e.key === 'med_font_scale') applyFontScale(getFontScale(), false);
     else if (e.key === 'med_reduced_motion') applyReducedMotion(e.newValue === 'true', false);
+    else if (e.key === BRUSH_KEY) applyBrushMode(isBrushMode(), false);
+    else if (e.key === INK_KEY) applyInkLabs(isInkLabs(), false);
+    else if (e.key === 'medicalism_ink_labs_v1' && window.MedicalismInkLabs && window.MedicalismInkLabs.refresh) window.MedicalismInkLabs.refresh();
     else if (e.key === 'medicalism_highlights_v1' || e.key === 'med_bookmarks') syncDrawerControls();
   });
 
@@ -926,6 +1007,8 @@
     applyFontScale(getFontScale(), false);
     initReadingProgressGPU();
     ensureQuickDock();
+    if (isBrushMode() && getReadingEl()) applyBrushMode(true, false);
+    if (isInkLabs() && getReadingEl()) applyInkLabs(true, false);
 
     document.addEventListener('click', function (e) {
       var trigger = e.target && e.target.closest ? e.target.closest('[data-v2-settings-trigger], #v2SettingsBtn') : null;
@@ -955,6 +1038,11 @@
     getFontFamily: getFontFamily,
     setFontScale: function (scale) { return applyFontScale(scale, true); },
     getFontScale: getFontScale,
+    setBrushMode: function (on) { return applyBrushMode(on, true); },
+    toggleBrushMode: function () { return applyBrushMode(!isBrushMode(), true); },
+    isBrushMode: isBrushMode,
+    setInkLabs: function (on) { return applyInkLabs(on, true); },
+    isInkLabs: isInkLabs,
     syncDock: syncQuickDock,
     showToast: showToast
   };

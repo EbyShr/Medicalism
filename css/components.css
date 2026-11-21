@@ -1774,3 +1774,30 @@ mark.user-highlight[data-color="blue"] {
 .exam-cram-mode mark.user-highlight {
   display: inline !important;
 }
+
+/* Part 1 Anti-Collision Bottom Bar & Part 2 Direct Brush Selection Suppression */
+.highlight-popover.popover-bottom-dock {
+  position: fixed !important;
+  left: 50% !important;
+  top: auto !important;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+  transform: translateX(-50%) !important;
+  padding: 8px 14px !important;
+  gap: 10px !important;
+  max-width: calc(100vw - 24px);
+  z-index: 10002;
+}
+.highlight-popover.popover-bottom-dock .swatch-btn { min-inline-size: 34px; min-block-size: 34px; }
+@media (pointer: coarse) {
+  .highlight-popover .swatch-btn { min-inline-size: 34px; min-block-size: 34px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes v2PillSlideUp { from { opacity: 0; transform: translate(-50%, 16px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  .highlight-popover.popover-bottom-dock { animation: v2PillSlideUp 180ms cubic-bezier(0.16, 1, 0.3, 1); }
+}
+body.brush-highlight-mode #chapterContentArea,
+body.brush-highlight-mode #main-content,
+body.brush-highlight-mode .chapter-content { user-select: none !important; -webkit-user-select: none !important; -webkit-touch-callout: none !important; cursor: text; }
+body.brush-highlight-mode[data-brush-tool="eraser"] #chapterContentArea,
+body.brush-highlight-mode[data-brush-tool="eraser"] #main-content,
+body.brush-highlight-mode[data-brush-tool="eraser"] .chapter-content { cursor: pointer; }

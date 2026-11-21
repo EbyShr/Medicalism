@@ -565,7 +565,21 @@ window.StudyFeatures = {
     this.positionPopover(popover, rect);
   },
 
+  isBottomBarMode() {
+    return window.innerWidth < 1024 || (typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches);
+  },
+
   positionPopover(popover, rect) {
+    if (this.isBottomBarMode()) {
+      popover.style.display = 'flex';
+      popover.style.left = '';
+      popover.style.top = '';
+      popover.classList.remove('popover-below');
+      popover.classList.add('popover-bottom-dock');
+      return;
+    }
+
+    popover.classList.remove('popover-bottom-dock');
     popover.style.display = 'flex';
     const popoverWidth = popover.offsetWidth || 190;
     const popoverHeight = popover.offsetHeight || 38;
@@ -595,45 +609,32 @@ window.StudyFeatures = {
     const popover = document.getElementById('highlightPopover');
     if (popover) {
       popover.style.display = 'none';
+      popover.classList.remove('popover-bottom-dock');
     }
     this._activeRange = null;
     this._activeMark = null;
   },
 
-  applyHighlightColor(color) {
-    // 1. Changing color of an existing highlight
-    if (this._activeMark) {
-      const id = this._activeMark.getAttribute('data-id');
-      this._activeMark.setAttribute('data-color', color);
-      const highlights = this.getHighlights();
-      const item = highlights.find(h => h.id === id);
-      if (item) {
-        item.color = color;
-        this.saveHighlights(highlights);
-      }
-      this.hideHighlightPopover();
-      if (typeof window.showToast === 'function') {
-        window.showToast('رنگ هایلایت تغییر یافت');
-      }
-      return;
+  recolorHighlightMark(mark, color, opts) {
+    if (!mark) return false;
+    const id = mark.getAttribute('data-id');
+    mark.setAttribute('data-color', color);
+    const highlights = this.getHighlights();
+    const item = highlights.find(h => h.id === id);
+    if (item) {
+      item.color = color;
+      this.saveHighlights(highlights);
     }
+    if ((!opts || !opts.silent) && typeof window.showToast === 'function') {
+      window.showToast('رنگ هایلایت تغییر یافت');
+    }
+    return true;
+  },
 
-    // 2. Creating a new highlight from selection
-    const selection = window.getSelection();
-    let range = this._activeRange;
-    if (!range && selection && selection.rangeCount > 0) {
-      range = selection.getRangeAt(0);
-    }
-    if (!range) {
-      this.hideHighlightPopover();
-      return;
-    }
-
+  createHighlightFromRange(range, color, opts) {
+    if (!range) return null;
     const text = range.toString().trim();
-    if (!text) {
-      this.hideHighlightPopover();
-      return;
-    }
+    if (!text) return null;
 
     const highlightId = 'hl_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
     const chapterId = window.appState ? window.appState.activeChapterId : 'ch-27';
@@ -658,7 +659,7 @@ window.StudyFeatures = {
 
     const mark = document.createElement('mark');
     mark.className = 'user-highlight';
-    mark.setAttribute('data-color', color);
+    mark.setAttribute('data-color', color || 'yellow');
     mark.setAttribute('data-id', highlightId);
     mark.setAttribute('title', 'برای ویرایش یا حذف کلیک کنید');
 
@@ -677,33 +678,80 @@ window.StudyFeatures = {
       }
     }
 
-    if (wrapped) {
-      this.attachMarkEvents(mark);
+    if (!wrapped) return null;
 
-      const highlights = this.getHighlights();
-      highlights.push({
-        id: highlightId,
-        chapterId,
-        sectionId: secId,
-        sectionTitle: secTitle,
-        chapterTitle,
-        color,
-        text,
-        prefix,
-        suffix,
-        createdAt: Date.now()
-      });
-      this.saveHighlights(highlights);
+    this.attachMarkEvents(mark);
 
-      if (this.isExamCramModeActive() && block) {
-        block.classList.add('cram-keep-visible');
-      }
+    const highlights = this.getHighlights();
+    highlights.push({
+      id: highlightId,
+      chapterId,
+      sectionId: secId,
+      sectionTitle: secTitle,
+      chapterTitle,
+      color: color || 'yellow',
+      text,
+      prefix,
+      suffix,
+      createdAt: Date.now()
+    });
+    this.saveHighlights(highlights);
 
-      if (typeof window.showToast === 'function') {
-        window.showToast('متن با موفقیت هایلایت شد ✓');
-      }
+    if (this.isExamCramModeActive() && block) {
+      block.classList.add('cram-keep-visible');
     }
 
+    if ((!opts || !opts.silent) && typeof window.showToast === 'function') {
+      window.showToast('متن با موفقیت هایلایت شد ✓');
+    }
+
+    return mark;
+  },
+
+  deleteHighlightMark(mark, opts) {
+    if (!mark) return false;
+    const id = mark.getAttribute('data-id');
+    const parent = mark.parentNode;
+    if (parent) {
+      while (mark.firstChild) {
+        parent.insertBefore(mark.firstChild, mark);
+      }
+      parent.removeChild(mark);
+      parent.normalize();
+    }
+
+    const highlights = this.getHighlights().filter(h => h.id !== id);
+    this.saveHighlights(highlights);
+
+    if (this._activeMark === mark) {
+      this.hideHighlightPopover();
+    }
+    if ((!opts || !opts.silent) && typeof window.showToast === 'function') {
+      window.showToast('هایلایت حذف شد');
+    }
+    return true;
+  },
+
+  applyHighlightColor(color) {
+    // 1. Changing color of an existing highlight
+    if (this._activeMark) {
+      this.recolorHighlightMark(this._activeMark, color);
+      this.hideHighlightPopover();
+      return;
+    }
+
+    // 2. Creating a new highlight from selection
+    const selection = window.getSelection();
+    let range = this._activeRange;
+    if (!range && selection && selection.rangeCount > 0) {
+      range = selection.getRangeAt(0);
+    }
+    if (!range) {
+      this.hideHighlightPopover();
+      return;
+    }
+
+    this.createHighlightFromRange(range, color);
     this.hideHighlightPopover();
     if (window.getSelection) {
       window.getSelection().removeAllRanges();
@@ -715,24 +763,8 @@ window.StudyFeatures = {
       this.hideHighlightPopover();
       return;
     }
-
-    const id = this._activeMark.getAttribute('data-id');
-    const parent = this._activeMark.parentNode;
-    if (parent) {
-      while (this._activeMark.firstChild) {
-        parent.insertBefore(this._activeMark.firstChild, this._activeMark);
-      }
-      parent.removeChild(this._activeMark);
-      parent.normalize();
-    }
-
-    const highlights = this.getHighlights().filter(h => h.id !== id);
-    this.saveHighlights(highlights);
-
+    this.deleteHighlightMark(this._activeMark);
     this.hideHighlightPopover();
-    if (typeof window.showToast === 'function') {
-      window.showToast('هایلایت حذف شد');
-    }
   },
 
   deleteHighlightById(id) {
@@ -757,6 +789,7 @@ window.StudyFeatures = {
   attachMarkEvents(mark) {
     if (!mark) return;
     mark.addEventListener('click', (e) => {
+      if (document.body.classList.contains('brush-highlight-mode')) return;
       e.stopPropagation();
       e.preventDefault();
       this.showPopoverForMark(mark);
@@ -901,9 +934,11 @@ window.StudyFeatures = {
       console.warn('Highlights badge update warning:', e);
     }
 
-    // 1. Listen for mouseup / touchend inside chapter content
+    // 1. Listen for mouseup / touchend / selectionchange inside chapter content
+    const READING_SEL = '#chapterContentArea, .chapter-content, #main-content';
     const onSelectionCheck = () => {
       setTimeout(() => {
+        if (document.body.classList.contains('brush-highlight-mode')) return;
         const selection = window.getSelection();
         if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
           return;
@@ -913,7 +948,7 @@ window.StudyFeatures = {
         if (text.length < 2) return;
 
         const range = selection.getRangeAt(0);
-        const container = document.querySelector('#chapterContentArea, .chapter-content, #main-content');
+        const container = document.querySelector(READING_SEL);
         if (!container || !container.contains(range.commonAncestorContainer)) {
           return;
         }
@@ -923,15 +958,54 @@ window.StudyFeatures = {
     };
 
     document.addEventListener('mouseup', (e) => {
+      if (document.body.classList.contains('brush-highlight-mode')) return;
       if (e.target && e.target.closest && e.target.closest('#highlightPopover')) return;
       if (e.target && e.target.closest && e.target.closest('mark.user-highlight')) return;
       onSelectionCheck();
     });
 
     document.addEventListener('touchend', (e) => {
+      if (document.body.classList.contains('brush-highlight-mode')) return;
       if (e.target && e.target.closest && e.target.closest('#highlightPopover')) return;
       if (e.target && e.target.closest && e.target.closest('mark.user-highlight')) return;
       onSelectionCheck();
+    });
+
+    let selTimer = null;
+    document.addEventListener('selectionchange', () => {
+      if (document.body.classList.contains('brush-highlight-mode')) return;
+      if (!this.isBottomBarMode()) return;
+      clearTimeout(selTimer);
+      selTimer = setTimeout(() => {
+        const selection = window.getSelection();
+        if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
+          if (this._activeRange && !this._activeMark) {
+            this.hideHighlightPopover();
+          }
+          return;
+        }
+        const text = selection.toString().trim();
+        if (text.length < 2) return;
+        const range = selection.getRangeAt(0);
+        const container = document.querySelector(READING_SEL);
+        if (container && container.contains(range.commonAncestorContainer)) {
+          this.showPopoverForSelection(range);
+        }
+      }, 140);
+    });
+
+    // Reduce Android / browser context-menu collision on active text selections inside reading content
+    document.addEventListener('contextmenu', (e) => {
+      const container = document.querySelector(READING_SEL);
+      if (!container || !container.contains(e.target)) return;
+      if (document.body.classList.contains('brush-highlight-mode')) {
+        e.preventDefault();
+        return;
+      }
+      const selection = window.getSelection();
+      if (selection && !selection.isCollapsed && selection.toString().trim().length > 0) {
+        e.preventDefault();
+      }
     });
 
     // 2. Hide popover when clicking elsewhere

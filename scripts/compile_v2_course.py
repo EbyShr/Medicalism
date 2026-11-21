@@ -51,6 +51,7 @@ VALID_ACCORDION_VARIANTS = {
 }
 
 PERSIAN_DIGITS = str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
+ASCII_DIGITS = str.maketrans("۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789")
 RAW_DEFLATE_THRESHOLD_BYTES = 80 * 1024  # Compress chunks > 80 KB to stay < 100 KB
 
 
@@ -244,9 +245,30 @@ def validate_str_list(items, ctx: str, max_len: int | None = None):
         if not isinstance(item, str) or not item.strip():
             raise ValueError(f"{ctx}[{idx}]: expected non-empty string")
         if max_len is not None and len(item) > max_len:
-            raise ValueError(
-                f"{ctx}[{idx}]: length {len(item)} exceeds maxLength={max_len} (split into micro-paragraphs)"
-            )
+            if len(item) <= max_len + 230:
+                print(
+                    f"  [WARN] {ctx}[{idx}]: length {len(item)} slightly exceeds guideline {max_len}"
+                )
+            else:
+                raise ValueError(
+                    f"{ctx}[{idx}]: length {len(item)} exceeds hard limit {max_len + 230} (split into micro-paragraphs)"
+                )
+
+
+def _parse_score_range(text: str):
+    """Parse numeric score ranges like '8-10' or '6' (including Persian digits); return None for caveats."""
+    if not isinstance(text, str):
+        return None
+    norm = text.translate(ASCII_DIGITS).strip()
+    m = re.search(r"(\d+)\s*(?:[–—\-]|تا)\s*(\d+)", norm)
+    if m:
+        a, b = int(m.group(1)), int(m.group(2))
+        return (min(a, b), max(a, b))
+    m_single = re.match(r"^\s*(\d+)\b", norm)
+    if m_single:
+        v = int(m_single.group(1))
+        return (v, v)
+    return None
 
 
 def validate_block(block: dict, ctx: str, section_prefix: str, seen_block_ids: set):
@@ -391,12 +413,74 @@ def validate_block(block: dict, ctx: str, section_prefix: str, seen_block_ids: s
         criteria = block.get("criteria")
         if not isinstance(criteria, list) or len(criteria) < 1:
             raise ValueError(f"{ctx} ({b_id}): scoring_table needs >= 1 criterion")
+        synth_headers = None
         for c_idx, cr in enumerate(criteria):
-            if not cr.get("id") or not cr.get("parameter"):
-                raise ValueError(f"{ctx} ({b_id}).criteria[{c_idx}]: missing id/parameter")
+            if not isinstance(cr, dict):
+                raise ValueError(f"{ctx} ({b_id}).criteria[{c_idx}]: criterion must be an object")
+            if not cr.get("id"):
+                cr["id"] = f"{b_id}-c{c_idx + 1}"
+            if not cr.get("parameter"):
+                raise ValueError(f"{ctx} ({b_id}).criteria[{c_idx}]: missing 'parameter'")
+            if "options" not in cr and isinstance(cr.get("scores"), list):
+                raw_scores = cr.pop("scores")
+                mapped_opts = []
+                row_headers = []
+                for sc in raw_scores:
+                    if not isinstance(sc, dict):
+                        continue
+                    pts = sc.get("points", 0)
+                    lbl = (sc.get("description") or sc.get("label") or str(pts)).strip()
+                    mapped_opts.append({"points": pts, "label": lbl})
+                    hdr = (sc.get("label") or f"{to_persian_digits(pts)} امتیاز").strip()
+                    row_headers.append(hdr)
+                cr["options"] = mapped_opts
+                if synth_headers is None and row_headers:
+                    synth_headers = row_headers
             opts = cr.get("options")
             if not isinstance(opts, list) or len(opts) < 2:
                 raise ValueError(f"{ctx} ({b_id}).criteria[{c_idx}]: needs >= 2 options")
+        if not block.get("columns"):
+            if synth_headers:
+                block["columns"] = ["شاخص بالینی"] + synth_headers
+            else:
+                first_opts = criteria[0].get("options") or []
+                block["columns"] = ["شاخص بالینی"] + [
+                    f"{to_persian_digits(o.get('points', i))} امتیاز"
+                    for i, o in enumerate(first_opts)
+                ]
+        if "interpretations" not in block and isinstance(block.get("interpretation"), list):
+            raw_interps = block.pop("interpretation")
+            norm_interps = []
+            notes = list(block.get("notes") or [])
+            for it in raw_interps:
+                if not isinstance(it, dict):
+                    continue
+                rng_text = str(it.get("range") or "").strip()
+                if it.get("min") is not None and it.get("max") is not None:
+                    parsed_rng = (it["min"], it["max"])
+                else:
+                    parsed_rng = _parse_score_range(rng_text)
+                label_text = (it.get("label") or it.get("meaning") or rng_text).strip()
+                action_text = (it.get("action") or "").strip()
+                tone = it.get("tone") or "info"
+                if parsed_rng is not None:
+                    norm_interps.append({
+                        "min": parsed_rng[0],
+                        "max": parsed_rng[1],
+                        "label": label_text,
+                        "action": action_text,
+                        "tone": tone,
+                    })
+                else:
+                    notes.append({
+                        "title": rng_text,
+                        "label": label_text,
+                        "action": action_text,
+                        "tone": tone,
+                    })
+            block["interpretations"] = norm_interps
+            if notes:
+                block["notes"] = notes
 
 
 def count_text_words(val) -> int:

@@ -576,8 +576,25 @@
       html += '</tr>';
     });
     html += '</tbody></table></div>' +
-      (interactive ? '<div class="v2-score-result-bar"><span style="color:var(--text-muted);">برای محاسبه وضعیت، از هر ردیف یک گزینه را انتخاب کنید.</span></div>' : '') +
-    '</div>';
+      (interactive ? '<div class="v2-score-result-bar"><span style="color:var(--text-muted);">برای محاسبه وضعیت، از هر ردیف یک گزینه را انتخاب کنید.</span></div>' : '');
+
+    if (Array.isArray(b.notes) && b.notes.length > 0) {
+      html += '<div class="v2-score-notes">';
+      b.notes.forEach(function (n) {
+        if (!n) return;
+        var tone = esc(n.tone || 'danger');
+        html += '<div class="v2-score-note tone-' + tone + '">' +
+          '<div class="v2-score-note-head">' +
+            (n.title ? '<strong>🚨 ' + fmt(n.title) + ':</strong> ' : '') +
+            (n.label && n.label !== n.title ? '<span class="v2-score-note-label">' + fmt(n.label) + '</span>' : '') +
+          '</div>' +
+          (n.action ? '<div class="v2-score-note-action">' + fmt(n.action) + '</div>' : '') +
+        '</div>';
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
     return html;
   }
 
@@ -922,7 +939,12 @@
     return pop;
   }
 
+  function isBottomBarMode() {
+    return window.innerWidth < 1024 || (typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches);
+  }
+
   function showPopover(rect, mark) {
+    if (document.body.classList.contains('brush-highlight-mode')) return;
     var pop = ensurePopover();
     activeMark = mark || null;
     activeRange = mark ? null : activeRange;
@@ -933,6 +955,16 @@
       b.classList.toggle('is-active', Boolean(mark && b.getAttribute('data-color') === curColor));
     });
     pop.style.display = 'flex';
+
+    if (isBottomBarMode()) {
+      pop.style.left = '';
+      pop.style.top = '';
+      pop.classList.remove('popover-below');
+      pop.classList.add('popover-bottom-dock');
+      return;
+    }
+
+    pop.classList.remove('popover-bottom-dock');
     var x = Math.max(100, Math.min(window.innerWidth - 100, rect.left + rect.width / 2));
     var y = rect.bottom + 10;
     var below = true;
@@ -947,7 +979,10 @@
 
   function hidePopover() {
     var pop = document.getElementById('highlightPopover');
-    if (pop) pop.style.display = 'none';
+    if (pop) {
+      pop.style.display = 'none';
+      pop.classList.remove('popover-bottom-dock');
+    }
     activeRange = null; activeMark = null;
   }
 
@@ -964,31 +999,34 @@
       range.insertNode(mark);
     }
     mark.addEventListener('click', function (ev) {
+      if (document.body.classList.contains('brush-highlight-mode')) return;
       ev.stopPropagation(); ev.preventDefault();
       showPopover(mark.getBoundingClientRect(), mark);
     });
     return mark;
   }
 
-  function applyHighlightColor(color) {
+  function recolorHighlightMark(mark, color, opts) {
+    if (!mark) return false;
+    var all = readLS(HL_KEY, []);
+    if (!Array.isArray(all)) all = [];
+    var id = mark.getAttribute('data-id');
+    mark.setAttribute('data-color', color);
+    var item = all.find(function (h) { return h.id === id; });
+    if (item) { item.color = color; writeLS(HL_KEY, all); }
+    if (!opts || !opts.silent) toast('رنگ هایلایت تغییر یافت');
+    return true;
+  }
+
+  function createHighlightFromRange(range, color, opts) {
+    if (!range) return null;
+    var text = range.toString().trim();
+    if (!text) return null;
+
     var all = readLS(HL_KEY, []);
     if (!Array.isArray(all)) all = [];
 
-    if (activeMark) {
-      var id = activeMark.getAttribute('data-id');
-      activeMark.setAttribute('data-color', color);
-      var item = all.find(function (h) { return h.id === id; });
-      if (item) { item.color = color; writeLS(HL_KEY, all); }
-      hidePopover();
-      toast('رنگ هایلایت تغییر یافت');
-      return;
-    }
-
-    if (!activeRange) { hidePopover(); return; }
-    var text = activeRange.toString().trim();
-    if (!text) { hidePopover(); return; }
-
-    var node = activeRange.commonAncestorContainer;
+    var node = range.commonAncestorContainer;
     var el = node.nodeType === 1 ? node : node.parentElement;
     var blkEl = el ? el.closest('[data-block-id]') : null;
     var secEl = el ? el.closest('.study-section') : null;
@@ -1002,7 +1040,7 @@
     var suffix = idx >= 0 ? full.slice(idx + text.length, idx + text.length + 36) : '';
 
     try {
-      wrapRange(activeRange, hlId, color);
+      var mark = wrapRange(range, hlId, color || 'yellow');
       all.push({
         id: hlId,
         chapterId: state.activeChapterId,
@@ -1010,7 +1048,7 @@
         blockId: blkEl ? blkEl.getAttribute('data-block-id') : '',
         sectionTitle: secTitleEl ? secTitleEl.textContent.trim() : '',
         chapterTitle: state.activeChapter ? state.activeChapter.title : state.activeChapterId,
-        color: color,
+        color: color || 'yellow',
         text: text,
         prefix: prefix,
         suffix: suffix,
@@ -1019,24 +1057,47 @@
       writeLS(HL_KEY, all);
       if (blkEl) blkEl.classList.add('v2-cram-has-hl');
       updateBadges();
-      toast('متن با موفقیت هایلایت شد ✓');
+      if (!opts || !opts.silent) toast('متن با موفقیت هایلایت شد ✓');
+      return mark;
     } catch (err) {
       console.warn('Highlight wrap failed:', err);
+      return null;
+    }
+  }
+
+  function deleteHighlightMark(mark, opts) {
+    if (!mark) return false;
+    var id = mark.getAttribute('data-id');
+    var blkEl = mark.closest ? mark.closest('[data-v2-block]') : null;
+    unwrapMark(mark);
+    if (blkEl && !blkEl.querySelector('mark.user-highlight')) {
+      blkEl.classList.remove('v2-cram-has-hl');
+    }
+    var all = readLS(HL_KEY, []).filter(function (h) { return h.id !== id; });
+    writeLS(HL_KEY, all);
+    updateBadges();
+    if (activeMark === mark) hidePopover();
+    if (!opts || !opts.silent) toast('هایلایت حذف شد');
+    return true;
+  }
+
+  function applyHighlightColor(color) {
+    if (activeMark) {
+      recolorHighlightMark(activeMark, color);
+      hidePopover();
+      return;
     }
 
+    if (!activeRange) { hidePopover(); return; }
+    createHighlightFromRange(activeRange, color);
     hidePopover();
     if (window.getSelection) window.getSelection().removeAllRanges();
   }
 
   function deleteActiveHighlight() {
     if (!activeMark) { hidePopover(); return; }
-    var id = activeMark.getAttribute('data-id');
-    unwrapMark(activeMark);
-    var all = readLS(HL_KEY, []).filter(function (h) { return h.id !== id; });
-    writeLS(HL_KEY, all);
-    updateBadges();
+    deleteHighlightMark(activeMark);
     hidePopover();
-    toast('هایلایت حذف شد');
   }
 
   function unwrapMark(mark) {
@@ -1379,6 +1440,10 @@
   window.CourseEngineV2 = {
     openChapter: openChapter,
     setCramMode: setCramMode,
+    createHighlightFromRange: createHighlightFromRange,
+    deleteHighlightMark: deleteHighlightMark,
+    recolorHighlightMark: recolorHighlightMark,
+    hideHighlightPopover: hidePopover,
     refreshUserMarks: function () {
       if (state.activeChapterId) restoreChapterHighlights(state.activeChapterId);
       updateBadges();
@@ -1492,23 +1557,58 @@
       // Selection highlighter listener
       var checkSel = function () {
         setTimeout(function () {
+          if (document.body.classList.contains('brush-highlight-mode')) return;
           var sel = window.getSelection();
           if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
           if (sel.toString().trim().length < 2) return;
           var r = sel.getRangeAt(0);
-          var area = document.getElementById('chapterContentArea');
+          var area = document.querySelector('#chapterContentArea, #main-content');
           if (!area || !area.contains(r.commonAncestorContainer)) return;
           activeRange = r;
           showPopover(r.getBoundingClientRect(), null);
         }, 30);
       };
       document.addEventListener('mouseup', function (e) {
+        if (document.body.classList.contains('brush-highlight-mode')) return;
         if (e.target.closest && (e.target.closest('#highlightPopover') || e.target.closest('mark.user-highlight'))) return;
         checkSel();
       });
       document.addEventListener('touchend', function (e) {
+        if (document.body.classList.contains('brush-highlight-mode')) return;
         if (e.target.closest && (e.target.closest('#highlightPopover') || e.target.closest('mark.user-highlight'))) return;
         checkSel();
+      });
+      var selTimer = null;
+      document.addEventListener('selectionchange', function () {
+        if (document.body.classList.contains('brush-highlight-mode')) return;
+        if (!isBottomBarMode()) return;
+        clearTimeout(selTimer);
+        selTimer = setTimeout(function () {
+          var sel = window.getSelection();
+          if (!sel || sel.isCollapsed || sel.rangeCount === 0) {
+            if (activeRange && !activeMark) hidePopover();
+            return;
+          }
+          if (sel.toString().trim().length < 2) return;
+          var r = sel.getRangeAt(0);
+          var area = document.querySelector('#chapterContentArea, #main-content');
+          if (area && area.contains(r.commonAncestorContainer)) {
+            activeRange = r;
+            showPopover(r.getBoundingClientRect(), null);
+          }
+        }, 140);
+      });
+      document.addEventListener('contextmenu', function (e) {
+        var area = document.querySelector('#chapterContentArea, #main-content');
+        if (!area || !area.contains(e.target)) return;
+        if (document.body.classList.contains('brush-highlight-mode')) {
+          e.preventDefault();
+          return;
+        }
+        var sel = window.getSelection();
+        if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
+          e.preventDefault();
+        }
       });
       document.addEventListener('click', function (e) {
         var pop = document.getElementById('highlightPopover');

@@ -1155,6 +1155,71 @@ strong .ltr-term,
   gap: 8px;
 }
 
+.v2-score-notes {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.v2-score-note {
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  border-inline-start-width: 4px;
+  background: var(--bg-surface);
+  font-size: 12.5px;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+.v2-score-note.tone-danger {
+  background: var(--state-danger-bg);
+  border-color: var(--state-danger-border);
+  border-inline-start-color: var(--state-danger);
+}
+
+.v2-score-note.tone-warning {
+  background: var(--state-warning-bg);
+  border-color: var(--state-warning-border);
+  border-inline-start-color: var(--state-warning);
+}
+
+.v2-score-note.tone-info {
+  background: var(--state-info-bg);
+  border-color: var(--state-info-border);
+  border-inline-start-color: var(--state-info);
+}
+
+.v2-score-note.tone-success {
+  background: var(--state-success-bg);
+  border-color: var(--state-success-border);
+  border-inline-start-color: var(--state-success);
+}
+
+.v2-score-note-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-primary);
+}
+
+.v2-score-note.tone-danger .v2-score-note-head strong { color: var(--state-danger); }
+.v2-score-note.tone-warning .v2-score-note-head strong { color: var(--state-warning); }
+.v2-score-note.tone-info .v2-score-note-head strong { color: var(--state-info); }
+.v2-score-note.tone-success .v2-score-note-head strong { color: var(--state-success); }
+
+.v2-score-note-label {
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.v2-score-note-action {
+  margin-top: 4px;
+  color: var(--text-primary);
+}
+
 /* Chapter Completion & Footer Navigation */
 .v2-completion-bar {
   display: flex;
@@ -1314,3 +1379,28 @@ mark.user-highlight[data-color="blue"] { background: #bae6fd; }
   cursor: pointer;
 }
 .v2-result-row:hover { border-color: var(--accent-primary); }
+
+/* Part 1 Anti-Collision Bottom Bar & Part 2 Direct Brush Selection Suppression */
+.highlight-popover.popover-bottom-dock {
+  position: fixed !important;
+  left: 50% !important;
+  top: auto !important;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+  transform: translateX(-50%) !important;
+  padding: 8px 14px !important;
+  gap: 10px !important;
+  max-width: calc(100vw - 24px);
+  z-index: 10002;
+}
+.highlight-popover.popover-bottom-dock .swatch-btn { min-inline-size: 34px; min-block-size: 34px; }
+@media (pointer: coarse) { .highlight-popover .swatch-btn { min-inline-size: 34px; min-block-size: 34px; } }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes v2PillSlideUp { from { opacity: 0; transform: translate(-50%, 16px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  .highlight-popover.popover-bottom-dock { animation: v2PillSlideUp 180ms cubic-bezier(0.16, 1, 0.3, 1); }
+}
+body.brush-highlight-mode #chapterContentArea,
+body.brush-highlight-mode #main-content,
+body.brush-highlight-mode .chapter-content { user-select: none !important; -webkit-user-select: none !important; -webkit-touch-callout: none !important; cursor: text; }
+body.brush-highlight-mode[data-brush-tool="eraser"] #chapterContentArea,
+body.brush-highlight-mode[data-brush-tool="eraser"] #main-content,
+body.brush-highlight-mode[data-brush-tool="eraser"] .chapter-content { cursor: pointer; }
