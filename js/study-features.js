@@ -615,10 +615,66 @@ window.StudyFeatures = {
     this._activeMark = null;
   },
 
+  wrapRangeSafely(range, id, color) {
+    if (!range || range.collapsed) return null;
+    let root = range.commonAncestorContainer;
+    if (!root) return null;
+    if (root.nodeType !== Node.ELEMENT_NODE) root = root.parentNode;
+    if (!root) return null;
+
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    const targets = [];
+    let tn;
+    while ((tn = walker.nextNode())) {
+      if (tn.parentElement && tn.parentElement.closest('mark.user-highlight, script, style')) continue;
+      const len = tn.nodeValue ? tn.nodeValue.length : 0;
+      if (!len) continue;
+      let sOff = 0;
+      let eOff = len;
+      try {
+        if (tn === range.startContainer) {
+          sOff = range.startOffset;
+        } else if (range.comparePoint(tn, len) === -1) {
+          continue;
+        }
+        if (tn === range.endContainer) {
+          eOff = range.endOffset;
+        } else if (range.comparePoint(tn, 0) === 1) {
+          continue;
+        }
+      } catch (err) {
+        continue;
+      }
+      if (eOff <= sOff) continue;
+      if (tn.nodeValue.slice(sOff, eOff).trim().length === 0) continue;
+      targets.push({ tn, sOff, eOff });
+    }
+
+    let firstMark = null;
+    for (const item of targets) {
+      const node = item.tn;
+      if (!node.parentNode) continue;
+      if (item.eOff < node.nodeValue.length) node.splitText(item.eOff);
+      const mid = item.sOff > 0 ? node.splitText(item.sOff) : node;
+      const mark = document.createElement('mark');
+      mark.className = 'user-highlight';
+      mark.setAttribute('data-color', color || 'yellow');
+      mark.setAttribute('data-id', id);
+      mark.setAttribute('title', 'برای ویرایش یا حذف کلیک کنید');
+      mid.parentNode.insertBefore(mark, mid);
+      mark.appendChild(mid);
+      this.attachMarkEvents(mark);
+      if (!firstMark) firstMark = mark;
+    }
+    return firstMark;
+  },
+
   recolorHighlightMark(mark, color, opts) {
     if (!mark) return false;
     const id = mark.getAttribute('data-id');
-    mark.setAttribute('data-color', color);
+    document.querySelectorAll(`mark.user-highlight[data-id="${id}"]`).forEach(m => {
+      m.setAttribute('data-color', color);
+    });
     const highlights = this.getHighlights();
     const item = highlights.find(h => h.id === id);
     if (item) {
@@ -657,30 +713,14 @@ window.StudyFeatures = {
     const prefix = textIdx > 0 ? fullText.substring(Math.max(0, textIdx - 40), textIdx) : '';
     const suffix = textIdx >= 0 ? fullText.substring(textIdx + text.length, textIdx + text.length + 40) : '';
 
-    const mark = document.createElement('mark');
-    mark.className = 'user-highlight';
-    mark.setAttribute('data-color', color || 'yellow');
-    mark.setAttribute('data-id', highlightId);
-    mark.setAttribute('title', 'برای ویرایش یا حذف کلیک کنید');
-
-    let wrapped = false;
+    let mark = null;
     try {
-      range.surroundContents(mark);
-      wrapped = true;
-    } catch (e) {
-      try {
-        const contents = range.extractContents();
-        mark.appendChild(contents);
-        range.insertNode(mark);
-        wrapped = true;
-      } catch (err) {
-        console.warn('Could not wrap range in mark:', err);
-      }
+      mark = this.wrapRangeSafely(range, highlightId, color || 'yellow');
+    } catch (err) {
+      console.warn('Could not wrap range safely in mark:', err);
     }
 
-    if (!wrapped) return null;
-
-    this.attachMarkEvents(mark);
+    if (!mark) return null;
 
     const highlights = this.getHighlights();
     highlights.push({
@@ -711,19 +751,21 @@ window.StudyFeatures = {
   deleteHighlightMark(mark, opts) {
     if (!mark) return false;
     const id = mark.getAttribute('data-id');
-    const parent = mark.parentNode;
-    if (parent) {
-      while (mark.firstChild) {
-        parent.insertBefore(mark.firstChild, mark);
+    const segs = id ? Array.from(document.querySelectorAll(`mark.user-highlight[data-id="${id}"]`)) : [mark];
+    if (segs.length === 0) segs.push(mark);
+    segs.forEach(seg => {
+      const parent = seg.parentNode;
+      if (parent) {
+        while (seg.firstChild) parent.insertBefore(seg.firstChild, seg);
+        parent.removeChild(seg);
+        parent.normalize();
       }
-      parent.removeChild(mark);
-      parent.normalize();
-    }
+    });
 
     const highlights = this.getHighlights().filter(h => h.id !== id);
     this.saveHighlights(highlights);
 
-    if (this._activeMark === mark) {
+    if (this._activeMark && this._activeMark.getAttribute('data-id') === id) {
       this.hideHighlightPopover();
     }
     if ((!opts || !opts.silent) && typeof window.showToast === 'function') {
@@ -768,14 +810,15 @@ window.StudyFeatures = {
   },
 
   deleteHighlightById(id) {
-    // If mark currently in active DOM, unwrap it
-    const mark = document.querySelector(`mark.user-highlight[data-id="${id}"]`);
-    if (mark && mark.parentNode) {
+    // If marks currently in active DOM, unwrap all segments
+    document.querySelectorAll(`mark.user-highlight[data-id="${id}"]`).forEach(mark => {
       const parent = mark.parentNode;
-      while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
-      parent.removeChild(mark);
-      parent.normalize();
-    }
+      if (parent) {
+        while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+        parent.removeChild(mark);
+        parent.normalize();
+      }
+    });
 
     const highlights = this.getHighlights().filter(h => h.id !== id);
     this.saveHighlights(highlights);
@@ -891,27 +934,9 @@ window.StudyFeatures = {
           const range = this.findTextRange(searchRoot, h.text, h.prefix, h.suffix);
           if (range) {
             try {
-              const mark = document.createElement('mark');
-              mark.className = 'user-highlight';
-              mark.setAttribute('data-color', h.color || 'yellow');
-              mark.setAttribute('data-id', h.id);
-              mark.setAttribute('title', 'برای ویرایش یا حذف کلیک کنید');
-              range.surroundContents(mark);
-              this.attachMarkEvents(mark);
-            } catch (e) {
-              try {
-                const mark = document.createElement('mark');
-                mark.className = 'user-highlight';
-                mark.setAttribute('data-color', h.color || 'yellow');
-                mark.setAttribute('data-id', h.id);
-                mark.setAttribute('title', 'برای ویرایش یا حذف کلیک کنید');
-                const contents = range.extractContents();
-                mark.appendChild(contents);
-                range.insertNode(mark);
-                this.attachMarkEvents(mark);
-              } catch (err) {
-                console.warn('Reapply highlight error:', h.id, err);
-              }
+              this.wrapRangeSafely(range, h.id, h.color || 'yellow');
+            } catch (err) {
+              console.warn('Reapply highlight error:', h.id, err);
             }
           }
         } catch (itemErr) {
@@ -989,21 +1014,17 @@ window.StudyFeatures = {
         const range = selection.getRangeAt(0);
         const container = document.querySelector(READING_SEL);
         if (container && container.contains(range.commonAncestorContainer)) {
+          this._activeRange = range;
+          const popover = document.getElementById('highlightPopover');
+          if (popover && popover.style.display === 'flex' && !this._activeMark) return;
           this.showPopoverForSelection(range);
         }
-      }, 140);
+      }, 260);
     });
 
-    // Reduce Android / browser context-menu collision on active text selections inside reading content
     document.addEventListener('contextmenu', (e) => {
       const container = document.querySelector(READING_SEL);
-      if (!container || !container.contains(e.target)) return;
-      if (document.body.classList.contains('brush-highlight-mode')) {
-        e.preventDefault();
-        return;
-      }
-      const selection = window.getSelection();
-      if (selection && !selection.isCollapsed && selection.toString().trim().length > 0) {
+      if (container && container.contains(e.target) && document.body.classList.contains('brush-highlight-mode')) {
         e.preventDefault();
       }
     });

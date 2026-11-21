@@ -986,24 +986,66 @@
     activeRange = null; activeMark = null;
   }
 
-  function wrapRange(range, id, color) {
-    var mark = document.createElement('mark');
-    mark.className = 'user-highlight';
-    mark.setAttribute('data-color', color || 'yellow');
-    mark.setAttribute('data-id', id);
-    try {
-      range.surroundContents(mark);
-    } catch (e) {
-      var frag = range.extractContents();
-      mark.appendChild(frag);
-      range.insertNode(mark);
-    }
+  function attachMarkEvents(mark) {
+    if (!mark) return;
     mark.addEventListener('click', function (ev) {
       if (document.body.classList.contains('brush-highlight-mode')) return;
       ev.stopPropagation(); ev.preventDefault();
       showPopover(mark.getBoundingClientRect(), mark);
     });
-    return mark;
+  }
+
+  function wrapRange(range, id, color) {
+    if (!range || range.collapsed) return null;
+    var root = range.commonAncestorContainer;
+    if (!root) return null;
+    if (root.nodeType !== 1) root = root.parentNode;
+    if (!root) return null;
+
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    var targets = [];
+    var tn;
+    while ((tn = walker.nextNode())) {
+      if (tn.parentElement && tn.parentElement.closest('mark.user-highlight, script, style')) continue;
+      var len = tn.nodeValue ? tn.nodeValue.length : 0;
+      if (!len) continue;
+      var sOff = 0, eOff = len;
+      try {
+        if (tn === range.startContainer) {
+          sOff = range.startOffset;
+        } else if (range.comparePoint(tn, len) === -1) {
+          continue;
+        }
+        if (tn === range.endContainer) {
+          eOff = range.endOffset;
+        } else if (range.comparePoint(tn, 0) === 1) {
+          continue;
+        }
+      } catch (err) {
+        continue;
+      }
+      if (eOff <= sOff) continue;
+      if (tn.nodeValue.slice(sOff, eOff).trim().length === 0) continue;
+      targets.push({ tn: tn, sOff: sOff, eOff: eOff });
+    }
+
+    var firstMark = null;
+    for (var i = 0; i < targets.length; i++) {
+      var item = targets[i];
+      var node = item.tn;
+      if (!node.parentNode) continue;
+      if (item.eOff < node.nodeValue.length) node.splitText(item.eOff);
+      var mid = item.sOff > 0 ? node.splitText(item.sOff) : node;
+      var mark = document.createElement('mark');
+      mark.className = 'user-highlight';
+      mark.setAttribute('data-color', color || 'yellow');
+      mark.setAttribute('data-id', id);
+      mid.parentNode.insertBefore(mark, mid);
+      mark.appendChild(mid);
+      attachMarkEvents(mark);
+      if (!firstMark) firstMark = mark;
+    }
+    return firstMark;
   }
 
   function recolorHighlightMark(mark, color, opts) {
@@ -1011,7 +1053,9 @@
     var all = readLS(HL_KEY, []);
     if (!Array.isArray(all)) all = [];
     var id = mark.getAttribute('data-id');
-    mark.setAttribute('data-color', color);
+    document.querySelectorAll('mark.user-highlight[data-id="' + id + '"]').forEach(function (m) {
+      m.setAttribute('data-color', color);
+    });
     var item = all.find(function (h) { return h.id === id; });
     if (item) { item.color = color; writeLS(HL_KEY, all); }
     if (!opts || !opts.silent) toast('رنگ هایلایت تغییر یافت');
@@ -1041,6 +1085,7 @@
 
     try {
       var mark = wrapRange(range, hlId, color || 'yellow');
+      if (!mark) return null;
       all.push({
         id: hlId,
         chapterId: state.activeChapterId,
@@ -1068,15 +1113,19 @@
   function deleteHighlightMark(mark, opts) {
     if (!mark) return false;
     var id = mark.getAttribute('data-id');
-    var blkEl = mark.closest ? mark.closest('[data-v2-block]') : null;
-    unwrapMark(mark);
-    if (blkEl && !blkEl.querySelector('mark.user-highlight')) {
-      blkEl.classList.remove('v2-cram-has-hl');
-    }
+    var segs = id ? Array.prototype.slice.call(document.querySelectorAll('mark.user-highlight[data-id="' + id + '"]')) : [mark];
+    if (segs.length === 0) segs = [mark];
+    segs.forEach(function (seg) {
+      var blkEl = seg.closest ? seg.closest('[data-v2-block]') : null;
+      unwrapMark(seg);
+      if (blkEl && !blkEl.querySelector('mark.user-highlight')) {
+        blkEl.classList.remove('v2-cram-has-hl');
+      }
+    });
     var all = readLS(HL_KEY, []).filter(function (h) { return h.id !== id; });
     writeLS(HL_KEY, all);
     updateBadges();
-    if (activeMark === mark) hidePopover();
+    if (activeMark && activeMark.getAttribute('data-id') === id) hidePopover();
     if (!opts || !opts.silent) toast('هایلایت حذف شد');
     return true;
   }
@@ -1294,12 +1343,11 @@
       });
     });
 
-    listEl.querySelectorAll('[data-del-hl]').forEach(function (btn) {
+      listEl.querySelectorAll('[data-del-hl]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
         var id = btn.getAttribute('data-del-hl');
-        var m = document.querySelector('mark.user-highlight[data-id="' + id + '"]');
-        if (m) unwrapMark(m);
+        document.querySelectorAll('mark.user-highlight[data-id="' + id + '"]').forEach(unwrapMark);
         writeLS(HL_KEY, readLS(HL_KEY, []).filter(function (x) { return x.id !== id; }));
         updateBadges();
         renderHighlightsList();
@@ -1594,19 +1642,15 @@
           var area = document.querySelector('#chapterContentArea, #main-content');
           if (area && area.contains(r.commonAncestorContainer)) {
             activeRange = r;
+            var pop = document.getElementById('highlightPopover');
+            if (pop && pop.style.display === 'flex' && !activeMark) return;
             showPopover(r.getBoundingClientRect(), null);
           }
-        }, 140);
+        }, 260);
       });
       document.addEventListener('contextmenu', function (e) {
         var area = document.querySelector('#chapterContentArea, #main-content');
-        if (!area || !area.contains(e.target)) return;
-        if (document.body.classList.contains('brush-highlight-mode')) {
-          e.preventDefault();
-          return;
-        }
-        var sel = window.getSelection();
-        if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
+        if (area && area.contains(e.target) && document.body.classList.contains('brush-highlight-mode')) {
           e.preventDefault();
         }
       });

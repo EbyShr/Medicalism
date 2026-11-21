@@ -8,6 +8,7 @@
 
   var STORAGE_KEY = 'medicalism_ink_labs_v1';
   var PALM_KEY = 'med_ink_palm_rejection';
+  var SCROLL_LOCK_KEY = 'med_ink_scroll_lock';
   var READING_SELECTOR = '#chapterContentArea, #main-content, .chapter-content';
   var SECTION_SELECTOR = '.v2-section, .section-card';
   var SVG_NS = 'http://www.w3.org/2000/svg';
@@ -31,6 +32,7 @@
   var width = 4;
   var hidden = false;
   var palmRejection = loadPalmPref();
+  var scrollLocked = loadScrollLockPref();
 
   var store = loadStore();
   var undoStack = [];
@@ -38,6 +40,8 @@
   var observers = [];
   var activeDraw = null;
   var activeErase = null;
+  var activePenPointerId = null;
+  var lastPenSeenAt = 0;
   var globalListenersBound = false;
 
   function loadPalmPref() {
@@ -46,6 +50,14 @@
 
   function savePalmPref(val) {
     try { localStorage.setItem(PALM_KEY, val ? 'true' : 'false'); } catch (e) {}
+  }
+
+  function loadScrollLockPref() {
+    try { return localStorage.getItem(SCROLL_LOCK_KEY) === 'true'; } catch (e) { return false; }
+  }
+
+  function saveScrollLockPref(val) {
+    try { localStorage.setItem(SCROLL_LOCK_KEY, val ? 'true' : 'false'); } catch (e) {}
   }
 
   function loadStore() {
@@ -224,11 +236,12 @@
   function syncBodyClasses() {
     if (!document.body) return;
     document.body.classList.toggle('ink-labs-active', enabled);
-    document.body.classList.remove('ink-mode-scroll', 'ink-mode-pen', 'ink-mode-highlighter', 'ink-mode-eraser', 'ink-mode-draw', 'ink-palm-on', 'ink-palm-off', 'ink-labs-hidden');
+    document.body.classList.remove('ink-mode-scroll', 'ink-mode-pen', 'ink-mode-highlighter', 'ink-mode-eraser', 'ink-mode-draw', 'ink-palm-on', 'ink-palm-off', 'ink-scroll-locked', 'ink-labs-hidden');
     if (!enabled) return;
     document.body.classList.add('ink-mode-' + mode);
     if (mode !== 'scroll') document.body.classList.add('ink-mode-draw');
     document.body.classList.add(palmRejection ? 'ink-palm-on' : 'ink-palm-off');
+    if (scrollLocked) document.body.classList.add('ink-scroll-locked');
     if (hidden) document.body.classList.add('ink-labs-hidden');
   }
 
@@ -286,6 +299,8 @@
     });
     var palmBtn = tb.querySelector('#v2InkPalmBtn');
     if (palmBtn) palmBtn.setAttribute('aria-pressed', palmRejection ? 'true' : 'false');
+    var lockBtn = tb.querySelector('#v2InkScrollLockBtn');
+    if (lockBtn) lockBtn.setAttribute('aria-pressed', scrollLocked ? 'true' : 'false');
 
     tb.querySelectorAll('[data-ink-color]').forEach(function (b) {
       b.setAttribute('aria-pressed', b.getAttribute('data-ink-color') === color ? 'true' : 'false');
@@ -336,6 +351,7 @@
         '</div>' +
         '<span class="ink-tb-sep" role="separator" aria-orientation="vertical"></span>' +
         '<button type="button" class="ink-tb-btn" id="v2InkPalmBtn" aria-pressed="true" title="حذف لمس کف دست: فقط قلم/ماوس می‌نویسد و انگشت صفحه را اسکرول می‌کند">🖊️ فقط قلم</button>' +
+        '<button type="button" class="ink-tb-btn" id="v2InkScrollLockBtn" aria-pressed="false" title="قفل اسکرول صفحه هنگام نوشتن عمودی با قلم یا انگشت روی کارت‌ها">🔒 قفل اسکرول</button>' +
       '</div>' +
       '<div class="ink-tb-row">' +
         '<div class="ink-tb-group" role="group" aria-label="رنگ قلم">' + colorHtml + '</div>' +
@@ -367,6 +383,13 @@
       savePalmPref(palmRejection);
       syncToolbarUi();
       announce(palmRejection ? 'فقط قلم و ماوس فعال شد' : 'لمس با انگشت فعال شد');
+    });
+
+    tb.querySelector('#v2InkScrollLockBtn').addEventListener('click', function () {
+      scrollLocked = !scrollLocked;
+      saveScrollLockPref(scrollLocked);
+      syncToolbarUi();
+      announce(scrollLocked ? 'اسکرول صفحه قفل شد' : 'قفل اسکرول برداشته شد');
     });
 
     tb.querySelectorAll('[data-ink-color]').forEach(function (b) {
@@ -467,12 +490,56 @@
     return false;
   }
 
+  function isStylusTouchEvent(e) {
+    if (!e || !e.touches || !e.touches.length) return false;
+    for (var i = 0; i < e.touches.length; i++) {
+      if (e.touches[i].touchType === 'stylus') return true;
+    }
+    return false;
+  }
+
   function bindSvgEvents(svg) {
     if (!svg || svg.dataset.inkBound === '1') return;
     svg.dataset.inkBound = '1';
+    var penTimer = null;
+
+    function markPenActive(e) {
+      if (e.pointerType !== 'pen') return;
+      lastPenSeenAt = Date.now();
+      if (e.type === 'pointerdown') activePenPointerId = e.pointerId;
+      if (penTimer) { clearTimeout(penTimer); penTimer = null; }
+      svg.classList.add('is-pen-active');
+    }
+
+    function clearPenActive(e) {
+      if (e.pointerType !== 'pen') return;
+      if (e.pointerId === activePenPointerId) activePenPointerId = null;
+      if (penTimer) clearTimeout(penTimer);
+      penTimer = setTimeout(function () {
+        svg.classList.remove('is-pen-active');
+      }, 500);
+    }
+
+    svg.addEventListener('pointerenter', markPenActive);
+    svg.addEventListener('pointerleave', clearPenActive);
+
+    // Block vertical scroll on sketchpads, unlocked finger draw, scroll-locked overlays, and active/stylus pen touches
+    function onTouchGuard(e) {
+      if (!enabled || hidden || mode === 'scroll') return;
+      if (svg.classList.contains('ink-sketchpad-svg') || !palmRejection || scrollLocked) {
+        e.preventDefault();
+        return;
+      }
+      if (isStylusTouchEvent(e) || activePenPointerId !== null || (Date.now() - lastPenSeenAt < 600)) {
+        e.preventDefault();
+      }
+    }
+    svg.addEventListener('touchstart', onTouchGuard, { passive: false });
+    svg.addEventListener('touchmove', onTouchGuard, { passive: false });
 
     svg.addEventListener('pointerdown', function (e) {
       if (!enabled || hidden || mode === 'scroll') return;
+      if (e.pointerType === 'pen') markPenActive(e);
       if (!shouldAllowPointer(e)) return;
 
       e.preventDefault();
@@ -518,6 +585,7 @@
 
     svg.addEventListener('pointermove', function (e) {
       if (!enabled) return;
+      if (e.pointerType === 'pen') markPenActive(e);
       if (activeErase && e.pointerId === activeErase.pointerId && activeErase.svg === svg) {
         tryEraseAt(svg, activeErase.target, e.clientX, e.clientY);
         return;
@@ -537,6 +605,7 @@
     });
 
     function finishPointer(e) {
+      if (e.pointerType === 'pen') clearPenActive(e);
       if (activeErase && e.pointerId === activeErase.pointerId && activeErase.svg === svg) {
         activeErase = null;
         return;

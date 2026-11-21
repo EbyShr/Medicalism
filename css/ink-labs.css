@@ -55,14 +55,19 @@ body.ink-mode-draw .ink-card-overlay {
   pointer-events: auto;
 }
 
-body.ink-mode-draw.ink-palm-on .ink-card-overlay,
-body.ink-mode-draw.ink-palm-on .ink-sketchpad-svg {
+body.ink-mode-draw .ink-sketchpad-svg {
+  pointer-events: auto;
+  touch-action: none !important;
+}
+
+body.ink-mode-draw.ink-palm-on:not(.ink-scroll-locked) .ink-card-overlay:not(.is-pen-active) {
   touch-action: pan-y pinch-zoom;
 }
 
 body.ink-mode-draw.ink-palm-off .ink-card-overlay,
-body.ink-mode-draw.ink-palm-off .ink-sketchpad-svg {
-  touch-action: none;
+body.ink-mode-draw.ink-scroll-locked .ink-card-overlay,
+body.ink-mode-draw .ink-card-overlay.is-pen-active {
+  touch-action: none !important;
 }
 
 body.ink-mode-scroll .ink-sketchpad-svg {

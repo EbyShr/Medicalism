@@ -20,14 +20,17 @@
 
   var READING_SELECTOR = '#chapterContentArea, #main-content, .chapter-content';
   var BLOCK_SELECTOR = 'p, li, td, th, dd, dt, blockquote, .v2-callout-body, .v2-callout-text, .v2-osce-scenario, .v2-tl-summary, .v2-stat-note, .callout-content, .card-content, h2, h3, h4';
-  var SKIP_SELECTOR = 'a, button, input, select, textarea, label, summary, .v2-tl-node, .v2-score-cell-btn, .v2-order-item, .v2-nav-card, .btn-bookmark, .btn-toggle-chapter-completed, #v2CompleteChapterBtn, #highlightPopover, #v2BrushPalette, .v2-quick-dock, .v2-settings-dialog, .v2-btn-outline';
+  var SKIP_SELECTOR = 'a, button, input, select, textarea, label, summary, .v2-tl-node, .v2-score-cell-btn, .v2-order-item, .v2-nav-card, .btn-bookmark, .btn-toggle-chapter-completed, #v2CompleteChapterBtn, #highlightPopover, #v2BrushPalette, #v2BrushMarkBar, .v2-quick-dock, .v2-settings-dialog, .v2-btn-outline';
 
   var isActive = false;
   var listenersBound = false;
   var activeTool = loadSavedTool();
   var drag = null;
   var dragErase = false;
-  var touchTap = null;
+  var touchState = null;
+  var holdTimer = null;
+  var lastTap = null;
+  var activeBarMark = null;
 
   function loadSavedTool() {
     try {
@@ -90,6 +93,12 @@
       '@media (hover:hover){.v2-brush-btn:hover{border-color:var(--accent-primary,#0d9488);transform:translateY(-1px);}}' +
       '@media (prefers-reduced-motion:no-preference){@keyframes v2BrushIn{from{opacity:0;transform:translate(-50%,16px);}to{opacity:1;transform:translate(-50%,0);}}#v2BrushPalette.is-open{animation:v2BrushIn 180ms cubic-bezier(.16,1,.3,1);}.v2-brush-btn{transition:transform 130ms ease,background-color 130ms ease,border-color 130ms ease,box-shadow 130ms ease;}}' +
       '@media (forced-colors:active){.v2-brush-btn[aria-pressed="true"]{outline:2px solid Highlight;background:Highlight;color:HighlightText;}.v2-brush-sep{border-inline-start-color:ButtonText;}}' +
+      '#v2BrushMarkBar{position:fixed;left:50%;transform:translateX(-50%);z-index:10004;display:none;align-items:center;gap:6px;padding:6px 12px;border-radius:9999px;background:var(--bg-surface-elevated,rgba(255,255,255,.97));border:1px solid var(--border-default,rgba(15,23,42,.18));box-shadow:var(--shadow-lg,0 12px 28px rgba(0,0,0,.22));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);direction:rtl;font-family:var(--font-current,inherit);}' +
+      '[data-theme="dark"] #v2BrushMarkBar{background:rgba(19,28,49,.96);border-color:rgba(148,163,184,.28);}' +
+      '#v2BrushMarkBar.is-open{display:flex;}' +
+      '.v2-bmb-swatch{min-inline-size:26px;min-block-size:26px;border-radius:50%;border:2px solid rgba(15,23,42,.2);cursor:pointer;padding:0;}' +
+      '.v2-bmb-swatch[data-color="yellow"]{background:#fef08a;}.v2-bmb-swatch[data-color="green"]{background:#bbf7d0;}.v2-bmb-swatch[data-color="pink"]{background:#fbcfe8;}.v2-bmb-swatch[data-color="blue"]{background:#bae6fd;}' +
+      '.v2-bmb-swatch[aria-pressed="true"]{border-color:var(--accent-primary,#0d9488);transform:scale(1.14);}' +
       '#v2BrushLiveStatus{position:fixed;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}';
     document.head.appendChild(st);
   }
@@ -126,7 +135,7 @@
     }).join('');
 
     pal.innerHTML =
-      '<div class="v2-brush-caption">کشیدن ماوس/قلم یا لمس هر جمله برای هایلایت</div>' +
+      '<div class="v2-brush-caption">کشیدن افقی برای انتخاب کلمات • دوبار لمس برای کل جمله • لمس هایلایت برای ویرایش</div>' +
       '<div class="v2-brush-row">' +
         '<div class="v2-brush-group" role="group" aria-label="رنگ ماژیک">' + colorBtns + '</div>' +
         '<span class="v2-brush-sep" role="separator" aria-orientation="vertical"></span>' +
@@ -181,7 +190,70 @@
     }
 
     syncToolUi();
+    ensureMarkBarDom();
     return pal;
+  }
+
+  function ensureMarkBarDom() {
+    var bar = document.getElementById('v2BrushMarkBar');
+    if (bar) return bar;
+    bar = document.createElement('div');
+    bar.id = 'v2BrushMarkBar';
+    bar.setAttribute('role', 'toolbar');
+    bar.setAttribute('aria-label', 'ویرایش هایلایت انتخاب‌شده');
+    bar.innerHTML = COLOR_ITEMS.map(function (c) {
+      return '<button type="button" class="v2-bmb-swatch" data-bmb-color="' + c.id + '" data-color="' + c.id + '" aria-pressed="false" aria-label="' + c.label + '"></button>';
+    }).join('') +
+      '<span class="v2-brush-sep" role="separator" aria-orientation="vertical"></span>' +
+      '<button type="button" class="v2-brush-btn v2-brush-exit" id="v2BrushMarkDeleteBtn" aria-label="حذف هایلایت">🗑️ حذف</button>' +
+      '<button type="button" class="v2-brush-btn" id="v2BrushMarkCloseBtn" aria-label="بستن">✕</button>';
+    document.body.appendChild(bar);
+
+    bar.querySelectorAll('[data-bmb-color]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var col = btn.getAttribute('data-bmb-color');
+        var adapter = getAdapter();
+        if (activeBarMark && adapter && adapter.recolorHighlightMark) {
+          adapter.recolorHighlightMark(activeBarMark, col, { silent: true });
+          announce('رنگ هایلایت تغییر یافت');
+        }
+        hideMarkBar();
+      });
+    });
+
+    bar.querySelector('#v2BrushMarkDeleteBtn').addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (activeBarMark) removeMark(activeBarMark);
+      hideMarkBar();
+    });
+
+    bar.querySelector('#v2BrushMarkCloseBtn').addEventListener('click', function (e) {
+      e.stopPropagation();
+      hideMarkBar();
+    });
+    return bar;
+  }
+
+  function showMarkBar(mark) {
+    if (!mark) return;
+    activeBarMark = mark;
+    var bar = ensureMarkBarDom();
+    var curCol = mark.getAttribute('data-color') || 'yellow';
+    bar.querySelectorAll('[data-bmb-color]').forEach(function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-bmb-color') === curCol ? 'true' : 'false');
+    });
+    var pal = document.getElementById('v2BrushPalette');
+    var palRect = pal ? pal.getBoundingClientRect() : null;
+    var bottomPx = palRect && palRect.top > 70 ? Math.round(window.innerHeight - palRect.top + 10) : 98;
+    bar.style.bottom = bottomPx + 'px';
+    bar.classList.add('is-open');
+  }
+
+  function hideMarkBar() {
+    activeBarMark = null;
+    var bar = document.getElementById('v2BrushMarkBar');
+    if (bar) bar.classList.remove('is-open');
   }
 
   function syncToolUi() {
@@ -445,23 +517,189 @@
     return Boolean(el.closest(SKIP_SELECTOR));
   }
 
-  function onPointerDown(e) {
-    if (!isActive) return;
-    var container = getReadingContainer();
-    if (!container || isSkippedTarget(e.target, container)) return;
+  function clearHoldTimer() {
+    if (holdTimer) {
+      clearTimeout(holdTimer);
+      holdTimer = null;
+    }
+  }
 
-    if (e.pointerType === 'touch') {
-      // Do NOT preventDefault on touch so native vertical scroll remains smooth
-      touchTap = {
-        pointerId: e.pointerId,
-        startX: e.clientX,
-        startY: e.clientY,
-        startTime: Date.now(),
-        moved: false,
-        target: e.target
-      };
+  function onTouchStart(e) {
+    if (!isActive) return;
+    if (!e.touches || e.touches.length !== 1) {
+      clearHoldTimer();
+      touchState = null;
+      clearPreview();
       return;
     }
+    var container = getReadingContainer();
+    var t = e.touches[0];
+    if (!container || isSkippedTarget(t.target, container)) return;
+
+    var el = t.target && t.target.nodeType === 1 ? t.target : (t.target ? t.target.parentElement : null);
+    var startMark = el ? el.closest('mark.user-highlight') : null;
+    var pt = getCaretPoint(t.clientX, t.clientY);
+    var block = pt ? resolveReadableBlock(pt.node, container) : null;
+    var collected = block ? collectTextSegments(block) : null;
+    var startOff = (pt && collected) ? domPointToFlatOffset(collected.segments, pt.node, pt.offset) : -1;
+
+    clearHoldTimer();
+    touchState = {
+      id: t.identifier,
+      startX: t.clientX,
+      startY: t.clientY,
+      startTime: Date.now(),
+      mode: 'undecided',
+      startMark: startMark,
+      block: block,
+      segments: collected ? collected.segments : [],
+      fullText: collected ? collected.fullText : '',
+      startOff: startOff,
+      curOff: startOff
+    };
+
+    if (!startMark && activeTool !== 'eraser' && block && startOff !== -1) {
+      holdTimer = setTimeout(function () {
+        if (!touchState || touchState.mode !== 'undecided') return;
+        touchState.mode = 'drag-select';
+        var bounds = expandToWordBounds(touchState.fullText, touchState.startOff, touchState.startOff);
+        if (bounds[1] > bounds[0]) {
+          renderPreview(flatRangeToDomRange(touchState.segments, bounds[0], bounds[1]), activeTool);
+        }
+      }, 220);
+    }
+  }
+
+  function onTouchMove(e) {
+    if (!isActive || !touchState) return;
+    if (!e.touches || e.touches.length > 1) {
+      clearHoldTimer();
+      clearPreview();
+      touchState.mode = 'scroll';
+      return;
+    }
+    var t = null;
+    for (var i = 0; i < e.touches.length; i++) {
+      if (e.touches[i].identifier === touchState.id) { t = e.touches[i]; break; }
+    }
+    if (!t) t = e.touches[0];
+
+    var dx = t.clientX - touchState.startX;
+    var dy = t.clientY - touchState.startY;
+    var absX = Math.abs(dx), absY = Math.abs(dy);
+    var dist = Math.hypot(dx, dy);
+
+    if (touchState.mode === 'scroll') return;
+
+    if (touchState.mode === 'undecided' && dist > 8) {
+      clearHoldTimer();
+      if (absY > absX * 1.25) {
+        touchState.mode = 'scroll';
+        return;
+      }
+      touchState.mode = activeTool === 'eraser' ? 'erase' : 'drag-select';
+    }
+
+    if (touchState.mode === 'erase') {
+      e.preventDefault();
+      var container = getReadingContainer();
+      var under = document.elementFromPoint(t.clientX, t.clientY);
+      var m = under && under.closest ? under.closest('mark.user-highlight') : null;
+      if (m && container && container.contains(m)) removeMark(m);
+      return;
+    }
+
+    if (touchState.mode === 'drag-select') {
+      e.preventDefault();
+      if (!touchState.block || touchState.startOff === -1) return;
+      var pt = getCaretPoint(t.clientX, t.clientY);
+      if (pt && touchState.block.contains(pt.node)) {
+        var off = domPointToFlatOffset(touchState.segments, pt.node, pt.offset);
+        if (off !== -1) touchState.curOff = off;
+      }
+      var bounds = expandToWordBounds(touchState.fullText, touchState.startOff, touchState.curOff);
+      if (bounds[1] > bounds[0]) {
+        renderPreview(flatRangeToDomRange(touchState.segments, bounds[0], bounds[1]), activeTool);
+      } else {
+        clearPreview();
+      }
+    }
+  }
+
+  function onTouchEnd(e) {
+    if (!isActive || !touchState) return;
+    var st = touchState;
+    touchState = null;
+    clearHoldTimer();
+    clearPreview();
+
+    if (st.mode === 'scroll' || st.mode === 'erase') {
+      lastTap = null;
+      return;
+    }
+
+    var ct = (e.changedTouches && e.changedTouches[0]) || { clientX: st.startX, clientY: st.startY };
+
+    if (st.mode === 'drag-select') {
+      lastTap = null;
+      if (st.block && st.startOff !== -1) {
+        var ptEnd = getCaretPoint(ct.clientX, ct.clientY);
+        if (ptEnd && st.block.contains(ptEnd.node)) {
+          var endOff = domPointToFlatOffset(st.segments, ptEnd.node, ptEnd.offset);
+          if (endOff !== -1) st.curOff = endOff;
+        }
+        var bounds = expandToWordBounds(st.fullText, st.startOff, st.curOff);
+        if (bounds[1] - bounds[0] >= 1) {
+          commitFlatRange(st.block, bounds[0], bounds[1], activeTool);
+        }
+      }
+      return;
+    }
+
+    // Clean tap (< 8px, < 380ms)
+    var dur = Date.now() - st.startTime;
+    var dist = Math.hypot(ct.clientX - st.startX, ct.clientY - st.startY);
+    if (dist > 10 || dur >= 380) return;
+
+    var container = getReadingContainer();
+    if (st.startMark && container && container.contains(st.startMark)) {
+      lastTap = null;
+      if (activeTool === 'eraser') {
+        removeMark(st.startMark);
+        hideMarkBar();
+      } else {
+        showMarkBar(st.startMark);
+      }
+      return;
+    }
+
+    hideMarkBar();
+    if (activeTool === 'eraser') return;
+
+    var now = Date.now();
+    if (lastTap && (now - lastTap.time < 360) && Math.hypot(ct.clientX - lastTap.x, ct.clientY - lastTap.y) < 32) {
+      lastTap = null;
+      if (st.block && st.startOff !== -1) {
+        var sent = expandToSentenceBounds(st.fullText, st.startOff);
+        if (sent[1] - sent[0] >= 2) {
+          commitFlatRange(st.block, sent[0], sent[1], activeTool);
+        }
+      }
+      return;
+    }
+    lastTap = { time: now, x: ct.clientX, y: ct.clientY };
+  }
+
+  function onTouchCancel() {
+    clearHoldTimer();
+    touchState = null;
+    clearPreview();
+  }
+
+  function onPointerDown(e) {
+    if (!isActive || e.pointerType === 'touch') return;
+    var container = getReadingContainer();
+    if (!container || isSkippedTarget(e.target, container)) return;
 
     if (e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
@@ -499,14 +737,7 @@
   }
 
   function onPointerMove(e) {
-    if (!isActive) return;
-    if (touchTap && e.pointerType === 'touch' && e.pointerId === touchTap.pointerId) {
-      if (Math.abs(e.clientX - touchTap.startX) >= 10 || Math.abs(e.clientY - touchTap.startY) >= 10) {
-        touchTap.moved = true;
-      }
-      return;
-    }
-
+    if (!isActive || e.pointerType === 'touch') return;
     if (!drag || e.pointerId !== drag.pointerId) return;
     if (dragErase) {
       var container = getReadingContainer();
@@ -531,43 +762,7 @@
   }
 
   function onPointerUp(e) {
-    if (!isActive) return;
-
-    if (touchTap && e.pointerType === 'touch' && e.pointerId === touchTap.pointerId) {
-      var tap = touchTap;
-      touchTap = null;
-      var dist = Math.hypot(e.clientX - tap.startX, e.clientY - tap.startY);
-      var dur = Date.now() - tap.startTime;
-      if (tap.moved || dist >= 10 || dur >= 350) return;
-
-      var container = getReadingContainer();
-      var elAt = document.elementFromPoint(e.clientX, e.clientY) || tap.target;
-      if (!container || isSkippedTarget(elAt, container)) return;
-
-      var el = elAt.nodeType === 1 ? elAt : elAt.parentElement;
-      var existingMark = el ? el.closest('mark.user-highlight') : null;
-      if (existingMark && container.contains(existingMark)) {
-        removeMark(existingMark);
-        return;
-      }
-      if (activeTool === 'eraser') return;
-
-      var pt = getCaretPoint(e.clientX, e.clientY);
-      if (!pt) return;
-      var block = resolveReadableBlock(pt.node, container);
-      if (!block) return;
-
-      var collected = collectTextSegments(block);
-      var off = domPointToFlatOffset(collected.segments, pt.node, pt.offset);
-      if (off === -1) return;
-
-      var sent = expandToSentenceBounds(collected.fullText, off);
-      if (sent[1] - sent[0] >= 2) {
-        commitFlatRange(block, sent[0], sent[1], activeTool);
-      }
-      return;
-    }
-
+    if (!isActive || e.pointerType === 'touch') return;
     if (!drag || e.pointerId !== drag.pointerId) return;
     var d = drag;
     var wasErase = dragErase;
@@ -576,18 +771,13 @@
     clearPreview();
     if (wasErase) return;
 
-    var adapter = getAdapter();
     var moveDist = Math.hypot(e.clientX - d.downX, e.clientY - d.downY);
     if (moveDist < 6 && d.startMark) {
-      var curCol = d.startMark.getAttribute('data-color');
-      if (curCol === activeTool) removeMark(d.startMark);
-      else if (adapter && adapter.recolorHighlightMark) {
-        adapter.recolorHighlightMark(d.startMark, activeTool, { silent: true });
-        announce('رنگ هایلایت به ' + VALID_TOOLS[activeTool] + ' تغییر یافت');
-      }
+      showMarkBar(d.startMark);
       return;
     }
 
+    hideMarkBar();
     if (moveDist < 4) return;
     var bounds = expandToWordBounds(d.fullText, d.startOff, d.curOff);
     if (bounds[1] - bounds[0] >= 1) {
@@ -595,11 +785,39 @@
     }
   }
 
-  function onPointerCancel() {
+  function onPointerCancel(e) {
+    if (e && e.pointerType === 'touch') { onTouchCancel(); return; }
     drag = null;
     dragErase = false;
-    touchTap = null;
     clearPreview();
+  }
+
+  function onDblClick(e) {
+    if (!isActive || activeTool === 'eraser') return;
+    var container = getReadingContainer();
+    if (!container || isSkippedTarget(e.target, container)) return;
+    var el = e.target.nodeType === 1 ? e.target : e.target.parentElement;
+    if (el && el.closest('mark.user-highlight')) return;
+
+    var pt = getCaretPoint(e.clientX, e.clientY);
+    if (!pt) return;
+    var block = resolveReadableBlock(pt.node, container);
+    if (!block) return;
+    var collected = collectTextSegments(block);
+    var off = domPointToFlatOffset(collected.segments, pt.node, pt.offset);
+    if (off === -1) return;
+    var sent = expandToSentenceBounds(collected.fullText, off);
+    if (sent[1] - sent[0] >= 2) {
+      commitFlatRange(block, sent[0], sent[1], activeTool);
+    }
+  }
+
+  function onDocClick(e) {
+    if (!isActive) return;
+    var bar = document.getElementById('v2BrushMarkBar');
+    if (bar && bar.contains(e.target)) return;
+    if (e.target && e.target.closest && e.target.closest('mark.user-highlight')) return;
+    hideMarkBar();
   }
 
   function onContextMenu(e) {
@@ -623,10 +841,16 @@
   function bindGlobalListeners() {
     if (listenersBound) return;
     listenersBound = true;
+    document.addEventListener('touchstart', onTouchStart, { passive: false, capture: true });
+    document.addEventListener('touchmove', onTouchMove, { passive: false, capture: true });
+    document.addEventListener('touchend', onTouchEnd, true);
+    document.addEventListener('touchcancel', onTouchCancel, true);
     document.addEventListener('pointerdown', onPointerDown, true);
     document.addEventListener('pointermove', onPointerMove, { passive: true });
     document.addEventListener('pointerup', onPointerUp, true);
     document.addEventListener('pointercancel', onPointerCancel, true);
+    document.addEventListener('dblclick', onDblClick, true);
+    document.addEventListener('click', onDocClick);
     document.addEventListener('contextmenu', onContextMenu, true);
     document.addEventListener('keydown', onKeyDown);
   }
@@ -647,7 +871,9 @@
     isActive = false;
     drag = null;
     dragErase = false;
-    touchTap = null;
+    touchState = null;
+    clearHoldTimer();
+    hideMarkBar();
     clearPreview();
     var pal = document.getElementById('v2BrushPalette');
     if (pal) pal.classList.remove('is-open');

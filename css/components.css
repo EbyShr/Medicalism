@@ -1774,6 +1774,12 @@ mark.user-highlight[data-color="blue"] {
 .exam-cram-mode mark.user-highlight {
   display: inline !important;
 }
+.ltr-term mark.user-highlight {
+  padding: 0;
+  border-radius: 3px;
+  border: none;
+  color: #0f172a;
+}
 
 /* Part 1 Anti-Collision Bottom Bar & Part 2 Direct Brush Selection Suppression */
 .highlight-popover.popover-bottom-dock {

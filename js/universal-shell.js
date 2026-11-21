@@ -32,6 +32,7 @@
     'med_brush_highlight_mode',
     'med_ink_labs_enabled',
     'med_ink_palm_rejection',
+    'med_ink_scroll_lock',
     'medicalism_ink_labs_v1',
     'medicalism_exam_cram_mode',
     'rad_exam_mode',
@@ -273,7 +274,7 @@
       if (pop) pop.style.display = 'none';
       if (getReadingEl()) {
         if (eng) eng.activate();
-        else loadLazyScript('v2-brush-js', './js/brush-highlighter.js?v=20261121e', function () {
+        else loadLazyScript('v2-brush-js', './js/brush-highlighter.js?v=20261121f', function () {
           if (isBrushMode() && window.MedicalismBrushEngine) window.MedicalismBrushEngine.activate();
         });
       }
@@ -290,11 +291,11 @@
     if (on && getReadingEl()) {
       if (!document.getElementById('v2-ink-labs-css') && document.head) {
         var ln = document.createElement('link');
-        ln.id = 'v2-ink-labs-css'; ln.rel = 'stylesheet'; ln.href = './css/ink-labs.css?v=20261121e';
+        ln.id = 'v2-ink-labs-css'; ln.rel = 'stylesheet'; ln.href = './css/ink-labs.css?v=20261121f';
         document.head.appendChild(ln);
       }
       if (eng) eng.enable();
-      else loadLazyScript('v2-ink-labs-js', './js/ink-labs.js?v=20261121e', function () {
+      else loadLazyScript('v2-ink-labs-js', './js/ink-labs.js?v=20261121f', function () {
         if (isInkLabs() && window.MedicalismInkLabs) window.MedicalismInkLabs.enable();
       });
     } else if (!on && eng) {
