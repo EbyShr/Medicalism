@@ -227,114 +227,188 @@
       }
     }
 
+    getStatsCache() {
+      try {
+        const raw = localStorage.getItem('med_quiz_stats_v2');
+        const parsed = raw ? JSON.parse(raw) : {};
+        return (parsed && typeof parsed === 'object') ? parsed : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    syncCompactStatsCache() {
+      if (!this.currentQuiz || !Array.isArray(this.allQuestions) || this.allQuestions.length === 0) return;
+      try {
+        const cache = this.getStatsCache();
+        const byChapter = new Map();
+        this.allQuestions.forEach(q => {
+          const chId = q.chapterId || this.currentQuiz.id;
+          if (!byChapter.has(chId)) byChapter.set(chId, []);
+          byChapter.get(chId).push(q);
+        });
+
+        byChapter.forEach((qs, chId) => {
+          let answered = 0;
+          let correct = 0;
+          let incorrect = 0;
+          let flagged = 0;
+          const chStoredAns = this.loadStoredAnswers(chId);
+          const chStoredFlags = this.loadStoredFlags(chId);
+
+          qs.forEach(q => {
+            const qKey = this.getQuestionKey(q);
+            const isFlagged = this.flags.has(qKey) || this.flags.has(q.id) || this.flags.has(String(q.id)) ||
+              chStoredFlags.includes(qKey) || chStoredFlags.includes(q.id) || chStoredFlags.includes(String(q.id));
+            if (isFlagged) flagged++;
+
+            const ans = (this.answers && (this.answers[qKey] ?? this.answers[q.id] ?? this.answers[String(q.id)])) ??
+              (chStoredAns[qKey] ?? chStoredAns[q.id] ?? chStoredAns[String(q.id)]);
+            if (ans !== undefined && ans !== null) {
+              answered++;
+              if (q.correct_answer && ans === q.correct_answer) correct++;
+              else if (q.correct_answer) incorrect++;
+            }
+          });
+
+          cache[chId] = { answered, correct, incorrect, flagged, total: qs.length };
+        });
+
+        localStorage.setItem('med_quiz_stats_v2', JSON.stringify(cache));
+      } catch (e) {
+        console.warn('Could not sync compact quiz stats:', e);
+      }
+    }
+
     computeStudentStats() {
-      const course = window.QuizRegistry ? window.QuizRegistry.getQuizById('ncd') : null;
-      const chapters = (course && course.chapters && course.chapters.filter(c => !c.isAll)) || [];
+      const courses = (window.QuizRegistry && typeof window.QuizRegistry.getAllQuizzes === 'function')
+        ? window.QuizRegistry.getAllQuizzes()
+        : [];
+      const statsCache = this.getStatsCache();
 
       let totalAnswered = 0;
       let totalCorrect = 0;
       let totalIncorrect = 0;
-      const flaggedSet = new Set();
-      const incorrectQuestionsMap = new Map();
+      let totalFlagged = 0;
       const flaggedQuestionsMap = new Map();
-      const allUniqueAnsweredQuestions = new Map();
+      const incorrectQuestionsMap = new Map();
+      const chaptersToLoadForReview = new Set();
 
-      // Collect from individual chapters
-      chapters.forEach(ch => {
-        const questions = ch.fallbackQuestions || 
-          (window.QuizRegistry && window.QuizRegistry.questionsCache && window.QuizRegistry.questionsCache.get(ch.id)) || [];
+      courses.forEach(course => {
+        const chapters = (course.chapters && Array.isArray(course.chapters))
+          ? course.chapters.filter(c => !c.isAll)
+          : [course];
 
-        const storedAnswers = this.loadStoredAnswers(ch.id);
-        const storedFlags = this.loadStoredFlags(ch.id);
-
-        questions.forEach(q => {
-          const key = `${ch.id}_${q.id}`;
-
-          // Check flagged
-          if (storedFlags.includes(q.id) || storedFlags.includes(String(q.id))) {
-            flaggedSet.add(key);
-            flaggedQuestionsMap.set(key, { ...q, chapterId: ch.id, chapterTitle: ch.shortTitle || ch.title });
-          }
-
-          // Check answered
-          const userAns = storedAnswers[q.id] || storedAnswers[String(q.id)];
-          if (userAns !== undefined && userAns !== null) {
-            const isCorrect = userAns === q.correct_answer;
-            allUniqueAnsweredQuestions.set(key, isCorrect);
-            if (!isCorrect) {
-              incorrectQuestionsMap.set(key, { ...q, chapterId: ch.id, chapterTitle: ch.shortTitle || ch.title, userAns });
-            }
-          }
-        });
-      });
-
-      // Also check global answer sets if saved under 'ncd' or 'ncd-all'
-      ['ncd', 'ncd-all'].forEach(qKey => {
-        const globalAnswers = this.loadStoredAnswers(qKey);
-        const globalFlags = this.loadStoredFlags(qKey);
+        const globalAnswers = this.loadStoredAnswers(course.id);
+        const allAnswers = this.loadStoredAnswers(`${course.id}-all`);
+        const globalFlags = this.loadStoredFlags(course.id);
+        const allFlags = this.loadStoredFlags(`${course.id}-all`);
 
         chapters.forEach(ch => {
-          const questions = ch.fallbackQuestions || 
-            (window.QuizRegistry && window.QuizRegistry.questionsCache && window.QuizRegistry.questionsCache.get(ch.id)) || [];
+          const cachedQuestions = (window.QuizRegistry && window.QuizRegistry.questionsCache && window.QuizRegistry.questionsCache.get(ch.id)) ||
+            (Array.isArray(ch.fallbackQuestions) && ch.fallbackQuestions.length > 0 ? ch.fallbackQuestions : null);
 
-          questions.forEach(q => {
-            const key = `${ch.id}_${q.id}`;
+          const chAnswers = this.loadStoredAnswers(ch.id);
+          const chFlags = this.loadStoredFlags(ch.id);
+          const hasStoredForCh = Object.keys(chAnswers).length > 0 || chFlags.length > 0 ||
+            Object.keys(globalAnswers).length > 0 || Object.keys(allAnswers).length > 0 ||
+            globalFlags.length > 0 || allFlags.length > 0;
 
-            if (globalFlags.includes(q.id) || globalFlags.includes(String(q.id))) {
-              flaggedSet.add(key);
-              flaggedQuestionsMap.set(key, { ...q, chapterId: ch.id, chapterTitle: ch.shortTitle || ch.title });
-            }
+          if (cachedQuestions && cachedQuestions.length > 0) {
+            const seenKeys = new Map();
+            const seenFlags = new Set();
 
-            const userAns = globalAnswers[q.id] || globalAnswers[String(q.id)];
-            if (userAns !== undefined && userAns !== null && !allUniqueAnsweredQuestions.has(key)) {
-              const isCorrect = userAns === q.correct_answer;
-              allUniqueAnsweredQuestions.set(key, isCorrect);
-              if (!isCorrect) {
-                incorrectQuestionsMap.set(key, { ...q, chapterId: ch.id, chapterTitle: ch.shortTitle || ch.title, userAns });
+            cachedQuestions.forEach(q => {
+              const gKey = q.globalId || `${ch.id}_${q.id}`;
+              const isFlagged = chFlags.includes(gKey) || chFlags.includes(q.id) || chFlags.includes(String(q.id)) ||
+                globalFlags.includes(gKey) || globalFlags.includes(q.id) ||
+                allFlags.includes(gKey) || allFlags.includes(q.id);
+              if (isFlagged && !seenFlags.has(gKey)) {
+                seenFlags.add(gKey);
+                flaggedQuestionsMap.set(gKey, { ...q, chapterId: ch.id, chapterTitle: ch.shortTitle || ch.title });
               }
+
+              const userAns = chAnswers[gKey] ?? chAnswers[q.id] ?? chAnswers[String(q.id)] ??
+                globalAnswers[gKey] ?? (typeof q.id === 'string' && q.id.startsWith('surg_') ? globalAnswers[q.id] : undefined) ??
+                allAnswers[gKey] ?? (typeof q.id === 'string' && q.id.startsWith('surg_') ? allAnswers[q.id] : undefined);
+
+              if (userAns !== undefined && userAns !== null && !seenKeys.has(gKey)) {
+                const isCorrect = q.correct_answer ? (userAns === q.correct_answer) : true;
+                seenKeys.set(gKey, isCorrect);
+                if (!isCorrect) {
+                  incorrectQuestionsMap.set(gKey, { ...q, chapterId: ch.id, chapterTitle: ch.shortTitle || ch.title, userAns });
+                }
+              }
+            });
+
+            totalFlagged += seenFlags.size;
+            seenKeys.forEach(isCorrect => {
+              totalAnswered++;
+              if (isCorrect) totalCorrect++;
+              else totalIncorrect++;
+            });
+          } else {
+            // Unloaded lazy chapter: read compact cache or raw localStorage key counts without blocking
+            const cachedStat = statsCache[ch.id];
+            const ansCount = Object.keys(chAnswers).length;
+            const flagCount = chFlags.length;
+            if (cachedStat && typeof cachedStat.answered === 'number') {
+              totalAnswered += cachedStat.answered;
+              totalCorrect += cachedStat.correct || 0;
+              totalIncorrect += cachedStat.incorrect || 0;
+              totalFlagged += Math.max(cachedStat.flagged || 0, flagCount);
+              if ((cachedStat.incorrect || 0) > 0 || (cachedStat.flagged || 0) > 0 || flagCount > 0) {
+                chaptersToLoadForReview.add(ch.id);
+              }
+            } else {
+              totalAnswered += ansCount;
+              totalFlagged += flagCount;
+              if (hasStoredForCh) chaptersToLoadForReview.add(ch.id);
             }
-          });
+          }
         });
       });
 
-      totalAnswered = allUniqueAnsweredQuestions.size;
-      allUniqueAnsweredQuestions.forEach(isCorrect => {
-        if (isCorrect) totalCorrect++;
-        else totalIncorrect++;
-      });
-
-      const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+      const gradedTotal = totalCorrect + totalIncorrect;
+      const accuracy = gradedTotal > 0 ? Math.round((totalCorrect / gradedTotal) * 100) : 0;
 
       return {
         totalAnswered,
         totalCorrect,
         totalIncorrect,
         accuracy,
-        flaggedCount: flaggedSet.size,
+        flaggedCount: Math.max(totalFlagged, flaggedQuestionsMap.size),
         flaggedQuestions: Array.from(flaggedQuestionsMap.values()),
-        incorrectQuestions: Array.from(incorrectQuestionsMap.values())
+        incorrectQuestions: Array.from(incorrectQuestionsMap.values()),
+        chaptersToLoadForReview: Array.from(chaptersToLoadForReview)
       };
     }
 
-    updateStudentPerformanceOverview() {
-      const stats = this.computeStudentStats();
-      
+    updateStudentPerformanceOverview(precomputedStats = null) {
+      const stats = precomputedStats || this.computeStudentStats();
+
       const elTotal = document.getElementById('perfTotalAnswered');
       const elAcc = document.getElementById('perfAccuracy');
       const elFlag = document.getElementById('perfFlaggedCount');
       const elInc = document.getElementById('perfIncorrectCount');
 
       if (elTotal) elTotal.textContent = this.toPersianDigits(stats.totalAnswered);
-      if (elAcc) elAcc.textContent = stats.totalAnswered > 0 ? `${this.toPersianDigits(stats.accuracy)}٪` : '۰٪';
+      if (elAcc) elAcc.textContent = (stats.totalCorrect + stats.totalIncorrect) > 0 ? `${this.toPersianDigits(stats.accuracy)}٪` : '۰٪';
       if (elFlag) elFlag.textContent = this.toPersianDigits(stats.flaggedCount);
       if (elInc) elInc.textContent = this.toPersianDigits(stats.totalIncorrect);
+      return stats;
     }
 
-    launchSmartReview() {
-      const stats = this.computeStudentStats();
+    async launchSmartReview() {
+      let stats = this.computeStudentStats();
+      if (stats.chaptersToLoadForReview && stats.chaptersToLoadForReview.length > 0 && window.QuizRegistry) {
+        await Promise.all(stats.chaptersToLoadForReview.map(id => window.QuizRegistry.loadQuestions(id).catch(() => [])));
+        stats = this.computeStudentStats();
+      }
+
       const combinedMap = new Map();
-      (stats.flaggedQuestions || []).forEach(q => combinedMap.set(`${q.chapterId}_${q.id}`, q));
-      (stats.incorrectQuestions || []).forEach(q => combinedMap.set(`${q.chapterId}_${q.id}`, q));
+      (stats.flaggedQuestions || []).forEach(q => combinedMap.set(q.globalId || `${q.chapterId}_${q.id}`, q));
+      (stats.incorrectQuestions || []).forEach(q => combinedMap.set(q.globalId || `${q.chapterId}_${q.id}`, q));
       const questions = Array.from(combinedMap.values());
 
       if (questions.length === 0) {
@@ -443,15 +517,13 @@
       if (this.dom.activeView) this.dom.activeView.style.display = 'none';
       if (this.dom.scorecardView) this.dom.scorecardView.style.display = 'none';
 
-      // Update Student Performance Overview from LocalStorage
-      this.updateStudentPerformanceOverview();
+      // Compute once and update Student Performance Overview
+      const stats = this.updateStudentPerformanceOverview();
 
       const quizzes = window.QuizRegistry ? window.QuizRegistry.getAllQuizzes() : [];
       if (!this.dom.quizzesGrid) return;
 
-      const recallsQuiz = quizzes.find(q => q.id === 'surgery-recent-recalls');
       const ncdQuiz = quizzes.find(q => q.id === 'ncd') || quizzes[0];
-      const stats = this.computeStudentStats();
 
       const flaggedCountPersian = this.toPersianDigits(stats.flaggedCount);
       const incorrectCountPersian = this.toPersianDigits(stats.totalIncorrect);
@@ -462,11 +534,6 @@
       const ncdChaptersCount = ncdIndividual.length;
 
       let html = '';
-
-      // Flagship Card 0: Recent Surgery Recall Questions & Lawrence Mini-Lessons (Practice-Only Sequential)
-      if (recallsQuiz) {
-        html += this.generateFlagshipRecallsCardHtml(recallsQuiz, 'hub');
-      }
 
       // Card 1: NCD Question Bank
       if (ncdQuiz) {
@@ -657,6 +724,44 @@
         </div>
       `;
 
+      // Card 4: PMP Clinical Exam Simulator (Standard Peer Card)
+      html += `
+        <div class="quiz-card" data-quiz-id="pmp-simulator">
+          <div>
+            <div class="quiz-card-header">
+              <span class="quiz-card-category" style="color: #4f46e5; background: rgba(79, 70, 229, 0.12);">
+                شبیه‌ساز ایستگاه بالینی
+              </span>
+              <span class="quiz-card-badge" style="background: rgba(79, 70, 229, 0.1); color: #4f46e5; border-color: rgba(79, 70, 229, 0.3);">
+                ۴۶ کیس • ۱۰۰ مرحله
+              </span>
+            </div>
+            <h3 class="quiz-card-title">شبیه‌ساز آزمون PMP و کیس‌های بالینی جراحی</h3>
+            <p class="quiz-card-desc">
+              شبیه‌ساز تعاملی مدیریت مرحله‌ای بیمار (Patient Management Problem) با نمره‌دهی استاندارد + / −، تصاویر تشخیصی و تحلیل خطاهای بالینی.
+            </p>
+          </div>
+          <div>
+            <div class="quiz-card-meta">
+              <div class="quiz-card-meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                <span>۴۶ سناریوی مرحله‌به‌مرحله جراحی</span>
+              </div>
+            </div>
+            <div>
+              <a href="./pmp-exam.html" class="btn-open-course" style="background: linear-gradient(135deg, #4f46e5, #0d9488); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <span>ورود به شبیه‌ساز PMP</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+
       this.dom.quizzesGrid.innerHTML = html;
     }
 
@@ -672,8 +777,8 @@
       if (!course) return;
 
       this.currentCourseId = courseId;
-      const individual = (course.chapters && course.chapters.filter(c => !c.isAll)) || [];
-      // Select all chapters by default
+      const individual = (course.chapters && course.chapters.filter(c => !c.isAll && !c.practiceOnly)) || [];
+      // Select all standard chapters by default
       this.selectedChapterIds = new Set(individual.map(c => c.id));
       this.selectedCourseMode = 'study';
 
@@ -688,11 +793,10 @@
       if (this.dom.courseTitle) this.dom.courseTitle.textContent = course.title;
       if (this.dom.courseDesc) this.dom.courseDesc.textContent = course.description;
 
-      // Spotlight Flagship Recalls Bank at the top of Surgery Course View (outside random mix chapters)
+      // Clear temporary flagship promo spotlight (recent recalls now lives neatly inside Surgery chapters)
       const spotlightEl = this.dom.courseFlagshipSpotlight || document.getElementById('courseFlagshipSpotlight');
       if (spotlightEl) {
-        const recallsQuiz = course.id === 'surgery' && window.QuizRegistry ? window.QuizRegistry.getQuizById('surgery-recent-recalls') : null;
-        spotlightEl.innerHTML = recallsQuiz ? this.generateFlagshipRecallsCardHtml(recallsQuiz, 'course') : '';
+        spotlightEl.innerHTML = '';
       }
 
       // Populate Chapters Grid
@@ -710,10 +814,11 @@
     renderCourseChaptersGrid(course) {
       if (!this.dom.courseChaptersGrid || !course.chapters) return;
       const chapters = course.chapters.filter(c => !c.isAll);
+      const statsCache = this.getStatsCache();
 
       this.dom.courseChaptersGrid.innerHTML = chapters.map((ch, idx) => {
-        const questions = ch.fallbackQuestions || 
-          (window.QuizRegistry && window.QuizRegistry.questionsCache && window.QuizRegistry.questionsCache.get(ch.id)) || [];
+        const questions = (window.QuizRegistry && window.QuizRegistry.questionsCache && window.QuizRegistry.questionsCache.get(ch.id)) ||
+          (Array.isArray(ch.fallbackQuestions) && ch.fallbackQuestions.length > 0 ? ch.fallbackQuestions : []);
         const totalChQuestions = ch.totalQuestions || questions.length || 0;
 
         const chAnswers = this.loadStoredAnswers(ch.id);
@@ -723,24 +828,30 @@
         let answeredCount = 0;
         let correctCount = 0;
 
-        questions.forEach(q => {
-          const qKey = q.globalId || `${ch.id}_${q.id}`;
-          const isSurgId = typeof q.id === 'string' && q.id.startsWith('surg_');
-          const ans = chAnswers[qKey] || chAnswers[q.id] || chAnswers[String(q.id)] ||
-                      globalAnswers[qKey] || (isSurgId ? globalAnswers[q.id] : undefined) ||
-                      allAnswers[qKey] || (isSurgId ? allAnswers[q.id] : undefined);
-          if (ans !== undefined && ans !== null) {
-            answeredCount++;
-            if (ans === q.correct_answer) {
-              correctCount++;
+        if (questions.length > 0) {
+          questions.forEach(q => {
+            const qKey = q.globalId || `${ch.id}_${q.id}`;
+            const isSurgId = typeof q.id === 'string' && q.id.startsWith('surg_');
+            const ans = chAnswers[qKey] ?? chAnswers[q.id] ?? chAnswers[String(q.id)] ??
+                        globalAnswers[qKey] ?? (isSurgId ? globalAnswers[q.id] : undefined) ??
+                        allAnswers[qKey] ?? (isSurgId ? allAnswers[q.id] : undefined);
+            if (ans !== undefined && ans !== null) {
+              answeredCount++;
+              if (ans === q.correct_answer) correctCount++;
             }
-          }
-        });
+          });
+        } else if (statsCache[ch.id]) {
+          answeredCount = statsCache[ch.id].answered || 0;
+          correctCount = statsCache[ch.id].correct || 0;
+        } else {
+          answeredCount = Object.keys(chAnswers).length;
+        }
 
-        const accuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+        const accuracy = (answeredCount > 0 && correctCount > 0) ? Math.round((correctCount / answeredCount) * 100) : 0;
         const progressPercent = totalChQuestions > 0 ? Math.min(100, Math.round((answeredCount / totalChQuestions) * 100)) : 0;
         const isSelected = this.selectedChapterIds.has(ch.id);
         const isSpecial = !!ch.isSpecialExam;
+        const isPracticeOnly = !!ch.practiceOnly;
 
         return `
           <div class="chapter-card ${isSpecial ? 'is-special-exam' : ''}" data-chapter-id="${ch.id}">
@@ -751,15 +862,17 @@
                 </div>
               ` : ''}
               <div class="chapter-card-header">
-                <span class="chapter-card-num ${isSpecial ? 'is-special-num' : ''}">${isSpecial ? `★ منتخب امتحانی ${idx + 1}` : `مبحث ${idx + 1}`}</span>
-                <button type="button" class="chapter-select-pill ${isSelected ? 'is-selected' : ''}" 
-                        onclick="window.medicalQuiz.toggleCourseTopic('${ch.id}')" 
-                        title="${isSelected ? 'کلیک کنید تا از آزمون ترکیبی خارج شود' : 'کلیک کنید تا به آزمون ترکیبی افزوده شود'}">
-                  <span class="item-checkbox" style="width: 14px; height: 14px; min-width: 14px; border-radius: 3px; font-size: 10px;">
-                    ${isSelected ? '✓' : ''}
-                  </span>
-                  <span>${isSelected ? 'انتخاب‌شده' : 'افزودن به آزمون'}</span>
-                </button>
+                <span class="chapter-card-num ${isSpecial ? 'is-special-num' : ''}">${isSpecial ? `★ منتخب امتحانی ${idx + 1}` : (isPracticeOnly ? 'بانک تمرینی' : `مبحث ${idx + 1}`)}</span>
+                ${!isPracticeOnly ? `
+                  <button type="button" class="chapter-select-pill ${isSelected ? 'is-selected' : ''}" 
+                          onclick="window.medicalQuiz.toggleCourseTopic('${ch.id}')" 
+                          title="${isSelected ? 'کلیک کنید تا از آزمون ترکیبی خارج شود' : 'کلیک کنید تا به آزمون ترکیبی افزوده شود'}">
+                    <span class="item-checkbox" style="width: 14px; height: 14px; min-width: 14px; border-radius: 3px; font-size: 10px;">
+                      ${isSelected ? '✓' : ''}
+                    </span>
+                    <span>${isSelected ? 'انتخاب‌شده' : 'افزودن به آزمون'}</span>
+                  </button>
+                ` : ''}
                 <span class="chapter-card-badge">${ch.badge || `${ch.totalQuestions} سوال`}</span>
               </div>
               <h4 class="chapter-card-title">${ch.title}</h4>
@@ -770,25 +883,31 @@
                 <span>⏱️ زمان تخمینی: ${ch.estimatedMinutes || 25} دقیقه</span>
                 ${answeredCount > 0 
                   ? `<span class="chapter-mastery-pill" style="color: ${accuracy >= 70 ? '#059669' : (accuracy >= 40 ? '#0284c7' : '#d97706')}; background: ${accuracy >= 70 ? 'rgba(5, 150, 105, 0.1)' : (accuracy >= 40 ? 'rgba(2, 132, 199, 0.1)' : 'rgba(217, 119, 6, 0.1)')};">
-                       ✓ ${this.toPersianDigits(answeredCount)} از ${this.toPersianDigits(totalChQuestions)} پاسخ داده شده (${this.toPersianDigits(accuracy)}٪ دقت)
+                       ✓ ${this.toPersianDigits(answeredCount)} از ${this.toPersianDigits(totalChQuestions)} پاسخ داده شده${correctCount > 0 ? ` (${this.toPersianDigits(accuracy)}٪ دقت)` : ''}
                      </span>`
                   : `<span class="chapter-mastery-pill is-unstarted">شروع نشده (۰ از ${this.toPersianDigits(totalChQuestions)})</span>`
                 }
               </div>
               <div class="chapter-card-buttons">
-                <button type="button" class="btn-mode-study" onclick="window.medicalQuiz.startSingleChapterQuiz('${ch.id}', 'study')" title="مطالعه آموزشی فقط این مبحث به صورت تصادفی">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                  </svg>
-                  <span>آموزشی (تصادفی)</span>
-                </button>
-                <button type="button" class="btn-mode-exam" onclick="window.medicalQuiz.startSingleChapterQuiz('${ch.id}', 'exam')" title="شبیه‌ساز آزمون فقط این مبحث">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                  </svg>
-                  <span>شبیه‌ساز آزمون</span>
-                </button>
+                ${isPracticeOnly ? `
+                  <button type="button" class="btn-mode-study" style="grid-column: 1 / -1;" onclick="window.medicalQuiz.startSingleChapterQuiz('${ch.id}', 'study')" title="مرور ترتیبی سوالات و پاسخ تشریحی">
+                    <span>📖 شروع مرور ترتیبی (آموزشی)</span>
+                  </button>
+                ` : `
+                  <button type="button" class="btn-mode-study" onclick="window.medicalQuiz.startSingleChapterQuiz('${ch.id}', 'study')" title="مطالعه آموزشی فقط این مبحث به صورت تصادفی">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    <span>آموزشی (تصادفی)</span>
+                  </button>
+                  <button type="button" class="btn-mode-exam" onclick="window.medicalQuiz.startSingleChapterQuiz('${ch.id}', 'exam')" title="شبیه‌ساز آزمون فقط این مبحث">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    <span>شبیه‌ساز آزمون</span>
+                  </button>
+                `}
               </div>
             </div>
 
@@ -803,7 +922,7 @@
 
     renderCourseTopicDropdown(course) {
       if (!this.dom.courseDropdownList || !course.chapters) return;
-      const individual = course.chapters.filter(c => !c.isAll);
+      const individual = course.chapters.filter(c => !c.isAll && !c.practiceOnly);
       const isAllSelected = individual.length > 0 && individual.every(c => this.selectedChapterIds.has(c.id));
       const totalQuestions = individual.reduce((sum, c) => sum + (c.totalQuestions || 0), 0);
 
@@ -859,7 +978,7 @@
       if (event && event.stopPropagation) event.stopPropagation();
       const course = window.QuizRegistry.getQuizById(this.currentCourseId || 'ncd');
       if (!course || !course.chapters) return;
-      const individual = course.chapters.filter(c => !c.isAll);
+      const individual = course.chapters.filter(c => !c.isAll && !c.practiceOnly);
       const isAllSelected = individual.every(c => this.selectedChapterIds.has(c.id));
 
       if (isAllSelected) {
@@ -876,7 +995,7 @@
       if (event && event.stopPropagation) event.stopPropagation();
       const course = window.QuizRegistry.getQuizById(this.currentCourseId || 'ncd');
       if (!course || !course.chapters) return;
-      const individual = course.chapters.filter(c => !c.isAll);
+      const individual = course.chapters.filter(c => !c.isAll && !c.practiceOnly);
       individual.forEach(c => this.selectedChapterIds.add(c.id));
       this.renderCourseTopicDropdown(course);
       this.renderCourseChaptersGrid(course);
@@ -911,7 +1030,7 @@
       }
 
       const course = window.QuizRegistry.getQuizById(this.currentCourseId || 'ncd');
-      const individual = (course && course.chapters && course.chapters.filter(c => !c.isAll)) || [];
+      const individual = (course && course.chapters && course.chapters.filter(c => !c.isAll && !c.practiceOnly)) || [];
       const totalPossible = individual.length;
       const selectedCount = this.selectedChapterIds.size;
 
@@ -1017,7 +1136,7 @@
         return;
       }
       const course = window.QuizRegistry.getQuizById(this.currentCourseId || 'ncd');
-      const individual = (course && course.chapters && course.chapters.filter(c => !c.isAll)) || [];
+      const individual = (course && course.chapters && course.chapters.filter(c => !c.isAll && !c.practiceOnly)) || [];
       const isAllSelected = individual.length > 0 && individual.every(c => this.selectedChapterIds.has(c.id));
 
       if (isAllSelected) {
@@ -1029,7 +1148,7 @@
     }
 
     returnToCourseView() {
-      if (this.currentQuiz && (this.currentQuiz.id === 'smart-review' || this.isPracticeOnlyQuiz())) {
+      if (this.currentQuiz && this.currentQuiz.id === 'smart-review') {
         this.returnToHub();
         return;
       }
@@ -1116,6 +1235,7 @@
         const isSequential = this.isSequentialOnlyQuiz(quizMeta);
 
         this.currentQuiz = quizMeta;
+        if (quizMeta.parentQuizId) this.currentCourseId = quizMeta.parentQuizId;
         this.mode = isPractice ? 'study' : initialMode;
         this.currentIndex = 0;
         this.activeTopic = 'all';
@@ -2565,6 +2685,7 @@
       this.isSubmitted = false;
       this.timerSeconds = 0;
       this.currentIndex = 0;
+      this.syncCompactStatsCache();
 
       this.clearPacingInterval();
       this.pacingSeconds = 0;
@@ -2622,6 +2743,7 @@
         localStorage.setItem(`med_quiz_mode_${qId}`, this.mode);
         localStorage.setItem(`med_quiz_topic_${qId}`, this.activeTopic);
         localStorage.setItem(`med_quiz_time_${qId}`, this.timerSeconds.toString());
+        this.syncCompactStatsCache();
       } catch (e) {
         console.warn("Could not save quiz state to localStorage:", e);
       }

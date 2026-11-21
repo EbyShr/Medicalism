@@ -1786,6 +1786,10 @@
    * 7. MEDICALISM TOP TOOLBAR CONTROLS (Theme, Font, Continuous Zoom)
    * ======================================================================== */
   function initMedicalismPrefs() {
+    if (window.MedicalismShell) {
+      window.MedicalismShell.setFontScale(window.MedicalismShell.getFontScale());
+      return;
+    }
     var root = document.documentElement;
     function safeGet(k, defVal) {
       try { var v = localStorage.getItem(k); return v !== null ? v : defVal; } catch (e) { return defVal; }

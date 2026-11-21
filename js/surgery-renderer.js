@@ -47,8 +47,8 @@ window.ComponentRenderer = {
         '<span>•</span><span>کیس‌های تصویری و شبیه‌ساز بالینی</span><span>•</span><span>' + (chapter.estimatedReadTime || '') + '</span>';
     } else if (chapter.isFlagship) {
       metaTagHtml = '' +
-        '<span class="badge-flagship-gold-crimson">🔥 ویژه امتحان: آسکی، PMP و پایان‌بخش البرز</span>' +
-        '<span>•</span><span>۳۵ ایستگاه بالینی، کیس‌های PMP و تله‌های نمره منفی</span><span>•</span><span>' + (chapter.estimatedReadTime || '') + '</span>';
+        '<span class="section-heading-badge" style="display:inline-flex;align-items:center;font-size:0.75rem;font-weight:800;padding:2px 10px;border-radius:var(--radius-full);background:var(--accent-primary-subtle);color:var(--accent-primary);border:1px solid var(--border-subtle);">راهنمای جامع OSCE و PMP جراحی</span>' +
+        '<span>•</span><span>۳۵ ایستگاه بالینی، کیس‌های PMP و نکات آزمون</span><span>•</span><span>' + (chapter.estimatedReadTime || '') + '</span>';
     } else {
       metaTagHtml = '' +
         '<span>فصل ' + (chapter.number || '') + '</span>' +
@@ -112,15 +112,8 @@ window.ComponentRenderer = {
           '</div>' +
         '</div>' +
         '<div class="quiz-crosslink-action" style="display: flex; flex-wrap: wrap; gap: 10px;">' +
-          '<a href="./quiz.html?quiz=surgery-recent-recalls&mode=study" class="btn-quiz-crosslink" style="background: linear-gradient(135deg, #e11d48 0%, #ea580c 100%); color: #fff;">' +
-            '<span>🔥 بانک سوالات اخیر جراحی (۱۳۵ سوال ترتیبی)</span>' +
-            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(180deg);">' +
-              '<line x1="5" y1="12" x2="19" y2="12"></line>' +
-              '<polyline points="12 5 19 12 12 19"></polyline>' +
-            '</svg>' +
-          '</a>' +
-          '<a href="./quiz.html" class="btn-quiz-crosslink">' +
-            '<span>ورود به آزمون و سنجش یادگیری</span>' +
+          '<a href="./quiz.html?course=surgery" class="btn-quiz-crosslink">' +
+            '<span>ورود به بانک سوالات جراحی و سنجش یادگیری</span>' +
             '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(180deg);">' +
               '<line x1="5" y1="12" x2="19" y2="12"></line>' +
               '<polyline points="12 5 19 12 12 19"></polyline>' +

@@ -1,0 +1,473 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://medicalism.alborz/schema/chapter-v2.schema.json",
+  "title": "Medicalism V2 Native Chapter Schema",
+  "description": "Strict semantic block schema (10 clinical primitives) for Gemini AI generation and zero-regex deterministic compilation.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "courseId",
+    "chapterId",
+    "number",
+    "title",
+    "shortTitle",
+    "source",
+    "sections"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "2.0"
+    },
+    "part": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "current": { "type": "integer", "minimum": 1 },
+        "total": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "courseId": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "chapterId": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "number": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3
+    },
+    "shortTitle": {
+      "type": "string",
+      "minLength": 2
+    },
+    "latinTitle": {
+      "type": "string"
+    },
+    "source": {
+      "type": "object",
+      "required": ["textbook", "chapterRef"],
+      "additionalProperties": false,
+      "properties": {
+        "textbook": { "type": "string", "minLength": 2 },
+        "chapterRef": { "type": "string", "minLength": 1 },
+        "guideline": { "type": "string" }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "autoComputedByCompiler": { "type": "boolean" },
+        "wordCount": { "type": "integer", "minimum": 0 },
+        "coreWordCount": { "type": "integer", "minimum": 0 },
+        "deepDiveWordCount": { "type": "integer", "minimum": 0 },
+        "coreStudyMinutes": { "type": "integer", "minimum": 0 },
+        "deepDiveMinutes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hasCramMode": { "type": "boolean" },
+        "hasOsceCards": { "type": "boolean" },
+        "hasWardOrders": { "type": "boolean" },
+        "hasInteractiveBlocks": { "type": "boolean" }
+      }
+    },
+    "cramSummary": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 3 }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/section"
+      }
+    }
+  },
+  "definitions": {
+    "tone": {
+      "type": "string",
+      "enum": ["info", "success", "warning", "danger", "neutral"]
+    },
+    "section": {
+      "type": "object",
+      "required": ["id", "title", "blocks"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "title": { "type": "string", "minLength": 2 },
+        "latinTitle": { "type": "string" },
+        "badge": { "type": "string" },
+        "blocks": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/block" }
+        }
+      }
+    },
+    "block": {
+      "oneOf": [
+        { "$ref": "#/definitions/proseBlock" },
+        { "$ref": "#/definitions/accordionBlock" },
+        { "$ref": "#/definitions/tableBlock" },
+        { "$ref": "#/definitions/pathwayBlock" },
+        { "$ref": "#/definitions/osceCardBlock" },
+        { "$ref": "#/definitions/wardOrdersBlock" },
+        { "$ref": "#/definitions/calloutBlock" },
+        { "$ref": "#/definitions/statStripBlock" },
+        { "$ref": "#/definitions/gestationalTimelineBlock" },
+        { "$ref": "#/definitions/scoringTableBlock" }
+      ]
+    },
+    "proseBlock": {
+      "type": "object",
+      "required": ["id", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "blockId": { "type": "string" },
+        "type": { "const": "prose" },
+        "cram": { "type": "boolean" },
+        "paragraphs": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 2, "maxLength": 520 }
+        },
+        "bullets": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 2, "maxLength": 520 }
+        }
+      }
+    },
+    "accordionBlock": {
+      "type": "object",
+      "required": ["id", "type", "title", "blocks"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "blockId": { "type": "string" },
+        "type": { "const": "accordion" },
+        "variant": {
+          "type": "string",
+          "enum": ["pathophysiology", "deep-dive", "deep_dive", "evidence", "clinical-note", "clinical_note"]
+        },
+        "collapsedByDefault": { "type": "boolean", "default": true },
+        "title": { "type": "string", "minLength": 2 },
+        "cram": { "type": "boolean" },
+        "blocks": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/block" }
+        }
+      }
+    },
+    "tableBlock": {
+      "type": "object",
+      "required": ["id", "type", "columns", "rows"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "blockId": { "type": "string" },
+        "type": { "const": "table" },
+        "caption": { "type": "string" },
+        "cram": { "type": "boolean" },
+        "columns": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "rows": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "object",
+                  "required": ["text"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "text": { "type": "string" },
+                    "tone": { "$ref": "#/definitions/tone" },
+                    "pill": { "type": "boolean" }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "pathwayBlock": {
+      "type": "object",
+      "required": ["id", "type", "title", "steps"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "blockId": { "type": "string" },
+        "type": { "const": "pathway" },
+        "title": { "type": "string", "minLength": 2 },
+        "layout": { "type": "string", "enum": ["horizontal", "vertical"] },
+        "cram": { "type": "boolean" },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["step", "label"],
+            "additionalProperties": false,
+            "properties": {
+              "step": { "type": "integer", "minimum": 1 },
+              "label": { "type": "string", "minLength": 2 },
+              "detail": { "type": "string" },
+              "tone": { "$ref": "#/definitions/tone" },
+              "branches": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["condition", "action"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "condition": { "type": "string", "minLength": 2 },
+                    "badge": { "type": "string" },
+                    "urgency": {
+                      "type": "string",
+                      "enum": ["routine", "urgent", "critical"]
+                    },
+                    "action": { "type": "string", "minLength": 2 }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "osceCardBlock": {
+      "type": "object",
+      "required": ["id", "type", "title", "scenario"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "blockId": { "type": "string" },
+        "type": { "const": "osce_card" },
+        "title": { "type": "string", "minLength": 2 },
+        "scenario": { "type": "string", "minLength": 5 },
+        "cram": { "type": "boolean" },
+        "history": { "type": "array", "items": { "type": "string" } },
+        "physicalExam": { "type": "array", "items": { "type": "string" } },
+        "workup": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "labs": { "type": "array", "items": { "type": "string" } },
+            "imaging": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "ctgNst": {
+          "type": "object",
+          "required": ["baseline", "variability", "category", "action"],
+          "additionalProperties": false,
+          "properties": {
+            "baseline": { "type": "string" },
+            "variability": { "type": "string" },
+            "accelerations": { "type": "string" },
+            "decelerations": { "type": "string" },
+            "category": { "type": "string" },
+            "action": { "type": "string" }
+          }
+        },
+        "differential": { "type": "array", "items": { "type": "string" } },
+        "redFlags": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "wardOrdersBlock": {
+      "type": "object",
+      "required": ["id", "type", "title", "orders"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "blockId": { "type": "string" },
+        "type": { "const": "ward_orders" },
+        "title": { "type": "string", "minLength": 2 },
+        "indication": { "type": "string" },
+        "cram": { "type": "boolean" },
+        "orders": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["category", "drug", "dose", "monitoring"],
+            "additionalProperties": false,
+            "properties": {
+              "category": { "type": "string" },
+              "drug": { "type": "string" },
+              "dose": { "type": "string" },
+              "route": { "type": "string" },
+              "frequency": { "type": "string" },
+              "monitoring": { "type": "string" },
+              "contraindication": { "type": "string" },
+              "priority": {
+                "type": "string",
+                "enum": ["stat", "high", "first_line", "routine"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "calloutBlock": {
+      "type": "object",
+      "required": ["id", "type", "kind", "title", "body"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "blockId": { "type": "string" },
+        "type": { "const": "callout" },
+        "kind": {
+          "type": "string",
+          "enum": ["pearl", "exam_trap", "red_flag", "acog_update"]
+        },
+        "title": { "type": "string", "minLength": 2 },
+        "body": { "type": "string", "minLength": 4 },
+        "cram": { "type": "boolean" }
+      }
+    },
+    "statStripBlock": {
+      "type": "object",
+      "required": ["id", "type", "items"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "blockId": { "type": "string" },
+        "type": { "const": "stat_strip" },
+        "cram": { "type": "boolean" },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "required": ["label", "value"],
+            "additionalProperties": false,
+            "properties": {
+              "label": { "type": "string" },
+              "value": { "type": "string" },
+              "note": { "type": "string" },
+              "tone": { "$ref": "#/definitions/tone" }
+            }
+          }
+        }
+      }
+    },
+    "gestationalTimelineBlock": {
+      "type": "object",
+      "required": ["id", "type", "title", "nodes"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "blockId": { "type": "string" },
+        "type": { "const": "gestational_timeline" },
+        "title": { "type": "string", "minLength": 2 },
+        "subtitle": { "type": "string" },
+        "defaultNodeId": { "type": "string" },
+        "cram": { "type": "boolean" },
+        "nodes": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["id", "label", "headline", "summary"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "label": { "type": "string", "minLength": 2 },
+              "range": { "type": "string" },
+              "badge": { "type": "string" },
+              "tone": { "$ref": "#/definitions/tone" },
+              "headline": { "type": "string", "minLength": 2 },
+              "summary": { "type": "string", "minLength": 4 },
+              "actions": { "type": "array", "items": { "type": "string" } },
+              "redFlags": { "type": "array", "items": { "type": "string" } },
+              "checklist": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "scoringTableBlock": {
+      "type": "object",
+      "required": ["id", "type", "title", "columns", "criteria"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "blockId": { "type": "string" },
+        "type": { "const": "scoring_table" },
+        "title": { "type": "string", "minLength": 2 },
+        "subtitle": { "type": "string" },
+        "interactive": { "type": "boolean", "default": true },
+        "scoreUnit": { "type": "string" },
+        "cram": { "type": "boolean" },
+        "columns": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "type": "string" }
+        },
+        "criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "parameter", "options"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string" },
+              "parameter": { "type": "string" },
+              "options": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "object",
+                  "required": ["points", "label"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "points": { "type": "number" },
+                    "label": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "interpretations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["min", "max", "label", "action"],
+            "additionalProperties": false,
+            "properties": {
+              "min": { "type": "number" },
+              "max": { "type": "number" },
+              "label": { "type": "string" },
+              "tone": { "$ref": "#/definitions/tone" },
+              "action": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

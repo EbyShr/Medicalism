@@ -177,20 +177,14 @@ window.AppNavigation = {
         }).join('');
 
         return `
-          <li class="nav-chapter-item nav-chapter-flagship ${isCurrentChapter ? 'is-active' : ''} ${isExpanded ? 'is-expanded' : ''}" data-nav-chapter="${ch.id}">
-            <div class="nav-chapter-header nav-flagship-header" data-chapter-id="${ch.id}" role="button" tabindex="0" title="${ch.title}">
+          <li class="nav-chapter-item ${isCurrentChapter ? 'is-active' : ''} ${isExpanded ? 'is-expanded' : ''}" data-nav-chapter="${ch.id}">
+            <div class="nav-chapter-header" data-chapter-id="${ch.id}" role="button" tabindex="0" title="${ch.title}">
               <div class="nav-chapter-title-group">
-                <div class="nav-flagship-pulse-icon" aria-hidden="true">
-                  <span class="nav-flagship-glow-ring"></span>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                  </svg>
-                </div>
-                <span class="badge-flagship-gold-crimson">🔥 ویژه امتحان</span>
-                <span class="nav-chapter-label nav-flagship-title-text" title="${ch.title}">آسکی، PMP و پایان‌بخش البرز</span>
+                <span class="nav-chapter-badge">OSCE</span>
+                <span class="nav-chapter-label" title="${ch.title}">راهنمای OSCE و PMP جراحی</span>
               </div>
               <div class="nav-flagship-header-meta">
-                <span class="nav-flagship-count-pill">${ch.sections.length} کیس</span>
+                <span class="nav-flagship-count-pill">${ch.sections.length} ایستگاه</span>
                 <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="9 18 15 12 9 6"></polyline>
                 </svg>
@@ -199,11 +193,6 @@ window.AppNavigation = {
             <ul class="nav-headings-list nav-flagship-headings-list">
               ${flagshipHeadingsHtml}
             </ul>
-          </li>
-          <li class="nav-flagship-divider-item" aria-hidden="true">
-            <div class="nav-flagship-divider-line">
-              <span>فصول جامع درسنامه لارنس (۲۲ فصل)</span>
-            </div>
           </li>
         `;
       }

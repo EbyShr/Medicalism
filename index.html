@@ -3,172 +3,125 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>مدیکالیسم البرز | پایگاه جامع آموزش پزشکی و یادگیری بالینی • ویژه دانشجویان پزشکی دانشگاه علوم پزشکی البرز</title>
-  <meta name="description" content="سامانه جامع آموزش پزشکی و یادگیری بالینی، از مبانی بهداشت و اپیدمیولوژی تا کورس‌های ماژور بالینی، ویژه دانشجویان پزشکی دانشگاه علوم پزشکی البرز (ABZUMS).">
-  <meta name="theme-color" content="#0284c7">
+  <meta name="color-scheme" content="light dark">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('med_theme');
+        var m = document.querySelector('meta[name="color-scheme"]');
+        if (m) m.content = (t === 'light' || t === 'dark') ? t : 'light dark';
+        var resolved = (t === 'light' || t === 'dark') ? t : ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', resolved);
+        var s = parseFloat(localStorage.getItem('med_font_scale'));
+        if (!isNaN(s) && s >= 0.8 && s <= 1.4) document.documentElement.style.setProperty('--font-scale', String(s));
+      } catch (e) {}
+    })();
+  </script>
+  <title>مدیکالیسم البرز | پایگاه جامع آموزش پزشکی و یادگیری بالینی (ABZUMS)</title>
+  <meta name="description" content="سامانه جامع آموزش پزشکی و یادگیری بالینی ویژه دانشجویان پزشکی دانشگاه علوم پزشکی البرز (ABZUMS).">
+  <meta name="theme-color" content="#0d9488">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d9488'/%3E%3Cpath d='M16 7v18M7 16h18' stroke='%23fff' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
 
-  <!-- Fonts: Vazirmatn & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <!-- Webfonts for Shabnam & Sahel -->
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/shabnam-font@v5.0.1/dist/font-face.css" rel="stylesheet" type="text/css">
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/font-face.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"></noscript>
 
-  <!-- Core App Styles -->
-  <link rel="stylesheet" href="./css/tokens.css?v=20261114">
-  <link rel="stylesheet" href="./css/base.css?v=20261114">
-  <link rel="stylesheet" href="./css/layout.css?v=20261114">
-  <link rel="stylesheet" href="./css/components.css?v=20261114">
-  <link rel="stylesheet" href="./css/medical-widgets.css?v=20261114">
-  <link rel="stylesheet" href="./css/dark-theme.css?v=20261114">
-  <link rel="stylesheet" href="./css/radiology.css?v=20261114">
-  <link rel="stylesheet" href="./css/portal.css?v=20261114">
+  <link rel="stylesheet" href="./css/portal.css?v=20261121">
+  <link rel="stylesheet" href="./css/design-system-v2.css?v=20261121">
 </head>
 <body class="portal-page">
 
-  <!-- Ambient Animated Background -->
-  <div class="ambient-bg" aria-hidden="true">
-    <div class="ambient-orb ambient-orb-1"></div>
-    <div class="ambient-orb ambient-orb-2"></div>
-    <div class="ambient-orb ambient-orb-3"></div>
-  </div>
-
-  <!-- Sticky Top Navigation Bar -->
+  <!-- Minimalist Sticky Top Navbar -->
   <header class="portal-header">
     <div class="portal-container portal-header-inner">
       <a href="./index.html" class="portal-brand" aria-label="مدیکالیسم البرز صفحه اصلی">
         <div class="portal-brand-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
           </svg>
         </div>
-        <div style="display: flex; align-items: baseline; gap: 4px;">
+        <div style="display:flex;align-items:baseline;gap:4px;">
           <span class="portal-brand-title">مدیکالیسم</span>
           <span class="portal-brand-badge">دانشگاه علوم پزشکی البرز</span>
         </div>
       </a>
 
-      <!-- Desktop Nav Links -->
       <nav class="portal-nav-links" aria-label="ناوبری پورتال">
-        <!-- Animated Dropdown for Courses & Chapters -->
         <div class="portal-dropdown" id="coursesDropdown">
           <button class="portal-dropdown-trigger" type="button" id="coursesDropdownBtn" aria-expanded="false" aria-haspopup="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
             </svg>
-            <span class="portal-dropdown-text-desktop">سرفصل‌ها و دوره‌های آموزشی</span>
-            <span class="portal-dropdown-text-mobile">دوره‌های آموزشی</span>
-            <svg class="portal-dropdown-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
+            <span class="portal-dropdown-text-desktop">دوره‌های آموزشی</span>
+            <span class="portal-dropdown-text-mobile">دوره‌ها</span>
+            <svg class="portal-dropdown-arrow" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
           </button>
 
           <div class="portal-dropdown-menu" id="coursesDropdownMenu" role="menu">
             <div class="dropdown-section-label">دوره‌های آموزشی فعال البرز</div>
-            
-            <!-- Course 1: Communicable & Non-Communicable Diseases -->
-            <a href="./communicable-and-noncommunicable-diseases.html" class="dropdown-course-card" style="display: block; text-decoration: none; color: inherit;">
-              <div class="dropdown-course-header" style="margin-block-end: 0;">
-                <div class="dropdown-course-icon-active">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                  </svg>
+
+            <a href="./obgyn.html" class="dropdown-course-card">
+              <div class="dropdown-course-header">
+                <div class="dropdown-course-icon-active" style="background:rgba(13,148,136,0.14);color:#0d9488;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 1 0 5 5 5 5 0 0 0-5-5z"></path><path d="M12 12v10M8 18h8"></path></svg>
                 </div>
-                <div style="flex: 1;">
-                  <div class="dropdown-course-title" style="display: flex; align-items: center; justify-content: space-between;">
-                    <span>بیماری‌های واگیر و غیرواگیر</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                  </div>
-                  <div class="dropdown-course-meta">۳۰ فصل جامع • آماده مطالعه</div>
+                <div style="flex:1;">
+                  <div class="dropdown-course-title">زنان و زایمان (بکمن و لینگ ویرایش ۹)</div>
+                  <div class="dropdown-course-meta">موتور V2 نیتیو • آماده برای ۵۰ فصل بالینی</div>
                 </div>
               </div>
             </a>
 
-            <!-- Course 2: Radiology & Clinical Imaging -->
-            <a href="./radiology.html" class="dropdown-course-card" style="margin-block-end: 0; border-color: rgba(14, 165, 233, 0.3); display: block; text-decoration: none; color: inherit;">
-              <div class="dropdown-course-header" style="margin-block-end: 0;">
-                <div class="dropdown-course-icon-active" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                    <polyline points="21 15 16 10 5 21"></polyline>
-                  </svg>
+            <a href="./surgery.html" class="dropdown-course-card">
+              <div class="dropdown-course-header">
+                <div class="dropdown-course-icon-active" style="background:rgba(225,29,72,0.12);color:#e11d48;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
                 </div>
-                <div style="flex: 1;">
-                  <div class="dropdown-course-title" style="display: flex; align-items: center; justify-content: space-between;">
-                    <span>رادیولوژی و تصویربرداری بالینی</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                  </div>
-                  <div class="dropdown-course-meta">۴ فصل جامع • آماده مطالعه</div>
+                <div style="flex:1;">
+                  <div class="dropdown-course-title">جراحی جنرال (رفرنس لارنس)</div>
+                  <div class="dropdown-course-meta">۲۲ فصل جامع لارنس + راهنمای OSCE و PMP</div>
                 </div>
               </div>
             </a>
-                      <!-- Course 3: General Surgery (Lawrence) -->
-            <a href="./surgery.html" class="dropdown-course-card" style="margin-block-start: 10px; margin-block-end: 0; border-color: rgba(225, 29, 72, 0.3); display: block; text-decoration: none; color: inherit;">
-              <div class="dropdown-course-header" style="margin-block-end: 0;">
-                <div class="dropdown-course-icon-active" style="background: rgba(225, 29, 72, 0.15); color: #e11d48;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                  </svg>
+
+            <a href="./communicable-and-noncommunicable-diseases.html" class="dropdown-course-card">
+              <div class="dropdown-course-header">
+                <div class="dropdown-course-icon-active">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
                 </div>
-                <div style="flex: 1;">
-                  <div class="dropdown-course-title" style="display: flex; align-items: center; justify-content: space-between;">
-                    <span>جراحی جنرال (رفرنس لارنس)</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                  </div>
-                  <div class="dropdown-course-meta">۲۲ فصل جامع لارنس + بسته ویژه آزمون البرز (۱۹۹ مبحث)</div>
-                  <div style="margin-block-start: 6px; display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 800; color: #e11d48; background: rgba(225, 29, 72, 0.1); padding: 2px 8px; border-radius: var(--radius-full); border: 1px solid rgba(225, 29, 72, 0.25);">🔥 ویژه امتحان: آسکی، PMP و پایان‌بخش البرز</div>
+                <div style="flex:1;">
+                  <div class="dropdown-course-title">بیماری‌های واگیر و غیرواگیر</div>
+                  <div class="dropdown-course-meta">۳۰ فصل جامع • پروتکل‌های کشوری</div>
+                </div>
+              </div>
+            </a>
+
+            <a href="./radiology.html" class="dropdown-course-card">
+              <div class="dropdown-course-header">
+                <div class="dropdown-course-icon-active" style="background:rgba(14,165,233,0.14);color:#0ea5e9;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                </div>
+                <div style="flex:1;">
+                  <div class="dropdown-course-title">رادیولوژی و تصویربرداری بالینی</div>
+                  <div class="dropdown-course-meta">۴ فصل جامع • ۴۷۴ کلیشه</div>
                 </div>
               </div>
             </a>
           </div>
         </div>
 
-        <!-- Direct Nav Link to Quiz Module -->
         <a href="./quiz.html" class="portal-nav-link" title="ورود به سامانه آزمون و بانک سوالات">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
-            <polyline points="9 11 12 14 22 4"></polyline>
-            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-          </svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
           <span>آزمون و بانک سوال</span>
         </a>
       </nav>
 
-      <!-- Action Buttons (Theme, Font) -->
       <div class="portal-header-actions">
-        <!-- Font Selector -->
-        <select class="font-select" id="portalFontSelect" title="تغییر قلم" style="font-size: 12px; padding: 5px 8px;">
-          <option value="vazirmatn">وزیرمتن</option>
-          <option value="shabnam">شبنم</option>
-          <option value="sahel">ساحل</option>
-        </select>
-
-        <!-- Dark/Light Theme Toggle -->
-        <button class="btn-icon" id="portalThemeToggleBtn" title="تغییر حالت تم (روشن / تاریک)" aria-label="تغییر تم">
-          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: none;">
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-          </svg>
-          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
+        <button type="button" class="v2-settings-trigger" id="v2SettingsBtn" data-v2-settings-trigger aria-label="تنظیمات و پروفایل">
+          <span class="v2-settings-avatar" aria-hidden="true">⚙️</span>
+          <span class="v2-settings-label-text">تنظیمات و پروفایل</span>
         </button>
       </div>
     </div>
@@ -177,602 +130,444 @@
   <!-- Hero Section -->
   <section class="portal-hero">
     <div class="portal-container">
-      
-      <!-- Main Headline -->
       <h1 class="portal-hero-title">
         پایگاه جامع آموزش پزشکی، یادگیری بالینی و <span class="hero-gradient-text">مدیریت دانش سلامت البرز</span>
       </h1>
 
-
-      <!-- Interactive Instant Hero Search -->
       <div class="hero-search-wrapper">
         <div class="hero-search-input-box">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" id="heroSearchInput" class="hero-search-input" placeholder="جستجوی فوری در سرفصل‌ها، بیماری‌ها، داروها، شاخص‌ها و نشانه‌ها..." autocomplete="off">
-          <span class="search-shortcut-badge" style="font-size: 11px;">کاوش سریع</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" id="heroSearchInput" class="hero-search-input" placeholder="جستجوی فوری در سرفصل‌ها، بیماری‌ها، جراحی، زنان و زایمان و رادیولوژی..." autocomplete="off">
+          <span class="search-shortcut-badge">کاوش سریع</span>
         </div>
-
-        <!-- Floating Search Results Dropdown -->
         <div class="hero-search-results-dropdown" id="heroSearchResults"></div>
 
-        <!-- Filter Chips Under Search -->
         <div class="hero-search-tags">
-          <span style="font-size: 11px; color: var(--text-muted); margin-inline-end: 4px;">جستجوهای شایع:</span>
-          <button type="button" class="hero-search-tag-chip" data-query="مالاریا">مالاریا و ناقلین</button>
+          <span style="font-size:11px;color:var(--text-muted);margin-inline-end:4px;">جستجوهای شایع:</span>
+          <button type="button" class="hero-search-tag-chip" data-query="پره اکلامپسی">پره اکلامپسی</button>
+          <button type="button" class="hero-search-tag-chip" data-query="فتق">فتق و جدار شکم</button>
           <button type="button" class="hero-search-tag-chip" data-query="Ira-PEN">بسته Ira-PEN</button>
           <button type="button" class="hero-search-tag-chip" data-query="سل">کنترل سل (TB)</button>
-          <button type="button" class="hero-search-tag-chip" data-query="سرطان">نظام ثبت سرطان</button>
-          <button type="button" class="hero-search-tag-chip" data-query="واکسن">بیماری‌های واکسن‌پذیر</button>
-          <button type="button" class="hero-search-tag-chip" data-query="هاری">هاری و بروسلوز</button>
+          <button type="button" class="hero-search-tag-chip" data-query="مالاریا">مالاریا و ناقلین</button>
           <button type="button" class="hero-search-tag-chip" data-query="شکستگی">رادیولوژی و شکستگی‌ها</button>
-          <button type="button" class="hero-search-tag-chip" data-query="فتق">فتق و جدار شکم (لارنس)</button>
         </div>
       </div>
-
-      <!-- Quick Quiz Module Promo Banner -->
-      <div style="margin-block-start: 24px; display: flex; justify-content: center; width: 100%; box-sizing: border-box;">
-        <a href="./quiz.html" style="text-decoration: none; display: inline-flex; align-items: center; gap: 12px; background: linear-gradient(135deg, rgba(5, 150, 105, 0.12), rgba(2, 132, 199, 0.12)); border: 1.5px solid rgba(5, 150, 105, 0.35); border-radius: var(--radius-xl); padding: 12px 18px; max-width: 100%; box-sizing: border-box; flex-wrap: wrap; justify-content: center; transition: all var(--transition-fast); box-shadow: 0 4px 14px rgba(5, 150, 105, 0.15);">
-          <div style="width: 36px; height: 36px; border-radius: var(--radius-lg); background: linear-gradient(135deg, #059669, #0284c7); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-          </div>
-          <div style="text-align: start;">
-            <div style="font-weight: 800; font-size: 14px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
-              <span>سامانه جدید: آزمون و بانک سوالات تحلیلی پزشکی</span>
-              <span style="font-size: 10px; background: #059669; color: #fff; padding: 1px 6px; border-radius: var(--radius-full);">جدید</span>
-            </div>
-            <div style="font-size: 12px; color: var(--text-muted);">حالت آموزشی با پاسخ تشریحی آنی • شبیه‌ساز رسمی با کارنامه • پشتیبانی از فایلهای JSON</div>
-          </div>
-          <div style="color: #059669; font-weight: 800; font-size: 13px; margin-inline-start: 12px; display: flex; align-items: center; gap: 4px;">
-            <span>ورود به آزمون</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-          </div>
-        </a>
-      </div>
-
     </div>
   </section>
 
-  <!-- Vision Banner for Alborz Medical Students -->
-  <section class="portal-container" id="vision" style="scroll-margin-top: 90px;">
+  <!-- Vision Callout -->
+  <section class="portal-container" id="vision">
     <div class="vision-callout-box">
       <div class="abzums-pill">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-          <path d="M2 17l10 5 10-5"></path>
-          <path d="M2 12l10 5 10-5"></path>
-        </svg>
         <span>ویژه دانشجویان و کادر آموزشی دانشگاه علوم پزشکی البرز (ABZUMS)</span>
       </div>
-
-      <h3 style="font-size: clamp(20px, 2.5vw, 26px); font-weight: 900; margin-block-end: 12px; color: var(--text-primary);">
+      <h3 style="font-size:clamp(20px,2.5vw,25px);font-weight:900;margin-block-end:10px;color:var(--text-primary);">
         چشم‌انداز مدیکالیسم: مرجعیت متمرکز آموزش پزشکی، از کلاس درس تا بالین بیمار
       </h3>
-      
-      <p style="font-size: 14.5px; color: var(--text-secondary); line-height: 1.8; margin-block-end: 16px;">
-        دانشجویان پزشکی در دوره‌های مختلف همواره با چالش حجم عظیم و پراکنده جزوات، فایل‌های متفرقه و دشواری دسترسی سریع به پروتکل‌ها مواجه هستند. <strong>مدیکالیسم البرز</strong> راه‌اندازی شده تا این گره را باز کند: پایگاهی منظم، همیشه در دسترس، با گرافیک استاندارد و بدون نیاز به اینترنت پرسرعت، که امکان مطالعه عمیق تئوری و مرور سریع نکات تشخیصی و درمانی را در حین راند و کشیک فراهم می‌سازد.
+      <p style="font-size:14.5px;color:var(--text-secondary);line-height:1.8;margin-block-end:14px;">
+        <strong>مدیکالیسم البرز (نسخه ۲)</strong> یکپارچگی کامل میان درسنامه‌های بالینی، اطلس‌های تصویربرداری، بانک سوالات تحلیلی و شبیه‌سازهای تصمیم‌گیری (PMP و OSCE) را با اجرای فوری و ۱۰۰٪ آفلاین در کلاس و بخش بالینی فراهم می‌سازد.
       </p>
-
-      <div style="display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; font-weight: 700; color: var(--accent-primary);">
-        <span>✓ آماده‌سازی برای آزمون‌های دانشگاهی و جامع</span>
-        <span>✓ راهنماهای تشخیصی بر بالین بیمار</span>
-        <span>✓ به‌روزرسانی مستمر بر اساس رفرنس‌های مصوب وزارت بهداشت</span>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:13px;font-weight:700;color:var(--accent-primary);">
+        <span>✓ آماده‌سازی برای آزمون‌های دانشگاهی و پره‌انترنی</span>
+        <span>✓ دستورات بالینی و الگوریتم‌ها بر بالین بیمار</span>
+        <span>✓ قابل پشتیبان‌گیری آفلاین و انتقال بین دستگاه‌ها</span>
       </div>
     </div>
   </section>
 
-  <!-- Quick Stats Strip (نوار آمار سریع سامانه) -->
-  <section class="portal-container portal-stats-section" aria-label="نوار آمار سریع سامانه">
+  <!-- Quick Stats Strip -->
+  <section class="portal-container portal-stats-section" aria-label="آمار سامانه">
     <div class="portal-stats-strip">
       <div class="stat-pill-item">
-        <div class="stat-pill-icon stat-icon-cyan">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-          </svg>
-        </div>
+        <div class="stat-pill-icon stat-icon-cyan">📚</div>
         <div class="stat-pill-content">
-          <div class="stat-pill-value">۳۰ <span class="stat-pill-unit">فصل آموزشی</span></div>
-          <div class="stat-pill-label">سرفصل‌های مصوب واگیر و غیرواگیر</div>
+          <div class="stat-pill-value">۵۸+ <span class="stat-pill-unit">فصل آموزشی</span></div>
+          <div class="stat-pill-label">زنان و زایمان، جراحی، بهداشت و رادیولوژی</div>
         </div>
       </div>
-
       <div class="stat-pill-item">
-        <div class="stat-pill-icon stat-icon-sky">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-            <polyline points="21 15 16 10 5 21"></polyline>
-          </svg>
-        </div>
+        <div class="stat-pill-icon stat-icon-sky">🩻</div>
         <div class="stat-pill-content">
           <div class="stat-pill-value">۴۷۴ <span class="stat-pill-unit">کلیشه رادیولوژی</span></div>
           <div class="stat-pill-label">اطلس دیجیتال با زوم و کنتراست پویا</div>
         </div>
       </div>
-
       <div class="stat-pill-item">
-        <div class="stat-pill-icon stat-icon-emerald">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="9 11 12 14 22 4"></polyline>
-            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-          </svg>
-        </div>
+        <div class="stat-pill-icon stat-icon-emerald">✅</div>
         <div class="stat-pill-content">
-          <div class="stat-pill-value">۷۰۰+ <span class="stat-pill-unit">سوال تحلیلی</span></div>
-          <div class="stat-pill-label">بانک سوالات جراحی لارنس، NCD و رادیولوژی</div>
+          <div class="stat-pill-value">۸۸۰+ <span class="stat-pill-unit">سوال و کیس</span></div>
+          <div class="stat-pill-label">بانک آزمون جراحی، NCD و شبیه‌ساز PMP</div>
         </div>
       </div>
-
       <div class="stat-pill-item">
-        <div class="stat-pill-icon stat-icon-indigo">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-            <line x1="8" y1="21" x2="16" y2="21"></line>
-            <line x1="12" y1="17" x2="12" y2="21"></line>
-          </svg>
-        </div>
+        <div class="stat-pill-icon stat-icon-indigo">⚡</div>
         <div class="stat-pill-content">
-          <div class="stat-pill-value">۱۰۰٪ <span class="stat-pill-unit">آفلاین و رایگان</span></div>
-          <div class="stat-pill-label">بدون نیاز به اینترنت، دسترسی سریع بالینی</div>
+          <div class="stat-pill-value">۱۰۰٪ <span class="stat-pill-unit">آفلاین و سریع</span></div>
+          <div class="stat-pill-label">بارگذاری ماژولار زیر ۳۰۰ میلی‌ثانیه</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 3-Card Bento Grid ("ماژول‌های اصلی سامانه") -->
-  <section class="portal-container portal-modules-section" id="modules" style="scroll-margin-top: 90px;">
+  <!-- Bento Grid Modules -->
+  <section class="portal-container portal-modules-section" id="modules">
     <div class="modules-section-header">
-      <div class="modules-section-pill">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
-          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-          <polyline points="2 17 12 22 22 17"></polyline>
-          <polyline points="2 12 12 17 22 12"></polyline>
-        </svg>
-        <span>معماری یکپارچه آموزش پزشکی مدیکالیسم</span>
-      </div>
-      <h2 class="modules-section-title">ماژول‌های اصلی سامانه آموزشی البرز</h2>
-      <p class="modules-section-desc">
-        تفکیک استاندارد دوره‌های بالینی، اطلس‌های تصویری و سامانه‌های خودارزیابی؛ دسترسی مستقیم دانشجویان پزشکی به محتوای مصوب.
-      </p>
+      <div class="modules-section-pill"><span>معماری یکپارچه آموزش پزشکی مدیکالیسم V2</span></div>
+      <h2 class="modules-section-title">ماژول‌ها و دوره‌های آموزشی سامانه البرز</h2>
+      <p class="modules-section-desc">دسترسی منظم و همسان به تمامی کورس‌های بالینی، اطلس‌های تصویری و سامانه‌های خودارزیابی.</p>
     </div>
 
     <div class="portal-bento-grid">
-      <!-- Bento Card 1: Communicable & Non-Communicable Diseases -->
-      <article class="bento-card bento-card-comm" data-module="diseases">
+      <!-- Card 1: OB/GYN (V2 Native Engine) -->
+      <article class="bento-card" data-module="obgyn" style="border-color:rgba(13,148,136,0.32);">
         <div>
           <div class="bento-card-header">
-            <div class="bento-icon-wrapper bento-icon-comm">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-              </svg>
+            <div class="bento-icon-wrapper" style="background:rgba(13,148,136,0.12);color:#0d9488;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2a5 5 0 1 0 5 5 5 5 0 0 0-5-5z"></path><path d="M12 12v10M8 18h8"></path></svg>
             </div>
-            <span class="bento-badge bento-badge-comm">درسنامه بالینی مصوب</span>
+            <span class="bento-badge" style="color:#0d9488;background:rgba(13,148,136,0.1);border-color:rgba(13,148,136,0.28);">موتور نیتیو V2 • بکمن ۹</span>
           </div>
-
           <div class="bento-card-body">
-            <h3 class="bento-card-title">درسنامه جامع بیماری‌های واگیر و غیرواگیر</h3>
+            <h3 class="bento-card-title">زنان و زایمان (رفرنس بکمن و لینگ ویرایش ۹)</h3>
             <p class="bento-card-text">
-              ۳۰ فصل مصوب، ۱۵۴ مبحث بالینی، جداول و الگوریتم‌های کشوری، بسته خدمت Ira-PEN، پروتکل‌های ملی سل، مالاریا، هاری، ایدز و بیماری‌های مزمن متابولیک و قلبی عروقی.
+              معماری جدید Medicalism V2 ویژه ۵۰ فصل Beckmann &amp; Ling 9th Ed؛ شامل میکروپاراگراف‌های استاندارد، نوار تعاملی سن بارداری، امتیازدهی بالینی (Bishop/APGAR)، ایستگاه OSCE و دستورات بخش زایمان.
             </p>
-
             <div class="bento-tags-list">
-              <span class="bento-tag">۳۰ فصل مصوب</span>
-              <span class="bento-tag">۱۵۴ مبحث بالینی</span>
-              <span class="bento-tag">جداول و الگوریتم‌های کشوری</span>
+              <span class="bento-tag">الگوریتم‌های ACOG</span>
+              <span class="bento-tag">تفسیر NST/CTG</span>
+              <span class="bento-tag">دستورات بخش (Ward Orders)</span>
+              <span class="bento-tag">مرور سریع هوشمند</span>
             </div>
           </div>
         </div>
-
         <div class="bento-card-footer">
-          <a href="./communicable-and-noncommunicable-diseases.html" class="bento-cta-btn bento-cta-comm">
-            <span>ورود به درسنامه بیماری‌ها</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
+          <a href="./obgyn.html" class="bento-cta-btn" style="background:linear-gradient(135deg,#0d9488,#0284c7);color:#fff;">
+            <span>ورود به درسنامه زنان و زایمان</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
           </a>
         </div>
       </article>
 
-      <!-- Bento Card 2: Radiology & Clinical Imaging -->
-      <article class="bento-card bento-card-rad" data-module="radiology">
-        <div>
-          <div class="bento-card-header">
-            <div class="bento-icon-wrapper bento-icon-rad">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                <polyline points="21 15 16 10 5 21"></polyline>
-              </svg>
-            </div>
-            <span class="bento-badge bento-badge-rad">اطلس دیجیتال و کیس‌های واقعی</span>
-          </div>
-
-          <div class="bento-card-body">
-            <h3 class="bento-card-title">اطلس و آموزش رادیولوژی بالینی</h3>
-            <p class="bento-card-text">
-              ۴ سرفصل ماژور، ۴۷۴ کلیشه رادیولوژی با کیفیت بالا، اصول تفسیر گرافی ساده شکم و اسکلتی، CT اسکن مغز و مطالعات حاجب ادراری همراه با نمایشگر پیشرفته با قابلیت زوم و کنتراست و آزمون تصویری.
-            </p>
-
-            <div class="bento-tags-list">
-              <span class="bento-tag">۴ سرفصل ماژور</span>
-              <span class="bento-tag">۴۷۴ کلیشه رادیولوژی</span>
-              <span class="bento-tag">نمایشگر زوم و کنتراست</span>
-              <span class="bento-tag">آزمون تصویری</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="bento-card-footer">
-          <a href="./radiology.html" class="bento-cta-btn bento-cta-rad">
-            <span>ورود به اطلس رادیولوژی</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </a>
-        </div>
-      </article>
-
-      
-      <!-- Bento Card: General Surgery (Lawrence) -->
+      <!-- Card 2: General Surgery (Standard Peer Course) -->
       <article class="bento-card bento-card-surg" data-module="surgery">
         <div>
           <div class="bento-card-header">
             <div class="bento-icon-wrapper bento-icon-surg">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="12" y1="18" x2="12" y2="12"></line>
-                <line x1="9" y1="15" x2="15" y2="15"></line>
-              </svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
             </div>
-            <span class="bento-badge bento-badge-surg">کورس ماژور بالینی • جدید</span>
+            <span class="bento-badge bento-badge-surg">کورس ماژور بالینی</span>
           </div>
-
           <div class="bento-card-body">
             <h3 class="bento-card-title">جراحی جنرال (رفرنس لارنس)</h3>
             <p class="bento-card-text">
-              درسنامه جامع بالینی بر اساس رفرنس مصوب لارنس (Lawrence)، پوشش کامل ۲۲ فصل جراحی جنرال شامل ارزیابی پری‌اپراتیو، آب و الکترولیت، شوک، تروما، سوختگی، عفونت جراحی، فتق‌ها، مری، معده، روده، کولون و مقعد، کبد، صفرا، پانکراس، پستان، غدد درون‌ریز، جراحی پلاستیک، عروق و جراحی اعصاب همراه با <strong>بسته ویژه آسکی و PMP البرز</strong>.
+              پوشش کامل ۲۲ فصل رفرنس لارنس (Lawrence) شامل ارزیابی پری‌اپراتیو، شوک، تروما، سوختگی، فتق‌ها، دستگاه گوارش، کبد و صفرا، پانکراس، پستان، غدد درون‌ریز، عروق و جراحی اعصاب به همراه راهنمای OSCE.
             </p>
-
             <div class="bento-tags-list">
-              <span class="bento-tag">۲۲ فصل رفرنس لارنس</span>
+              <span class="bento-tag">۲۲ فصل لارنس</span>
               <span class="bento-tag">۱۹۹ مبحث بالینی</span>
-              <span class="bento-tag" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(225, 29, 72, 0.18)); color: #e11d48; font-weight: 800; border: 1px solid rgba(225, 29, 72, 0.35);">🔥 ویژه امتحان: آسکی، PMP و پایان‌بخش البرز</span>
+              <span class="bento-tag">راهنمای OSCE و PMP</span>
               <span class="bento-tag">مرور شب امتحان</span>
             </div>
           </div>
         </div>
-
-        <div class="bento-card-footer" style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <div class="bento-card-footer">
           <a href="./surgery.html" class="bento-cta-btn bento-cta-surg">
             <span>ورود به درسنامه جراحی</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </a>
-          <a href="./surgery.html#surg-osce-pmp" class="bento-cta-btn" style="background: linear-gradient(135deg, #f59e0b 0%, #e11d48 100%); color: #fff; text-decoration: none;" title="ورود مستقیم به بسته ویژه آزمون آسکی و PMP البرز">
-            <span>🔥 بسته ویژه آسکی و PMP</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </a>
-          <a href="./quiz.html?quiz=surgery-recent-recalls&mode=study" class="bento-cta-btn" style="background: linear-gradient(135deg, #be123c 0%, #ea580c 100%); color: #fff; text-decoration: none;" title="مرور ترتیبی ۱۳۵ سوال اخیر جراحی با اصلاحیه کلیدها و درسنامه جامع لارنس">
-            <span>📖 سوالات اخیر جراحی (۱۳۵ سوال)</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
           </a>
         </div>
       </article>
 
-      <!-- Bento Card 3: Quiz & Analytical Test Bank -->
+      <!-- Card 3: Communicable & Non-Communicable Diseases -->
+      <article class="bento-card bento-card-comm" data-module="diseases">
+        <div>
+          <div class="bento-card-header">
+            <div class="bento-icon-wrapper bento-icon-comm">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            </div>
+            <span class="bento-badge bento-badge-comm">درسنامه بالینی مصوب</span>
+          </div>
+          <div class="bento-card-body">
+            <h3 class="bento-card-title">درسنامه جامع بیماری‌های واگیر و غیرواگیر</h3>
+            <p class="bento-card-text">
+              ۳۰ فصل مصوب و ۱۵۴ مبحث بالینی شامل جداول و الگوریتم‌های کشوری، بسته خدمت Ira-PEN، پروتکل‌های ملی سل، مالاریا، هاری، ایدز و بیماری‌های مزمن متابولیک و قلبی عروقی.
+            </p>
+            <div class="bento-tags-list">
+              <span class="bento-tag">۳۰ فصل مصوب</span>
+              <span class="bento-tag">۱۵۴ مبحث بالینی</span>
+              <span class="bento-tag">الگوریتم‌های کشوری</span>
+            </div>
+          </div>
+        </div>
+        <div class="bento-card-footer">
+          <a href="./communicable-and-noncommunicable-diseases.html" class="bento-cta-btn bento-cta-comm">
+            <span>ورود به درسنامه بیماری‌ها</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Card 4: Radiology & Clinical Imaging -->
+      <article class="bento-card bento-card-rad" data-module="radiology">
+        <div>
+          <div class="bento-card-header">
+            <div class="bento-icon-wrapper bento-icon-rad">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            </div>
+            <span class="bento-badge bento-badge-rad">اطلس دیجیتال و کیس‌های واقعی</span>
+          </div>
+          <div class="bento-card-body">
+            <h3 class="bento-card-title">اطلس و آموزش رادیولوژی بالینی</h3>
+            <p class="bento-card-text">
+              ۴ سرفصل ماژور و ۴۷۴ کلیشه رادیولوژی با کیفیت بالا؛ اصول تفسیر گرافی ساده شکم و اسکلتی، CT اسکن مغز و مطالعات حاجب ادراری همراه با نمایشگر زوم/کنتراست و آزمون تصویری.
+            </p>
+            <div class="bento-tags-list">
+              <span class="bento-tag">۴ سرفصل ماژور</span>
+              <span class="bento-tag">۴۷۴ کلیشه رادیولوژی</span>
+              <span class="bento-tag">آزمون تصویری</span>
+            </div>
+          </div>
+        </div>
+        <div class="bento-card-footer">
+          <a href="./radiology.html" class="bento-cta-btn bento-cta-rad">
+            <span>ورود به اطلس رادیولوژی</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </a>
+        </div>
+      </article>
+
+      <!-- Card 5: Quiz & Analytical Test Bank -->
       <article class="bento-card bento-card-quiz" data-module="quiz">
         <div>
           <div class="bento-card-header">
             <div class="bento-icon-wrapper bento-icon-quiz">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="9 11 12 14 22 4"></polyline>
-                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-              </svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
             </div>
             <span class="bento-badge bento-badge-quiz">ارزشیابی و خودآزمایی بالینی</span>
           </div>
-
           <div class="bento-card-body">
             <h3 class="bento-card-title">بانک جامع آزمون و سوالات تحلیلی</h3>
             <p class="bento-card-text">
-              بیش از ۷۵۰ سوال تحلیلی در ۳۶ مبحث مصوب (شامل ۴۵۸ سوال تفکیک‌شده و غنی‌سازی‌شده جراحی جنرال لارنس در ۲۴ فصل، ۲۹۵ سوال بیماری‌های غیرواگیر و ۲۰ کیس رادیولوژی)، حالت مطالعه آموزشی ۳ کارتی با رد گزینه‌ها و شبیه‌ساز رسمی با کارنامه هوشمند.
+              بانک جامع سوالات تحلیلی در ۳۷ مبحث تخصصی (جراحی جنرال لارنس، ریکال‌های جراحی، بیماری‌های غیرواگیر و رادیولوژی) با بارگذاری فوق‌سریع روی تقاضا، پاسخ تشریحی ۳ کارتی و شبیه‌ساز کارنامه‌دار.
             </p>
-
             <div class="bento-tags-list">
-              <span class="bento-tag">۴۵۸ سوال جراحی لارنس</span>
-              <span class="bento-tag">۲۹۵ سوال بیماری‌های غیرواگیر</span>
-              <span class="bento-tag">۳۶ مبحث تخصصی</span>
+              <span class="bento-tag">جراحی لارنس و ریکال‌ها</span>
+              <span class="bento-tag">بیماری‌های غیرواگیر</span>
               <span class="bento-tag">پاسخ تشریحی ۳ کارتی</span>
             </div>
           </div>
         </div>
-
-        <div class="bento-card-footer" style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <div class="bento-card-footer">
           <a href="./quiz.html" class="bento-cta-btn bento-cta-quiz">
             <span>ورود به سامانه آزمون</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
-          </a>
-          <a href="./quiz.html?quiz=surgery-recent-recalls&mode=study" class="bento-cta-btn" style="background: linear-gradient(135deg, #e11d48 0%, #ea580c 100%); color: #fff; text-decoration: none;" title="مرور ترتیبی ۱۳۵ سوال اخیر جراحی با تحلیل کلیدها و درسنامه لارنس">
-            <span>🔥 بانک سوالات اخیر جراحی (۱۳۵ سوال)</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
           </a>
         </div>
       </article>
 
-      <!-- Bento Card 5: PMP Clinical Exam Simulator -->
-      <article class="bento-card" data-module="pmp-exam" style="border-color: rgba(79, 70, 229, 0.35);">
+      <!-- Card 6: PMP Clinical Exam Simulator -->
+      <article class="bento-card" data-module="pmp-exam" style="border-color:rgba(79,70,229,0.28);">
         <div>
           <div class="bento-card-header">
-            <div class="bento-icon-wrapper" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.16), rgba(13, 148, 136, 0.16)); color: #4f46e5;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                <line x1="8" y1="21" x2="16" y2="21"></line>
-                <line x1="12" y1="17" x2="12" y2="21"></line>
-              </svg>
+            <div class="bento-icon-wrapper" style="background:rgba(79,70,229,0.12);color:#4f46e5;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
             </div>
-            <span class="bento-badge" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.15), rgba(13, 148, 136, 0.15)); color: #4f46e5; border-color: rgba(79, 70, 229, 0.35);">شبیه‌ساز ایستگاه بالینی • جدید</span>
+            <span class="bento-badge" style="background:rgba(79,70,229,0.1);color:#4f46e5;border-color:rgba(79,70,229,0.25);">شبیه‌ساز ایستگاه بالینی</span>
           </div>
-
           <div class="bento-card-body">
-            <h3 class="bento-card-title">🖥️ سامانه جامع شبیهساز آزمون PMP و کیسهای بالینی جراحی</h3>
+            <h3 class="bento-card-title">شبیه‌ساز آزمون PMP و کیس‌های بالینی</h3>
             <p class="bento-card-text">
-              شبیه‌ساز تعاملی مسائل مدیریت بیمار (Patient Management Problem) ویژه کارآموزی و پایان‌بخش جراحی عمومی: ۴۶ سناریوی مرحله‌به‌مرحله، ۱۰۰ آیتم تصمیم‌گیری، تصاویر بالینی واقعی و تحلیل شناختی خطاها.
+              شبیه‌ساز تعاملی مدیریت مرحله‌ای بیمار (Patient Management Problem): ۴۶ سناریوی واقعی جراحی، ۱۰۰ مرحله تصمیم‌گیری، تصاویر بالینی و تحلیل شناختی خطاهای درمانی.
             </p>
-
             <div class="bento-tags-list">
-              <span class="bento-tag">۴۶ کیس واقعی جراحی</span>
+              <span class="bento-tag">۴۶ کیس واقعی</span>
               <span class="bento-tag">۱۰۰ مرحله تصمیم‌گیری</span>
               <span class="bento-tag">نمره‌دهی استاندارد + / −</span>
-              <span class="bento-tag">تحلیل خطاهای بالینی</span>
             </div>
           </div>
         </div>
-
         <div class="bento-card-footer">
-          <a href="./pmp-exam.html" class="bento-cta-btn" style="background: linear-gradient(135deg, #4f46e5 0%, #0d9488 100%); color: #fff;">
+          <a href="./pmp-exam.html" class="bento-cta-btn" style="background:linear-gradient(135deg,#4f46e5 0%,#0d9488 100%);color:#fff;">
             <span>ورود به شبیه‌ساز آزمون PMP</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
           </a>
         </div>
       </article>
     </div>
   </section>
 
-  <!-- Portal Footer -->
   <footer class="portal-footer">
     <div class="portal-container portal-footer-inner">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <div class="portal-brand-icon" style="width: 32px; height: 32px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
-            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-          </svg>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="portal-brand-icon" style="width:30px;height:30px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
         </div>
-        <span style="font-weight: 900; font-size: 16px;">مدیکالیسم البرز | سامانه جامع آموزش علوم پزشکی و بالینی (ABZUMS)</span>
+        <span style="font-weight:900;font-size:15px;">مدیکالیسم البرز | سامانه جامع آموزش علوم پزشکی و بالینی (ABZUMS)</span>
       </div>
-      
       <p class="footer-copy">
-        بستری اختصاصی برای دانشجویان پزشکی دانشگاه علوم پزشکی البرز؛ پایگاه یکپارچه آموزش علوم پایه و دوره‌های ماژور بالینی، عاری از پراکندگی جزوات و آماده برای استفاده در کلاس و بر بالین بیمار.
+        بستری یکپارچه و سریع برای دانشجویان پزشکی دانشگاه علوم پزشکی البرز؛ قابل استفاده در کلاس درس، مطالعه شب امتحان و راند بالینی.
       </p>
-
-      <div style="font-size: 12px; color: var(--text-muted); margin-block-start: 12px;">
-        پایگاه جامع آموزش علوم پزشکی دانشگاه علوم پزشکی و خدمات بهداشتی درمانی البرز • پاییز ۱۴۰۵
+      <div style="font-size:12px;color:var(--text-muted);margin-block-start:10px;">
+        دانشگاه علوم پزشکی و خدمات بهداشتی درمانی البرز • پاییز ۱۴۰۵ • Medicalism V2
       </div>
     </div>
   </footer>
 
-  <!-- Scripts -->
-  <script src="./js/data/chapters-registry.js?v=20261114"></script>
-  <script src="./js/data/radiology-registry.js?v=20261114"></script>
-  <script src="./js/surgery-loader.js?v=20261114"></script>
-  <script src="./js/surgery-index.js?v=20261114"></script>
-  <script src="./js/radiology.js?v=20261114"></script>
+  <!-- Lightweight Startup Scripts (< 150 KB total page payload; search index lazy-loaded on demand) -->
+  <script src="./js/universal-shell.js?v=20261121"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const rawComm = Array.isArray(window.CHAPTERS_REGISTRY)
-        ? window.CHAPTERS_REGISTRY
-        : (window.CHAPTERS_REGISTRY && Array.isArray(window.CHAPTERS_REGISTRY.chapters) ? window.CHAPTERS_REGISTRY.chapters : []);
-      const commAndNcd = rawComm.map(ch => ({
-        ...ch,
-        targetUrl: `./communicable-and-noncommunicable-diseases.html#${ch.id}`,
-        trackLabel: ch.number <= 16 ? 'واگیر' : 'غیرواگیر',
-        trackPillClass: ch.number <= 16 ? 'pill-comm' : 'pill-ncd'
-      }));
+    document.addEventListener('DOMContentLoaded', function () {
+      var chapters = Array.isArray(window.GLOBAL_SEARCH_INDEX) ? window.GLOBAL_SEARCH_INDEX : [];
+      var searchIndexLoading = false;
+      var searchWaiters = [];
+      function ensureSearchIndex(cb) {
+        if (Array.isArray(window.GLOBAL_SEARCH_INDEX)) {
+          chapters = window.GLOBAL_SEARCH_INDEX;
+          if (cb) cb();
+          return;
+        }
+        if (cb) searchWaiters.push(cb);
+        if (searchIndexLoading) return;
+        searchIndexLoading = true;
+        var s = document.createElement('script');
+        s.src = './js/data/global-search-index.js?v=20261121';
+        s.async = true;
+        s.onload = function () {
+          chapters = Array.isArray(window.GLOBAL_SEARCH_INDEX) ? window.GLOBAL_SEARCH_INDEX : [];
+          searchIndexLoading = false;
+          var q = searchWaiters.splice(0);
+          q.forEach(function (fn) { try { fn(); } catch (e) {} });
+        };
+        s.onerror = function () {
+          searchIndexLoading = false;
+          searchWaiters.length = 0;
+        };
+        document.body.appendChild(s);
+      }
 
-      const rawRad = Array.isArray(window.RADIOLOGY_REGISTRY)
-        ? window.RADIOLOGY_REGISTRY
-        : (window.RADIOLOGY_REGISTRY && Array.isArray(window.RADIOLOGY_REGISTRY.chapters) ? window.RADIOLOGY_REGISTRY.chapters : []);
-      const rad = rawRad.map(ch => ({
-        ...ch,
-        targetUrl: `./radiology.html#${ch.id}`,
-        trackLabel: 'رادیولوژی',
-        trackPillClass: 'pill-rad'
-      }));
+      var heroSearch = document.getElementById('heroSearchInput');
+      var searchResults = document.getElementById('heroSearchResults');
+      var dropdown = document.getElementById('coursesDropdown');
+      var dropdownBtn = document.getElementById('coursesDropdownBtn');
 
-      const rawSurgery = Array.isArray(window.SURGERY_REGISTRY)
-        ? window.SURGERY_REGISTRY
-        : (window.SURGERY_REGISTRY && Array.isArray(window.SURGERY_REGISTRY.chapters) ? window.SURGERY_REGISTRY.chapters : []);
-      const surgery = rawSurgery.map(ch => ({
-        ...ch,
-        targetUrl: `./surgery.html#${ch.id}`,
-        trackLabel: 'جراحی جنرال',
-        trackPillClass: 'pill-surg'
-      }));
-      const chapters = [...commAndNcd, ...rad, ...surgery];
-      const heroSearch = document.getElementById('heroSearchInput');
-      const searchResults = document.getElementById('heroSearchResults');
-      const dropdown = document.getElementById('coursesDropdown');
-      const dropdownBtn = document.getElementById('coursesDropdownBtn');
-
-      // 1. Navigation Dropdown Toggle & Hover
       if (dropdown && dropdownBtn) {
-        let closeTimer = null;
-        let openTimer = null;
-        let lastOpenedAt = 0;
-
-        const openDropdown = () => {
-          clearTimeout(closeTimer);
-          clearTimeout(openTimer);
+        var closeTimer = null, openTimer = null, lastOpenedAt = 0;
+        var openDropdown = function () {
+          clearTimeout(closeTimer); clearTimeout(openTimer);
           dropdown.classList.add('is-open');
           dropdownBtn.setAttribute('aria-expanded', 'true');
           lastOpenedAt = Date.now();
         };
-
-        const closeDropdown = (immediate = false) => {
-          clearTimeout(closeTimer);
-          clearTimeout(openTimer);
+        var closeDropdown = function (immediate) {
+          clearTimeout(closeTimer); clearTimeout(openTimer);
           if (immediate) {
             dropdown.classList.remove('is-open');
             dropdownBtn.setAttribute('aria-expanded', 'false');
           } else {
-            closeTimer = setTimeout(() => {
+            closeTimer = setTimeout(function () {
               dropdown.classList.remove('is-open');
               dropdownBtn.setAttribute('aria-expanded', 'false');
-            }, 200);
+            }, 180);
           }
         };
-
-        // Micro-intent hover (60ms) to avoid accidental triggers when passing through
-        dropdownBtn.addEventListener('mouseenter', () => {
+        dropdownBtn.addEventListener('mouseenter', function () {
           clearTimeout(closeTimer);
-          openTimer = setTimeout(() => openDropdown(), 60);
+          openTimer = setTimeout(openDropdown, 60);
         });
-
-        dropdown.addEventListener('mouseenter', () => {
-          clearTimeout(closeTimer);
-        });
-
-        dropdown.addEventListener('mouseleave', () => {
-          clearTimeout(openTimer);
-          closeDropdown(false);
-        });
-
-        dropdownBtn.addEventListener('click', (e) => {
+        dropdown.addEventListener('mouseenter', function () { clearTimeout(closeTimer); });
+        dropdown.addEventListener('mouseleave', function () { clearTimeout(openTimer); closeDropdown(false); });
+        dropdownBtn.addEventListener('click', function (e) {
           e.stopPropagation();
-          // If already open and user intentionally clicks after exploring, toggle close; if just opened via hover (<350ms), keep open
-          if (dropdown.classList.contains('is-open') && (Date.now() - lastOpenedAt > 350)) {
-            closeDropdown(true);
-          } else {
-            openDropdown();
-          }
+          if (dropdown.classList.contains('is-open') && (Date.now() - lastOpenedAt > 350)) closeDropdown(true);
+          else openDropdown();
         });
-
-        // Close dropdown when clicking any destination link inside
-        dropdown.querySelectorAll('a').forEach(link => {
-          link.addEventListener('click', () => {
-            closeDropdown(true);
-          });
+        dropdown.querySelectorAll('a').forEach(function (link) {
+          link.addEventListener('click', function () { closeDropdown(true); });
         });
-
-        document.addEventListener('click', (e) => {
-          if (!dropdown.contains(e.target)) {
-            closeDropdown(true);
-          }
+        document.addEventListener('click', function (e) {
+          if (!dropdown.contains(e.target)) closeDropdown(true);
         });
-
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape') {
-            closeDropdown(true);
-          }
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') closeDropdown(true);
         });
       }
 
-      // 1.1 Make entire Bento Cards interactive and clickable
-      document.querySelectorAll('.bento-card').forEach(card => {
+      document.querySelectorAll('.bento-card').forEach(function (card) {
         card.style.cursor = 'pointer';
-        card.addEventListener('click', (e) => {
-          // If click originated from an anchor or button inside the card, allow native action
-          if (e.target.closest('a') || e.target.closest('button')) return;
-          const targetLink = card.querySelector('.bento-card-footer a');
+        card.addEventListener('click', function (e) {
+          if (e.target.closest('a, button')) return;
+          var targetLink = card.querySelector('.bento-card-footer a');
           if (targetLink && targetLink.getAttribute('href')) {
             window.location.href = targetLink.getAttribute('href');
           }
         });
       });
 
-      // 2. Real-time Floating Search on Hero
+      function normFa(s) {
+        return (s || '').toLowerCase()
+          .replace(/ي/g, 'ی').replace(/ك/g, 'ک')
+          .replace(/[\u200c\u200f\u064b-\u065f]/g, ' ')
+          .replace(/\s+/g, ' ').trim();
+      }
       function performSearch(query) {
         if (!searchResults) return;
-        const q = query.trim().toLowerCase();
+        var q = normFa(query);
         if (!q) {
           searchResults.style.display = 'none';
           searchResults.innerHTML = '';
           return;
         }
-
-        const hits = chapters.filter(ch => {
-          const text = [
-            ch.title,
-            ch.shortTitle,
-            ch.author,
-            (ch.sections || []).map(s => s.title + ' ' + (s.summary || '')).join(' ')
-          ].join(' ').toLowerCase();
-          return text.includes(q);
+        if (chapters.length === 0 && !Array.isArray(window.GLOBAL_SEARCH_INDEX)) {
+          searchResults.innerHTML = '<div style="padding:14px;text-align:center;color:var(--text-muted);font-size:13px;">در حال بارگذاری فهرست جستجو...</div>';
+          searchResults.style.display = 'block';
+          ensureSearchIndex(function () { performSearch(query); });
+          return;
+        }
+        var hits = chapters.filter(function (ch) {
+          var hay = normFa((ch.title || '') + ' ' + (ch.shortTitle || '') + ' ' + (ch.author || '') + ' ' + (ch.keywords || ''));
+          return hay.indexOf(q) !== -1;
         });
-
         if (hits.length === 0) {
-          searchResults.innerHTML = `
-            <div style="padding: 14px; text-align: center; color: var(--text-muted); font-size: 13px;">
-              سرفصلی مطابق با «${query}» یافت نشد
-            </div>
-          `;
+          searchResults.innerHTML = '<div style="padding:14px;text-align:center;color:var(--text-muted);font-size:13px;">سرفصلی مطابق با «' + query.replace(/</g, '&lt;') + '» یافت نشد</div>';
         } else {
-          searchResults.innerHTML = hits.slice(0, 7).map(ch => {
-            const numPadded = ch.number.toString().padStart(2, '۰');
-            return `
-              <a href="${ch.targetUrl}" class="hero-search-result-item">
-                <div style="min-width: 0;">
-                  <span style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-primary); margin-inline-end: 6px;">فصل ${numPadded}</span>
-                  <span class="search-result-title">${ch.title}</span>
-                </div>
-                <span class="search-result-track ${ch.trackPillClass}">${ch.trackLabel}</span>
-              </a>
-            `;
+          searchResults.innerHTML = hits.slice(0, 8).map(function (ch) {
+            var numPadded = String(ch.number || '').padStart(2, '۰');
+            return '<a href="' + ch.targetUrl + '" class="hero-search-result-item">' +
+              '<div style="min-width:0;">' +
+                '<span style="font-family:var(--font-mono);font-size:11px;color:var(--accent-primary);margin-inline-end:6px;">فصل ' + numPadded + '</span>' +
+                '<span class="search-result-title">' + ch.title + '</span>' +
+              '</div>' +
+              '<span class="search-result-track ' + ch.trackPillClass + '">' + ch.trackLabel + '</span>' +
+            '</a>';
           }).join('');
         }
         searchResults.style.display = 'block';
       }
 
       if (heroSearch) {
-        heroSearch.addEventListener('input', (e) => {
-          performSearch(e.target.value);
+        var debounceTimer = null;
+        heroSearch.addEventListener('focus', function () { ensureSearchIndex(); });
+        heroSearch.addEventListener('input', function (e) {
+          clearTimeout(debounceTimer);
+          var val = e.target.value;
+          debounceTimer = setTimeout(function () { performSearch(val); }, 110);
         });
-
-        heroSearch.addEventListener('keydown', (e) => {
+        heroSearch.addEventListener('keydown', function (e) {
           if (e.key === 'Enter') {
-            const firstResult = searchResults ? searchResults.querySelector('.hero-search-result-item') : null;
-            if (firstResult) {
-              window.location.href = firstResult.getAttribute('href');
-            }
+            var first = searchResults ? searchResults.querySelector('.hero-search-result-item') : null;
+            if (first) window.location.href = first.getAttribute('href');
           }
         });
-
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', function (e) {
           if (!heroSearch.contains(e.target) && (!searchResults || !searchResults.contains(e.target))) {
             if (searchResults) searchResults.style.display = 'none';
           }
         });
       }
 
-      // 3. Quick Chips click
-      document.querySelectorAll('.hero-search-tag-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-          const q = chip.getAttribute('data-query');
+      document.querySelectorAll('.hero-search-tag-chip').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          var q = chip.getAttribute('data-query');
           if (heroSearch) {
             heroSearch.value = q;
             performSearch(q);
@@ -780,63 +575,6 @@
           }
         });
       });
-
-      // 4. Theme Toggle Synchronization
-      const themeToggleBtn = document.getElementById('portalThemeToggleBtn');
-      const iconSun = themeToggleBtn ? themeToggleBtn.querySelector('.icon-sun') : null;
-      const iconMoon = themeToggleBtn ? themeToggleBtn.querySelector('.icon-moon') : null;
-
-      function updateThemeIcons(theme) {
-        if (iconSun && iconMoon) {
-          if (theme === 'dark') {
-            iconSun.style.display = 'block';
-            iconMoon.style.display = 'none';
-          } else {
-            iconSun.style.display = 'none';
-            iconMoon.style.display = 'block';
-          }
-        }
-      }
-
-      const savedTheme = localStorage.getItem('med_theme') || 
-        (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', savedTheme);
-      updateThemeIcons(savedTheme);
-
-      if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', () => {
-          const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-          const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-          document.documentElement.setAttribute('data-theme', nextTheme);
-          localStorage.setItem('med_theme', nextTheme);
-          updateThemeIcons(nextTheme);
-        });
-      }
-
-      // 5. Font Selector Synchronization
-      const fontSelect = document.getElementById('portalFontSelect');
-      const savedFont = localStorage.getItem('med_font_family') || 'vazirmatn';
-      if (fontSelect) {
-        fontSelect.value = savedFont;
-        applyFont(savedFont);
-
-        fontSelect.addEventListener('change', (e) => {
-          const newFont = e.target.value;
-          localStorage.setItem('med_font_family', newFont);
-          applyFont(newFont);
-        });
-      }
-
-      function applyFont(font) {
-        const root = document.documentElement;
-        if (font === 'shabnam') {
-          root.style.setProperty('--font-current', 'var(--font-shabnam)');
-        } else if (font === 'sahel') {
-          root.style.setProperty('--font-current', 'var(--font-sahel)');
-        } else {
-          root.style.setProperty('--font-current', 'var(--font-vazirmatn)');
-        }
-      }
     });
   </script>
 </body>

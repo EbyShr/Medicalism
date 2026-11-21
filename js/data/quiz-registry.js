@@ -11,22 +11,6 @@
   // Initial registered major quiz modules with their chapters
   const INITIAL_QUIZZES = [
     {
-      id: 'surgery-recent-recalls',
-      title: '🔥 بانک سوالات اخیر و پرتکرار جراحی (تحلیل کلیدها + درسنامه جامع لارنس)',
-      shortTitle: 'بانک سوالات اخیر و پرتکرار جراحی',
-      category: 'بانک پرچم‌دار جراحی (فقط حالت تمرینی و درسنامه)',
-      categoryColor: '#e11d48',
-      badge: '۱۳۵ سوال (چندگزینه‌ای و کوتاه‌پاسخ) • مرور ترتیبی',
-      preserveBadge: true,
-      totalQuestions: 135,
-      practiceOnly: true,
-      isSequentialOnly: true,
-      isFlagshipRecalls: true,
-      fileUrl: './data/quizzes/surgery_recent_recalls_quiz.json',
-      fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_RECENT_RECALLS_DATA)) ? window.SURGERY_RECENT_RECALLS_DATA : [],
-      description: 'مجموعه کامل ۱۳۵ سوال اخیر و پرتکرار جراحی (۸۰ سوال چندگزینه‌ای ۲ تا ۴ گزینه‌ای و ۵۵ سوال تشریحی کوتاه‌پاسخ) همراه با هشدارهای اصلاح کلیدهای اشتباه دانشجویی بر اساس متن صریح لارنس، تحلیل پاسخ ۳ کارتی و درسنامه‌های خودکفای ۰ تا ۱۰۰ با ترتیب پیوسته و استاندارد (سوال ۱ تا ۱۳۵).'
-    },
-    {
       id: 'ncd',
       title: 'بانک جامع سوالات بیماری‌های غیرواگیر (NCDs)',
       shortTitle: 'بیماری‌های غیرواگیر',
@@ -189,6 +173,22 @@
           totalQuestions: 458,
           estimatedMinutes: 458,
           isAll: true
+        },
+        {
+          id: 'surgery-recent-recalls',
+          title: 'سوالات اخیر و پرتکرار جراحی (تحلیل کلیدها + درسنامه جامع لارنس)',
+          shortTitle: 'سوالات اخیر و پرتکرار جراحی',
+          badge: '۱۳۵ سوال (تمرینی و ترتیبی)',
+          preserveBadge: true,
+          totalQuestions: 135,
+          estimatedMinutes: 90,
+          practiceOnly: true,
+          isSequentialOnly: true,
+          fileUrl: './data/quizzes/surgery_recent_recalls_quiz.json',
+          dataScript: './data/quizzes/surgery_recent_recalls_data.js?v=20261116',
+          globalVar: 'SURGERY_RECENT_RECALLS_DATA',
+          fallbackQuestions: (typeof window !== 'undefined' && Array.isArray(window.SURGERY_RECENT_RECALLS_DATA)) ? window.SURGERY_RECENT_RECALLS_DATA : [],
+          description: 'مجموعه ۱۳۵ سوال اخیر و پرتکرار جراحی (۸۰ سوال چندگزینه‌ای و ۵۵ سوال تشریحی کوتاه‌پاسخ) همراه با اصلاح کلیدهای دانشجویی بر اساس متن لارنس و مرور پیوسته ۱ تا ۱۳۵.'
         },
         {
           id: 'surgery-ch10-hernia',
@@ -462,25 +462,69 @@
     constructor() {
       this.quizzes = [...INITIAL_QUIZZES];
       this.questionsCache = new Map();
+      this.inflightScripts = new Map();
 
-      // Prepopulate cache from fallback questions of chapters
+      const hydrateEntry = (entry) => {
+        if (!entry || entry.isAll) return;
+        if (entry.fileUrl && !entry.dataScript) {
+          entry.dataScript = entry.fileUrl.replace('_quiz.json', '_data.js');
+        }
+        if (entry.fileUrl && !entry.globalVar) {
+          const fileName = entry.fileUrl.split('/').pop().split('?')[0];
+          entry.globalVar = fileName.replace('_quiz.json', '').toUpperCase() + '_DATA';
+        }
+        const preloaded = (entry.fallbackQuestions && Array.isArray(entry.fallbackQuestions) && entry.fallbackQuestions.length > 0)
+          ? entry.fallbackQuestions
+          : (typeof window !== 'undefined' && entry.globalVar && Array.isArray(window[entry.globalVar]) ? window[entry.globalVar] : null);
+        if (preloaded && preloaded.length > 0) {
+          this.questionsCache.set(entry.id, preloaded);
+          entry.totalQuestions = preloaded.length;
+          if (!entry.preserveBadge) entry.badge = `${preloaded.length} سوال`;
+        }
+      };
+
+      // Hydrate lazy script metadata & any preloaded arrays
       this.quizzes.forEach(q => {
         if (q.chapters && Array.isArray(q.chapters)) {
-          q.chapters.forEach(ch => {
-            if (ch.fallbackQuestions && Array.isArray(ch.fallbackQuestions) && ch.fallbackQuestions.length > 0) {
-              this.questionsCache.set(ch.id, ch.fallbackQuestions);
-              ch.totalQuestions = ch.fallbackQuestions.length;
-              ch.badge = `${ch.fallbackQuestions.length} سوال`;
-            }
-          });
-        } else if (q.fallbackQuestions && Array.isArray(q.fallbackQuestions) && q.fallbackQuestions.length > 0) {
-          this.questionsCache.set(q.id, q.fallbackQuestions);
-          q.totalQuestions = q.fallbackQuestions.length;
-          if (!q.preserveBadge) {
-            q.badge = `${q.fallbackQuestions.length} سوال`;
-          }
+          q.chapters.forEach(hydrateEntry);
+        } else {
+          hydrateEntry(q);
         }
       });
+    }
+
+    /**
+     * Load a single quiz bank on demand via dynamic <script> tag injection (file:// & https:// safe)
+     */
+    loadScriptData(quiz) {
+      if (!quiz || !quiz.dataScript || typeof document === 'undefined') {
+        return Promise.resolve([]);
+      }
+      if (quiz.globalVar && Array.isArray(window[quiz.globalVar]) && window[quiz.globalVar].length > 0) {
+        return Promise.resolve(window[quiz.globalVar]);
+      }
+      if (this.inflightScripts.has(quiz.dataScript)) {
+        return this.inflightScripts.get(quiz.dataScript);
+      }
+
+      const promise = new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = quiz.dataScript;
+        script.async = true;
+        script.onload = () => {
+          this.inflightScripts.delete(quiz.dataScript);
+          const arr = (quiz.globalVar && Array.isArray(window[quiz.globalVar])) ? window[quiz.globalVar] : [];
+          resolve(arr);
+        };
+        script.onerror = () => {
+          this.inflightScripts.delete(quiz.dataScript);
+          resolve([]);
+        };
+        document.body.appendChild(script);
+      });
+
+      this.inflightScripts.set(quiz.dataScript, promise);
+      return promise;
     }
 
     /**
@@ -491,20 +535,22 @@
         if (q.chapters && Array.isArray(q.chapters)) {
           const individual = q.chapters.filter(c => !c.isAll);
           let sum = 0;
+          let coreExamSum = 0;
           individual.forEach(c => {
             const cached = this.questionsCache.get(c.id);
             const count = (cached && cached.length) || c.totalQuestions || (c.fallbackQuestions && c.fallbackQuestions.length) || 0;
             sum += count;
+            if (!c.practiceOnly) coreExamSum += count;
           });
           q.totalQuestions = sum;
           q.totalChapters = individual.length;
           q.badge = `${sum} سوال در ${individual.length} مبحث`;
 
-          // Update 'all' chapter count and badge
+          // Update 'all' chapter count and badge (excludes practiceOnly sequential recalls)
           const allCh = q.chapters.find(c => c.isAll);
           if (allCh) {
-            allCh.totalQuestions = sum;
-            allCh.badge = `${sum} سوال`;
+            allCh.totalQuestions = coreExamSum;
+            allCh.badge = `${coreExamSum} سوال`;
           }
         }
         return q;
@@ -597,7 +643,7 @@
           if (cached && cached.length > 0) return cached;
         }
 
-        const individual = targetCourse.chapters.filter(c => !c.isAll);
+        const individual = targetCourse.chapters.filter(c => !c.isAll && !c.practiceOnly);
         const arrays = await Promise.all(individual.map(c => this.loadQuestions(c.id)));
         const combined = arrays.flat();
         if (combined.length > 0) {
@@ -642,7 +688,22 @@
         }
       }
 
-      // Try fetching from fileUrl
+      // 1. Dynamic <script> injection (works 100% on both file:// and https://)
+      if (quiz.dataScript) {
+        const scriptQuestions = await this.loadScriptData(quiz);
+        if (scriptQuestions && scriptQuestions.length > 0) {
+          const questions = prepareQuestions(scriptQuestions);
+          this.questionsCache.set(quizId, questions);
+          quiz.fallbackQuestions = questions;
+          quiz.totalQuestions = questions.length;
+          if (!quiz.preserveBadge) {
+            quiz.badge = `${questions.length} سوال`;
+          }
+          return questions;
+        }
+      }
+
+      // 2. Fallback: fetch JSON over HTTP(S) if available
       if (quiz.fileUrl) {
         try {
           const response = await fetch(quiz.fileUrl);
@@ -664,7 +725,7 @@
         }
       }
 
-      // Use embedded fallback if available
+      // 3. Embedded fallback if available
       if (quiz.fallbackQuestions && Array.isArray(quiz.fallbackQuestions) && quiz.fallbackQuestions.length > 0) {
         const questions = prepareQuestions(quiz.fallbackQuestions);
         this.questionsCache.set(quizId, questions);

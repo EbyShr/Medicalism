@@ -102,10 +102,15 @@ window.StudyFeatures = {
     };
 
     updateIcon(window.appState.theme);
-    window.appState.setTheme(window.appState.theme);
+    document.documentElement.setAttribute('data-theme', window.appState.theme);
 
     toggleBtn.addEventListener('click', () => {
-      window.appState.toggleTheme();
+      if (window.MedicalismShell) {
+        const next = window.appState.theme === 'dark' ? 'light' : 'dark';
+        window.MedicalismShell.setTheme(next);
+      } else {
+        window.appState.toggleTheme();
+      }
     });
 
     window.appState.subscribe('theme', (theme) => {
@@ -114,31 +119,38 @@ window.StudyFeatures = {
   },
 
   /**
-   * Real-time Reading Progress Bar
+   * Real-time Reading Progress Bar (GPU-composited --read-progress via rAF)
    */
   initReadingProgress() {
     const bar = document.getElementById('readingProgressBar');
     if (!bar) return;
 
-    const onScroll = () => {
+    let rafPending = false;
+    const update = () => {
+      rafPending = false;
       const scrollPos = window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
       const docHeight = Math.max(
         document.documentElement.scrollHeight - window.innerHeight,
         document.body.scrollHeight - window.innerHeight,
         0
       );
-      if (docHeight <= 0) {
-        bar.style.width = '0%';
-        return;
-      }
-      const progress = Math.min(Math.max((scrollPos / docHeight) * 100, 0), 100);
-      bar.style.width = `${progress}%`;
+      const ratio = docHeight > 0 ? Math.min(Math.max(scrollPos / docHeight, 0), 1) : 0;
+      bar.style.setProperty('--read-progress', ratio.toFixed(4));
     };
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-    this._updateReadingProgress = onScroll;
-    onScroll();
+    const onScroll = () => {
+      if (!rafPending) {
+        rafPending = true;
+        requestAnimationFrame(update);
+      }
+    };
+
+    if (!window.MedicalismShell) {
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll, { passive: true });
+    }
+    this._updateReadingProgress = update;
+    update();
   },
 
   /**
@@ -456,6 +468,9 @@ window.StudyFeatures = {
       const modalPill = document.getElementById('highlightsModalCountPill');
       if (modalPill) {
         modalPill.textContent = `${this.toPersianDigits(count)} مورد`;
+      }
+      if (window.MedicalismShell && typeof window.MedicalismShell.syncDock === 'function') {
+        window.MedicalismShell.syncDock();
       }
     } catch (e) {
       console.warn('Error updating highlights badge:', e);
@@ -1246,6 +1261,9 @@ window.StudyFeatures = {
 
   initExamCramMode() {
     const toggleBtns = document.querySelectorAll('#examCramToggleBtn, #mobileExamCramToggleBtn');
+    if (toggleBtns.length === 0) {
+      return; // Course has no cram mode support; never hide paragraphs on boot
+    }
     const isInitiallyActive = this.isExamCramModeActive();
 
     this.applyExamCramMode(isInitiallyActive, false);
@@ -1321,7 +1339,15 @@ window.StudyFeatures = {
         contentArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
-      if (notify && typeof window.showToast === 'function') {
+      try {
+        window.dispatchEvent(new CustomEvent('cramModeChanged', { detail: { active } }));
+      } catch (e) {}
+
+      try {
+      window.dispatchEvent(new CustomEvent('cramModeChanged', { detail: { active } }));
+    } catch (e) {}
+
+    if (notify && typeof window.showToast === 'function') {
         window.showToast(
           active
             ? '⚡ حالت آزمون و مرور سریع شب امتحان فعال شد'
@@ -1361,6 +1387,10 @@ window.StudyFeatures = {
     } else {
       if (banner) banner.style.display = 'none';
     }
+
+    try {
+      window.dispatchEvent(new CustomEvent('cramModeChanged', { detail: { active } }));
+    } catch (e) {}
 
     if (notify && typeof window.showToast === 'function') {
       window.showToast(

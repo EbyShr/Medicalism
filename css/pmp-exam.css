@@ -23,28 +23,28 @@
   --pmp-surface-elevated: var(--bg-surface-elevated, #ffffff);
 }
 
-/* Deep Slate-Indigo Dark Theme Tokens (Fixes missing --bg-surface-secondary) */
+/* Unified Deep Slate-Indigo Dark Mode (#0b1120 / #131c31 / #17223a inherited from design-system-v2.css) */
 html[data-theme="dark"],
 :root[data-theme="dark"],
 html[data-theme="dark"] body.pmp-page {
-  --bg-body: #0f172a;
-  --bg-body-secondary: #0b1120;
-  --bg-surface: #1e293b;
-  --bg-surface-secondary: #162032;
-  --bg-surface-elevated: #243247;
-  --bg-surface-hover: #293850;
-  --bg-sidebar: #0f172a;
-  --bg-glass: rgba(15, 23, 42, 0.88);
-  --bg-glass-strong: rgba(15, 23, 42, 0.96);
-  --text-primary: #f8fafc;
+  --bg-body: #0b1120;
+  --bg-body-secondary: #0f172a;
+  --bg-surface: #131c31;
+  --bg-surface-secondary: #17223a;
+  --bg-surface-elevated: #1e2d4a;
+  --bg-surface-hover: #253659;
+  --bg-sidebar: #0e1628;
+  --bg-glass: rgba(11, 17, 32, 0.88);
+  --bg-glass-strong: rgba(11, 17, 32, 0.96);
+  --text-primary: #f1f5f9;
   --text-secondary: #cbd5e1;
   --text-muted: #94a3b8;
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.14);
-  --pmp-accent: #34d399;
-  --pmp-accent-hover: #10b981;
-  --pmp-accent-soft: rgba(52, 211, 153, 0.14);
-  --pmp-accent-border: rgba(52, 211, 153, 0.30);
+  --border-subtle: rgba(148, 163, 184, 0.14);
+  --border-medium: rgba(148, 163, 184, 0.22);
+  --pmp-accent: #2dd4bf;
+  --pmp-accent-hover: #5eead4;
+  --pmp-accent-soft: rgba(45, 212, 191, 0.14);
+  --pmp-accent-border: rgba(45, 212, 191, 0.32);
   --pmp-good: #34d399;
   --pmp-good-soft: rgba(16, 185, 129, 0.14);
   --pmp-warn: #fbbf24;
@@ -54,15 +54,15 @@ html[data-theme="dark"] body.pmp-page {
   --pmp-rad-accent: #38bdf8;
   --pmp-rad-bg: rgba(14, 165, 233, 0.10);
   --pmp-rad-border: rgba(56, 189, 248, 0.30);
-  --pmp-card-shadow: 0 10px 28px -6px rgba(2, 6, 23, 0.55);
-  --pmp-surface: #1e293b;
-  --pmp-surface-2: #162032;
-  --pmp-surface-elevated: #243247;
+  --pmp-card-shadow: 0 10px 28px -6px rgba(2, 6, 23, 0.65);
+  --pmp-surface: #131c31;
+  --pmp-surface-2: #17223a;
+  --pmp-surface-elevated: #1e2d4a;
 }
 
 html[data-theme="dark"] body.pmp-page {
-  background-color: #0f172a;
-  color: #f8fafc;
+  background-color: #0b1120;
+  color: #f1f5f9;
 }
 
 /* Base Page + Font Enforcement */
