@@ -494,6 +494,10 @@ body.focus-mode-active .v2-sidebar {
   display: none !important;
 }
 
+.v2-cram-active .v2-section:not(:has([data-v2-block][data-cram="true"], .v2-cram-has-hl)) {
+  display: none !important;
+}
+
 .v2-cram-summary-title {
   font-size: 13.5px;
   font-weight: 800;

@@ -12,6 +12,7 @@ Usage:
 
 import argparse
 import base64
+import copy
 import json
 import math
 import os
@@ -103,9 +104,8 @@ def extract_json_objects(raw_text: str, filename: str) -> list[dict]:
     return objs
 
 
-def merge_chapter_parts(chapter_id: str, part_records: list[tuple[int, int, str, dict]]) -> dict:
-    """Sort multi-part JSON fragments for one chapterId and merge sections/cramSummary."""
-    # Sort by (part.current if provided else 1-based sequence, file_order, obj_order)
+def merge_chapter_parts(chapter_id: str, part_records: list[tuple[int, int, str, dict]]) -> tuple[dict, int]:
+    """Sort multi-part JSON fragments for one chapterId and merge sections/metadata deterministically."""
     explicit_totals = []
     normalized_items = []
     for seq_idx, (file_idx, obj_idx, src_name, obj) in enumerate(part_records, start=1):
@@ -127,7 +127,7 @@ def merge_chapter_parts(chapter_id: str, part_records: list[tuple[int, int, str,
 
     if len(normalized_items) > 1 or (explicit_totals and max(explicit_totals) > 1):
         expected_total = max(explicit_totals) if explicit_totals else len(normalized_items)
-        if len(set(explicit_totals)) > 1:
+        if explicit_totals and len(set(explicit_totals)) > 1:
             raise ValueError(f"{chapter_id}: conflicting part.total values across parts ({explicit_totals})")
         seen_currents = [item[0] for item in normalized_items]
         if len(set(seen_currents)) != len(seen_currents):
@@ -136,29 +136,105 @@ def merge_chapter_parts(chapter_id: str, part_records: list[tuple[int, int, str,
         if missing:
             raise ValueError(f"{chapter_id}: incomplete multi-part chapter (missing parts: {missing})")
 
-    base = dict(normalized_items[0][4])
+    base = copy.deepcopy(normalized_items[0][4])
     base.pop("part", None)
 
+    expected_number = base.get("number")
+    expected_course = base.get("courseId")
+    base_src = dict(base.get("source") or {})
+
     merged_sections: list[dict] = []
+    sec_by_id: dict[str, dict] = {}
+    seen_block_ids_per_sec: dict[str, set[str]] = {}
     merged_cram: list[str] = []
     seen_cram: set[str] = set()
     part_count = len(normalized_items)
 
-    for _cur, _fidx, _oidx, src_name, part_obj in normalized_items:
+    for cur, _fidx, _oidx, src_name, part_obj in normalized_items:
+        if part_obj.get("courseId") != expected_course:
+            raise ValueError(
+                f"{chapter_id} ({src_name}): mismatched courseId '{part_obj.get('courseId')}' != '{expected_course}'"
+            )
+        if part_obj.get("number") != expected_number:
+            raise ValueError(
+                f"{chapter_id} ({src_name}): mismatched chapter number {part_obj.get('number')} != {expected_number}"
+            )
+        if not base.get("latinTitle") and part_obj.get("latinTitle"):
+            base["latinTitle"] = part_obj["latinTitle"]
+        part_src = part_obj.get("source") or {}
+        if not base_src.get("guideline") and part_src.get("guideline"):
+            base_src["guideline"] = part_src["guideline"]
+        if not base_src.get("textbook") and part_src.get("textbook"):
+            base_src["textbook"] = part_src["textbook"]
+        if not base_src.get("chapterRef") and part_src.get("chapterRef"):
+            base_src["chapterRef"] = part_src["chapterRef"]
+
         part_sections = part_obj.get("sections")
         if not isinstance(part_sections, list) or len(part_sections) == 0:
             raise ValueError(f"{chapter_id} ({src_name}): part has empty or invalid 'sections'")
-        merged_sections.extend(part_sections)
+
+        for raw_sec in part_sections:
+            sec = copy.deepcopy(raw_sec)
+            s_id = sec.get("id")
+            if isinstance(s_id, str) and s_id in sec_by_id:
+                existing_sec = sec_by_id[s_id]
+                existing_ids = seen_block_ids_per_sec[s_id]
+                if not existing_sec.get("latinTitle") and sec.get("latinTitle"):
+                    existing_sec["latinTitle"] = sec["latinTitle"]
+                for blk in sec.get("blocks") or []:
+                    b_id = blk.get("id")
+                    if isinstance(b_id, str) and b_id in existing_ids:
+                        candidate = f"{b_id}-p{cur}"
+                        suffix_idx = 2
+                        while candidate in existing_ids:
+                            candidate = f"{b_id}-p{cur}-{suffix_idx}"
+                            suffix_idx += 1
+                        blk["id"] = candidate
+                    if isinstance(blk.get("id"), str):
+                        existing_ids.add(blk["id"])
+                    existing_sec.setdefault("blocks", []).append(blk)
+            else:
+                if isinstance(s_id, str):
+                    sec_by_id[s_id] = sec
+                    seen_block_ids_per_sec[s_id] = {
+                        blk["id"] for blk in (sec.get("blocks") or []) if isinstance(blk, dict) and isinstance(blk.get("id"), str)
+                    }
+                merged_sections.append(sec)
 
         for item in part_obj.get("cramSummary") or []:
             if isinstance(item, str) and item.strip() and item not in seen_cram:
                 seen_cram.add(item)
                 merged_cram.append(item)
 
+    if base_src:
+        base["source"] = base_src
     base["sections"] = merged_sections
     if merged_cram:
         base["cramSummary"] = merged_cram
-    return base, part_count
+
+    # Canonical top-level key ordering so single-file, split-file, and out-of-order pastes emit identical JS bytes
+    canonical_order = [
+        "schemaVersion",
+        "courseId",
+        "chapterId",
+        "number",
+        "title",
+        "shortTitle",
+        "latinTitle",
+        "source",
+        "metrics",
+        "capabilities",
+        "cramSummary",
+        "sections",
+    ]
+    ordered: dict = {}
+    for k in canonical_order:
+        if k in base and base[k] is not None:
+            ordered[k] = base[k]
+    for k in sorted(base.keys()):
+        if k not in ordered:
+            ordered[k] = base[k]
+    return ordered, part_count
 
 
 def validate_str_list(items, ctx: str, max_len: int | None = None):
